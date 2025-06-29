@@ -2,7 +2,7 @@ package repositories
 
 import (
 	"context"
-	. "go-fiber-template/domain/datasources"
+	ds "go-fiber-template/domain/datasources"
 	"go-fiber-template/domain/entities"
 	"os"
 
@@ -23,7 +23,7 @@ type IUsersRepository interface {
 	FindAll() (*[]entities.UserDataModel, error)
 }
 
-func NewUsersRepository(db *MongoDB) IUsersRepository {
+func NewUsersRepository(db *ds.MongoDB) IUsersRepository {
 	return &usersRepository{
 		Context:    db.Context,
 		Collection: db.MongoDB.Database(os.Getenv("DATABASE_NAME")).Collection("users"),

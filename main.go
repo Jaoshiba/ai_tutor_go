@@ -33,10 +33,12 @@ func main() {
 	mongodb := ds.NewMongoDB(10)
 
 	userRepo := repo.NewUsersRepository(mongodb)
+	fileRepo := repo.NewFilesRepository(mongodb)
 
 	sv0 := sv.NewUsersService(userRepo)
+	sv1 := sv.NewFileService(fileRepo)
 
-	gw.NewHTTPGateway(app, sv0)
+	gw.NewHTTPGateway(app, sv0, sv1)
 
 	PORT := os.Getenv("PORT")
 
