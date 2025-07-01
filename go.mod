@@ -1,13 +1,15 @@
 module go-fiber-template
 
-go 1.22.1
+go 1.24.1
 
 require (
+	baliance.com/gooxml v1.0.1
 	github.com/goccy/go-json v0.10.2
 	github.com/gofiber/contrib/jwt v1.0.8
 	github.com/gofiber/fiber/v2 v2.51.0
 	github.com/golang-jwt/jwt/v5 v5.2.0
 	github.com/joho/godotenv v1.3.0
+	github.com/ledongthuc/pdf v0.0.0-20250511090121-5959a4027728
 	go.elastic.co/apm/module/apmmongo v1.15.0
 	go.mongodb.org/mongo-driver v1.13.0
 )
