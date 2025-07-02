@@ -21,5 +21,5 @@ func (h *HTTPGateway) UploadFile(ctx *fiber.Ctx) error {
 	}
 	fmt.Println("text: ", text)
 
-	return nil
+	return ctx.Status(fiber.StatusOK).JSON(entities.ResponseModel{Message: text})
 }

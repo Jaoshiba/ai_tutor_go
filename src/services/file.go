@@ -3,6 +3,7 @@ package services
 import (
 	"bytes"
 	"fmt"
+	"strings"
 
 	repo "go-fiber-template/domain/repositories"
 
@@ -82,6 +83,7 @@ func (f *FileService) GetPdfData(file *multipart.FileHeader) (string, error) {
 		return "", err
 	}
 
+	var alltext string
 	for i := 1; i <= pdfReader.NumPage(); i++ {
 		page := pdfReader.Page(i)
 		fmt.Println("page: ", i)
@@ -94,12 +96,12 @@ func (f *FileService) GetPdfData(file *multipart.FileHeader) (string, error) {
 			return "", err
 		}
 
-		fmt.Print("rows: ", content)
+		alltext += content
 
 	}
 
-	// fmt.Println("fileBytes: ", fileBytes)
+	alltext = strings.ReplaceAll(alltext, "\n", "")
+	fmt.Print("alltext: ", alltext)
 
-	// fmt.Println("pdf: ", text)
-	return "", nil
+	return alltext, nil
 }
