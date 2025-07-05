@@ -17,7 +17,7 @@ type filesRepository struct {
 // uploadFile implements IFileRepository.
 
 type IFileRepository interface {
-	uploadFile(file *multipart.FileHeader) (string, error)
+	InsertModule(file *multipart.FileHeader) (string, error)
 }
 
 func NewFilesRepository(db *ds.MongoDB) IFileRepository {
@@ -27,6 +27,6 @@ func NewFilesRepository(db *ds.MongoDB) IFileRepository {
 	}
 }
 
-func (f *filesRepository) uploadFile(file *multipart.FileHeader) (string, error) {
+func (f *filesRepository) InsertModule(file *multipart.FileHeader) (string, error) {
 	return "", nil
 }
