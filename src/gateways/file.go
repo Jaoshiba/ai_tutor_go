@@ -19,7 +19,7 @@ func (h *HTTPGateway) UploadFile(ctx *fiber.Ctx) error {
 	if err != nil {
 		return ctx.Status(fiber.StatusUnprocessableEntity).JSON(entities.ResponseMessage{Message: "invalid file"})
 	}
-	fmt.Println("text: ", text)
+	// fmt.Println("text: ", text)
 
 	return ctx.Status(fiber.StatusOK).JSON(entities.ResponseModel{Message: text})
 }

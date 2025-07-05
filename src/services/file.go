@@ -58,7 +58,12 @@ func (f *FileService) GetDocx_DocData(file *multipart.FileHeader) (string, error
 
 	}
 
-	fmt.Println("doc: ", text)
+	chap, err := ChapterrizedText(text)
+	if err != nil {
+		return "", err
+	}
+
+	fmt.Println("doc: ", chap)
 
 	return "", nil
 }
@@ -101,7 +106,15 @@ func (f *FileService) GetPdfData(file *multipart.FileHeader) (string, error) {
 	}
 
 	alltext = strings.ReplaceAll(alltext, "\n", "")
-	fmt.Print("alltext: ", alltext)
+
+	chaps, err := ChapterrizedText(alltext)
+	if err != nil {
+		return "", err
+	}
+
+	fmt.Println("doc: ", chaps)
+
+	// fmt.Print("alltext: ", alltext)
 
 	return alltext, nil
 }
