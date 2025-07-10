@@ -2,12 +2,15 @@ package services
 
 import (
 	"context"
+	//"encoding/json"
 	"fmt"
 	"os"
 	"regexp"
 
 	"google.golang.org/genai"
+	
 )
+
 
 type IGoogleService interface {
 	ChapterrizedText(text string) (string, error)
