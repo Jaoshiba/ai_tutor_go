@@ -12,4 +12,5 @@ func NewFiberConfiguration() fiber.Config {
 		JSONEncoder: json.Marshal,
 		JSONDecoder: json.Unmarshal,
 	}
-}
+} 
+ 
