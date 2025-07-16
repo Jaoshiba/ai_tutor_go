@@ -33,10 +33,10 @@ func main() {
 	mongodb := ds.NewMongoDB(10)
 
 	userRepo := repo.NewUsersRepository(mongodb)
-	fileRepo := repo.NewFilesRepository(mongodb)
+	fileRepo := repo.NewModulesRepository(mongodb)
 
 	sv0 := sv.NewUsersService(userRepo)
-	sv1 := sv.NewFileService(fileRepo)
+	sv1 := sv.NewModuleService(fileRepo)
 
 	gw.NewHTTPGateway(app, sv0, sv1)
 

@@ -2,22 +2,29 @@ package services
 
 import (
 	"context"
+	"encoding/json"
 	"fmt"
 	"os"
 	"regexp"
+	"time"
 
+	"go-fiber-template/domain/entities"
+
+	"github.com/google/uuid"
 	"google.golang.org/genai"
 )
 
-type IGoogleService interface {
-	ChapterrizedText(text string) (string, error)
+type IChapter interface {
+	ChapterrizedText(text string) ([]entities.ChapterDataModel, error)
 }
 
-func ChapterrizedText(text string) (string, error) {
+func ChapterrizedText(text string) ([]entities.ChapterDataModel, error) {
+
+	var chapters []entities.ChapterDataModel
 
 	gemini_api_key := (os.Getenv("GEMINI_API_KEY"))
 	if gemini_api_key == "" {
-		return "can't get gemini api key", nil
+		return chapters, nil
 	}
 
 	ctx := context.Background()
@@ -27,7 +34,7 @@ func ChapterrizedText(text string) (string, error) {
 		Backend: genai.BackendGeminiAPI,
 	})
 	if err != nil {
-		return "", err
+		return chapters, err
 	}
 
 	promt := fmt.Sprintf(`Please divide the following Thai text into logical chapters or sections.
@@ -77,16 +84,35 @@ func ChapterrizedText(text string) (string, error) {
 		nil,
 	)
 	if err != nil {
-		return "", nil
+		return chapters, err
 	}
 
 	chaps := removeJsonBlock(result.Text())
 	fmt.Println("Finished your chapterize...")
-	fmt.Println("Chapterized Text: " + chaps)
 
-	// fmt.Println(gemini_api_key)
+	if chaps == "" {
+		return chapters, fmt.Errorf("no chapters found in the response")
+	}
 
-	return chaps, nil
+	var response entities.GeminiResponse
+	//add field and parse chapter data to chapterDataModel
+	err = json.Unmarshal([]byte(chaps), &response)
+	if err != nil {
+		fmt.Println("Error unmarshalling JSON:", err)
+		return chapters, err
+	}
+
+	for _, chapter := range response.Chapters {
+		ch := entities.ChapterDataModel{
+			ChapterId:   uuid.NewString(),
+			ChapterName: chapter.ChapterName,
+			Content:     chapter.Content,
+			CreateAt:    time.Now(),
+		}
+		chapters = append(chapters, ch)
+	}
+
+	return chapters, nil
 }
 
 func removeJsonBlock(text string) string {
@@ -98,6 +124,6 @@ func removeJsonBlock(text string) string {
 		return matches[1]
 	}
 
-	return ""
+	return text
 
 }
