@@ -1,14 +1,16 @@
 package services
 
 import (
+	"errors"
 	"go-fiber-template/domain/entities"
 	"go-fiber-template/domain/repositories"
-	"go-fiber-template/httpclient"
+	authUtil "go-fiber-template/src/services/auth"
 	"time"
+	"github.com/google/uuid"
 )
 
 type usersService struct {
-	UsersRepository repositories.IUsersRepository
+	UsersRepository repositories.IUsersRepository // <-- PostgreSQL implementation
 }
 
 type IUsersService interface {
@@ -23,22 +25,49 @@ func NewUsersService(repo0 repositories.IUsersRepository) IUsersService {
 }
 
 func (sv *usersService) GetAllUsers() (*[]entities.UserDataModel, error) {
-	data, err := sv.UsersRepository.FindAll()
-	if err != nil {
-		return nil, err
-	}
-
-	return data, nil
-
+	return sv.UsersRepository.FindAll()
 }
 
 func (sv *usersService) InsertNewUser(data entities.UserDataModel) error {
+
+	if err := sv.CheckByEmail(data.Email); err != nil {
+		return err // จะหยุดไม่ insert ถ้า email ซ้ำ
+	}
+	if err := sv.CheckByUsername(data.Username); err != nil {
+		return err // จะหยุดไม่ insert ถ้า email ซ้ำ
+	}
 	data.CreatedAt = time.Now().Add(7 * time.Hour)
-	dataIp, err := httpclient.GetIP()
+	data.UpdatedAt = time.Now().Add(7 * time.Hour)
+
+	data.UserID = uuid.New()
+
+	hashedPassword, err := authUtil.HashPassword(data.Password)
 	if err != nil {
 		return err
 	}
-	data.Ip = dataIp
+	data.Password = hashedPassword
 
 	return sv.UsersRepository.InsertUser(data)
+}
+
+func (sv *usersService) CheckByEmail(email string) error {
+	user, err := sv.UsersRepository.FindByEmail(email)
+	if err != nil {
+		return err // error จาก database
+	}
+	if user != nil {
+		return errors.New("email already exists")
+	}
+	return nil // email ใช้งานได้
+}
+
+func (sv *usersService) CheckByUsername(username string) error {
+	user, err := sv.UsersRepository.FindByUsername(username)
+	if err != nil {
+		return err
+	}
+	if user != nil {
+		return errors.New("email already exists")
+	}
+	return nil // email ใช้งานได้
 }

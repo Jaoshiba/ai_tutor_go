@@ -11,8 +11,8 @@ func GatewayUsers(gateway HTTPGateway, app *fiber.App) {
 	api := app.Group("/api/v1/users")
 	// ใช้ middleware กับ Group นี้
 	//api.Use(middlewares.JWTAuthMiddleware(gateway.AuthService))
-
-	api.Post("/add_user", gateway.CreateUser)
+	api.Post("/signup", gateway.CreateUser)
+	// api.Post("/add_user", gateway.CreateUser)
 	api.Get("/users", gateway.GetAllUserData)
 	api.Get("/me", gateway.GetMeDataHandler) // Endpoint สำหรับดึงข้อมูลผู้ใช้ที่ล็อกอินอยู่
 }
@@ -20,7 +20,6 @@ func GatewayUsers(gateway HTTPGateway, app *fiber.App) {
 func GatewayFile(gateway HTTPGateway, app *fiber.App) {
 	api := app.Group("/api/v1/file")
 	//api.Use(middlewares.JWTAuthMiddleware(gateway.AuthService))
-
 	api.Post("/upload", gateway.UploadFile)
 }
 

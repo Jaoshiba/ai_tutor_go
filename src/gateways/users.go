@@ -17,19 +17,21 @@ func (h *HTTPGateway) GetAllUserData(ctx *fiber.Ctx) error {
 }
 
 func (h *HTTPGateway) CreateUser(ctx *fiber.Ctx) error {
-
 	fmt.Println(string(ctx.Body()))
 	bodyData := entities.UserDataModel{}
 	if err := ctx.BodyParser(&bodyData); err != nil {
 		return ctx.Status(fiber.StatusUnprocessableEntity).JSON(entities.ResponseMessage{Message: "invalid json body"})
 	}
 
-	if bodyData.Username == "" || bodyData.Email == "" || bodyData.UserID == "" {
-		return ctx.Status(fiber.StatusUnprocessableEntity).JSON(entities.ResponseMessage{Message: "invalid json body"})
+	if bodyData.Username == "" || bodyData.Email == "" {
+		return ctx.Status(fiber.StatusUnprocessableEntity).JSON(entities.ResponseMessage{Message: "invalid json body u missed smt"})
 	}
-
+	
 	if err := h.UserService.InsertNewUser(bodyData); err != nil {
-		return ctx.Status(fiber.StatusForbidden).JSON(entities.ResponseModel{Message: "cannot insert new user account."})
-	}
+	return ctx.Status(fiber.StatusBadRequest).JSON(entities.ResponseModel{
+		Message: err.Error(), // บอกว่า email ซ้ำ หรือ username ซ้ำ
+	})
+}
+
 	return ctx.Status(fiber.StatusOK).JSON(entities.ResponseModel{Message: "success"})
 }
