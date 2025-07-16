@@ -2,31 +2,35 @@ package repositories
 
 import (
 	"context"
+	"fmt"
 	ds "go-fiber-template/domain/datasources"
-	"mime/multipart"
+	"go-fiber-template/domain/entities"
 	"os"
 
 	"go.mongodb.org/mongo-driver/mongo"
 )
 
-type filesRepository struct {
+type modulesRepository struct {
 	Context    context.Context
 	Collection *mongo.Collection
 }
 
-// uploadFile implements IFileRepository.
-
-type IFileRepository interface {
-	InsertModule(file *multipart.FileHeader) (string, error)
+type IModuleRepository interface {
+	InsertModule(module entities.ModuleDataModel) error
 }
 
-func NewFilesRepository(db *ds.MongoDB) IFileRepository {
-	return &filesRepository{
+func NewModulesRepository(db *ds.MongoDB) IModuleRepository {
+	return &modulesRepository{
 		Context:    db.Context,
-		Collection: db.MongoDB.Database(os.Getenv("DATABASE_NAME")).Collection("files"),
+		Collection: db.MongoDB.Database(os.Getenv("DATABASE_NAME")).Collection("modules"),
 	}
 }
 
-func (f *filesRepository) InsertModule(file *multipart.FileHeader) (string, error) {
-	return "", nil
+func (f *modulesRepository) InsertModule(module entities.ModuleDataModel) error {
+	fmt.Println("InsertModule called with module:", module)
+	_, err := f.Collection.InsertOne(f.Context, module)
+	if err != nil {
+		return err
+	}
+	return nil
 }
