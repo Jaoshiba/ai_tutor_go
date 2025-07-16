@@ -4,6 +4,7 @@ import (
 	"go-fiber-template/domain/entities"
 
 	"github.com/gofiber/fiber/v2"
+	"fmt"
 )
 
 func (h *HTTPGateway) GetAllUserData(ctx *fiber.Ctx) error {
@@ -17,6 +18,7 @@ func (h *HTTPGateway) GetAllUserData(ctx *fiber.Ctx) error {
 
 func (h *HTTPGateway) CreateUser(ctx *fiber.Ctx) error {
 
+	fmt.Println(string(ctx.Body()))
 	bodyData := entities.UserDataModel{}
 	if err := ctx.BodyParser(&bodyData); err != nil {
 		return ctx.Status(fiber.StatusUnprocessableEntity).JSON(entities.ResponseMessage{Message: "invalid json body"})
