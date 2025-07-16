@@ -3,34 +3,33 @@
 package gateways
 
 import (
-	"github.com/gofiber/fiber/v2"
 	service "go-fiber-template/src/services"
 	auth "go-fiber-template/src/services/auth"
-	"time" // สำหรับ time.Now() ใน LogoutHandler
+
+	"github.com/gofiber/fiber/v2"
+	// สำหรับ time.Now() ใน LogoutHandler
+	"time"
 )
 
 type HTTPGateway struct {
 	UserService       service.IUsersService
-	FileService       service.IFileService
+	ModuleService     service.IModuleService
 	GoogleAuthService auth.IGoogleOAuth
 	AuthService       auth.IAuthService
 }
 
-// NewHTTPGateway รับ AuthService เข้ามาด้วย
-func NewHTTPGateway(app *fiber.App, users service.IUsersService, files service.IFileService, googleAuth auth.IGoogleOAuth, authService auth.IAuthService) { // <--- ต้องรับ authService เข้ามา
+func NewHTTPGateway(app *fiber.App, users service.IUsersService, modules service.IModuleService, googleAuth auth.IGoogleOAuth, authService auth.IAuthService) {
 	gateway := &HTTPGateway{
 		UserService:       users,
-		FileService:       files,
+		ModuleService:     modules,
 		GoogleAuthService: googleAuth,
-		AuthService:       authService, // <--- กำหนดค่า
+		AuthService:       authService,
 	}
 
 	GatewayGoogleAuth(*gateway, app)
 	GatewayUsers(*gateway, app)
-	GatewayFile(*gateway, app)
-	GatewayAuth(*gateway, app) // <--- ต้องมีการเรียก GatewayAuth
+	GatewayModules(*gateway, app)
 }
-
 // LogoutHandler (ไม่มีการเปลี่ยนแปลง)
 func (h *HTTPGateway) LogoutHandler(c *fiber.Ctx) error {
 	c.Cookie(&fiber.Cookie{
