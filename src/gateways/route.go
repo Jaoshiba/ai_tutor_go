@@ -11,7 +11,7 @@ func GatewayUsers(gateway HTTPGateway, app *fiber.App) {
 	api.Get("/users", gateway.GetAllUserData)
 }
 
-func GatewayFile(gateway HTTPGateway, app *fiber.App) {
-	api := app.Group("/api/v1/file")
+func GatewayModules(gateway HTTPGateway, app *fiber.App) {
+	api := app.Group("/api/v1/modules")
 	api.Post("/upload", gateway.UploadFile)
 }

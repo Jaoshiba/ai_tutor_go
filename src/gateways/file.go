@@ -15,11 +15,7 @@ func (h *HTTPGateway) UploadFile(ctx *fiber.Ctx) error {
 	}
 	fmt.Println("GetDocx func call.....")
 
-	text, err := h.FileService.GetPdfData(file)
-	if err != nil {
-		return ctx.Status(fiber.StatusUnprocessableEntity).JSON(entities.ResponseMessage{Message: "invalid file"})
-	}
-	// fmt.Println("text: ", text)
+	h.ModuleServie.CreateModule(file, ctx)
 
-	return ctx.Status(fiber.StatusOK).JSON(entities.ResponseModel{Message: text})
+	return ctx.Status(fiber.StatusOK).JSON(entities.ResponseModel{Message: "Completed create module from your file"})
 }
