@@ -41,8 +41,16 @@ func main() {
 	}))
 
 	mongodb := ds.NewMongoDB(10)
-	userRepo := repo.NewUsersRepository(mongodb)
+	// userRepo := repo.NewUsersRepository(mongodb)
+	// fileRepo := repo.NewFilesRepository(mongodb)
+
+
+	postgresql := ds.NewPostgresql()
+	userRepo := repo.NewUsersRepositoryPostgres(postgresql)
 	fileRepo := repo.NewFilesRepository(mongodb)
+
+
+
 
 	// สร้าง Services
 	jwtSecret := os.Getenv("JWT_SECRET_KEY")
