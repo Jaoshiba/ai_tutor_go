@@ -15,7 +15,7 @@ func (h *HTTPGateway) UploadFile(ctx *fiber.Ctx) error {
 	}
 	fmt.Println("GetDocx func call.....")
 
-	h.ModuleServie.CreateModule(file, ctx)
+	h.ModuleService.CreateModule(file, ctx)
 
 	return ctx.Status(fiber.StatusOK).JSON(entities.ResponseModel{Message: "Completed create module from your file"})
 }
