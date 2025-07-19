@@ -3,15 +3,10 @@ package entities
 import "time"
 
 type ExamDataModel struct {
-	ExamId    string              `json:"examId" bson:"examId,omitempty"`
-	ChapterId string              `json:"chapterId" bson:"chapterId,omitempty"`
-	Questions  []QuestionDataModel `json:"question" bson:"question,omitempty"`
-	CreatedAt time.Time           `json:"createdAt" bson:"createdAt,omitempty"`
-	UpdatedAt time.Time           `json:"updatedAt" bson:"updatedAt,omitempty"`
-}
-
-type QuestionDataModel struct {
-	Question string   `json:"question" bson:"question,omitempty"`
-	Options  []string `json:"options" bson:"options,omitempty"`
-	Answer   string   `json:"answer" bson:"answer,omitempty"`
+	ExamId      string    `json:"examId" db:"examId,omitempty"`
+	ChapterId   string    `json:"chapterId" db:"chapterId,omitempty"`
+	PassScore   int       `json:"passScore" db:"passScore,omitempty"`
+	QuestionNum int       `json:"questionNum" db:"questionNum,omitempty"`
+	CreatedAt   time.Time `json:"createdAt" db:"createdAt,omitempty"`
+	UpdatedAt   time.Time `json:"updatedAt" db:"updatedAt,omitempty"`
 }

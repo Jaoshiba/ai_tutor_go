@@ -16,20 +16,33 @@ type HTTPGateway struct {
 	ModuleService     service.IModuleService
 	GoogleAuthService auth.IGoogleOAuth
 	AuthService       auth.IAuthService
+	ChapterService    service.IChapterService
+	FileService       service.IFileService
 }
 
-func NewHTTPGateway(app *fiber.App, users service.IUsersService, modules service.IModuleService, googleAuth auth.IGoogleOAuth, authService auth.IAuthService) {
+func NewHTTPGateway(
+	app *fiber.App,
+	users service.IUsersService,
+	modules service.IModuleService,
+	googleAuth auth.IGoogleOAuth,
+	authService auth.IAuthService,
+	chapterService service.IChapterService,
+	fileService service.IFileService,
+) {
 	gateway := &HTTPGateway{
 		UserService:       users,
 		ModuleService:     modules,
 		GoogleAuthService: googleAuth,
 		AuthService:       authService,
+		ChapterService:    chapterService,
+		FileService:       fileService,
 	}
 
 	GatewayGoogleAuth(*gateway, app)
 	GatewayUsers(*gateway, app)
 	GatewayModules(*gateway, app)
 }
+
 // LogoutHandler (ไม่มีการเปลี่ยนแปลง)
 func (h *HTTPGateway) LogoutHandler(c *fiber.Ctx) error {
 	c.Cookie(&fiber.Cookie{

@@ -2,33 +2,41 @@ package repositories
 
 import (
 	"context"
+	"database/sql"
 	"fmt"
-	ds "go-fiber-template/domain/datasources"
 	"go-fiber-template/domain/entities"
-	"os"
-
-	"go.mongodb.org/mongo-driver/mongo"
 )
 
 type modulesRepository struct {
-	Context    context.Context
-	Collection *mongo.Collection
+	db *sql.DB
 }
 
 type IModuleRepository interface {
 	InsertModule(module entities.ModuleDataModel) error
 }
 
-func NewModulesRepository(db *ds.MongoDB) IModuleRepository {
+func NewModulesRepository(db *sql.DB) IModuleRepository {
 	return &modulesRepository{
-		Context:    db.Context,
-		Collection: db.MongoDB.Database(os.Getenv("DATABASE_NAME")).Collection("modules"),
+		db: db,
 	}
 }
 
-func (f *modulesRepository) InsertModule(module entities.ModuleDataModel) error {
+func (db *modulesRepository) InsertModule(module entities.ModuleDataModel) error {
+
 	fmt.Println("InsertModule called with module:", module)
-	_, err := f.Collection.InsertOne(f.Context, module)
+	query := `
+		INSERT INTO modules (
+			moduleid, modulename, roadmapid, userid, createdat, updatedat
+		) VALUES ($1, $2, $3, $4, $5, $6)`
+
+	_, err := db.db.ExecContext(context.Background(), query,
+		module.ModuleId,
+		module.ModuleName,
+		module.RoadmapId,
+		module.UserId,
+		module.CreatedAt,
+		module.UpdatedAt,
+	)
 	if err != nil {
 		return err
 	}
