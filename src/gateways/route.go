@@ -20,7 +20,6 @@ func GatewayUsers(gateway HTTPGateway, app *fiber.App) {
 func GatewayModules(gateway HTTPGateway, app *fiber.App) {
 	api := app.Group("/api/v1/modules")
 	//api.Use(middlewares.JWTAuthMiddleware(gateway.AuthService))
-
 	api.Post("/upload", gateway.UploadFile)
 }
 
