@@ -4,9 +4,10 @@ import (
 	"errors"
 	"go-fiber-template/domain/entities"
 	"go-fiber-template/domain/repositories"
-	authUtil "go-fiber-template/src/services/auth"
+	util "go-fiber-template/src/services/utils"
 	"time"
 	"github.com/google/uuid"
+	"fmt"
 )
 
 type usersService struct {
@@ -41,7 +42,7 @@ func (sv *usersService) InsertNewUser(data entities.UserDataModel) error {
 
 	data.UserID = uuid.New()
 
-	hashedPassword, err := authUtil.HashPassword(data.Password)
+	hashedPassword, err := util.HashPassword(data.Password)
 	if err != nil {
 		return err
 	}
@@ -70,4 +71,28 @@ func (sv *usersService) CheckByUsername(username string) error {
 		return errors.New("email already exists")
 	}
 	return nil // email ใช้งานได้
+}
+
+func (sv *usersService) CheckUserExistBy(field string, value string) error {
+	var user *entities.UserDataModel
+	var err error
+
+	switch field {
+	case "email":
+		user, err = sv.UsersRepository.FindByEmail(value)
+	case "username":
+		user, err = sv.UsersRepository.FindByUsername(value)
+	default:
+		return errors.New("invalid field for user lookup")
+	}
+
+	if err != nil {
+		return err
+	}
+
+	if user != nil {
+		return fmt.Errorf("%s already exists", field)
+	}
+
+	return nil
 }

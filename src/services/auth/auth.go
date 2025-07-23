@@ -4,6 +4,9 @@ package services
 
 import (
 	"fmt" // เพิ่ม import สำหรับ fmt
+	"go-fiber-template/domain/entities"
+	repo "go-fiber-template/domain/repositories"
+	"go-fiber-template/src/services/utils"
 	"os"
 	"strings" // เพิ่ม import สำหรับ strings
 	"time"
@@ -24,19 +27,24 @@ type UserClaims struct {
 type IAuthService interface {
 	GenerateJWT(userID, email string) (string, error)
 	ValidateJWT(tokenString string) (*UserClaims, error)
-	CheckJWT(c *fiber.Ctx) error // <--- เพิ่มเมธอดนี้
+	CheckJWT(c *fiber.Ctx) error
+	Login(email, password string, ctx *fiber.Ctx) (entities.LoginResponse, error)
 }
 
 type authService struct {
-	jwtSecret string
+	jwtSecret      string
+	userRepository repo.IUsersRepository
 }
 
-func NewAuthService() IAuthService {
+func NewAuthService(userRepo repo.IUsersRepository) IAuthService {
 	secret := os.Getenv("JWT_SECRET_KEY")
 	if secret == "" {
 		log.Fatal("JWT_SECRET_KEY is not set in .env")
 	}
-	return &authService{jwtSecret: secret}
+	return &authService{
+		jwtSecret:      secret,
+		userRepository: userRepo,
+	}
 }
 
 func (s *authService) GenerateJWT(userID, email string) (string, error) {
@@ -80,8 +88,12 @@ func (s *authService) ValidateJWT(tokenString string) (*UserClaims, error) {
 
 // Implement CheckJWT method in authService
 func (s *authService) CheckJWT(c *fiber.Ctx) error {
+	fmt.Print("HEeHEeHeheeheh")
 	jwtCookie := c.Cookies("jwt")
+	fmt.Println("Cookies:", c.Cookies("jwt"))
+
 	if jwtCookie == "" {
+		fmt.Print("jwt is empty")
 		return c.Status(fiber.StatusUnauthorized).JSON(fiber.Map{
 			"isAuthenticated": false,
 			"message":         "Unauthorized: Missing JWT token",
@@ -117,4 +129,56 @@ func (s *authService) CheckJWT(c *fiber.Ctx) error {
 		"isAuthenticated": true,
 		"user":            user,
 	})
+}
+
+// services/auth.go
+
+func (s *authService) Login(email, password string, ctx *fiber.Ctx) (entities.LoginResponse, error) {
+	user, err := s.userRepository.FindByEmail(email)
+	if err != nil {
+		return entities.LoginResponse{
+			Success: false,
+			Error:   "Invalid email or password",
+		}, nil // nil error เพราะถือว่าเป็น response ปกติ ไม่ใช่ error ระบบ
+	}
+
+	if err := utils.ComparePassword(user.Password, password); err != nil {
+		return entities.LoginResponse{
+			Success: false,
+			Error:   "Invalid email or password",
+		}, nil
+	}
+
+	token, err := s.GenerateJWT(user.UserID.String(), user.Email)
+	if err != nil {
+		return entities.LoginResponse{
+			Success: false,
+			Error:   "Failed to generate token",
+		}, err // return error จริงเพราะเป็น error ระบบ
+	}
+
+	fmt.Print(token)
+
+	ctx.Cookie(&fiber.Cookie{
+		Name:     "jwt",
+		Value:    token,                    // JWT ที่ generate มา
+		Expires:  time.Now().Add(time.Hour * 24), // อายุ 1 วัน (แล้วแต่กำหนด)
+		HTTPOnly: true,                           // ป้องกัน JS access, ปลอดภัยขึ้น
+		Secure:   false,                           // ใช้เฉพาะ HTTPS
+		SameSite: "None",                          // หรือ "Strict" / "None" ตาม use-case
+	})
+
+	respData := map[string]interface{}{
+		"userid": user.UserID,
+		"email":  user.Email,
+		"role":   user.Role,
+		"token":  token,
+	}
+
+	fmt.Print("success cookie")
+
+	return entities.LoginResponse{
+		Success: true,
+		Data:    respData,
+	}, nil
 }

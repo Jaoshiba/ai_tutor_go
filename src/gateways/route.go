@@ -18,7 +18,7 @@ func GatewayUsers(gateway HTTPGateway, app *fiber.App) {
 }
 
 func GatewayModules(gateway HTTPGateway, app *fiber.App) {
-	api := app.Group("/api/v1/Modules")
+	api := app.Group("/api/v1/modules")
 	//api.Use(middlewares.JWTAuthMiddleware(gateway.AuthService))
 
 	api.Post("/upload", gateway.UploadFile)
@@ -34,6 +34,7 @@ func GatewayGoogleAuth(gateway HTTPGateway, app *fiber.App) {
 // GatewayAuth สำหรับ Logout และ Check Status
 func GatewayAuth(gateway HTTPGateway, app *fiber.App) {
 	authAPI := app.Group("/api/auth")
+	authAPI.Post("/login", gateway.Login)
 	authAPI.Post("/logout", gateway.LogoutHandler)
 	authAPI.Get("/status/check", gateway.AuthService.CheckJWT) // <--- เพิ่มบรรทัดนี้: ให้ AuthService จัดการ CheckJWT
 }
