@@ -117,8 +117,8 @@ func (c *ChapterServices) ChapterrizedText(text string) error {
 		ch := entities.ChapterDataModel{
 			ChapterId:      uuid.NewString(),
 			ChapterName:    chapter.ChapterName,
-			UserID:         "",
-			RoadmapId:      "",
+			UserID:         uuid.NewString(),
+			RoadmapId:      uuid.NewString(),
 			ChapterContent: chapter.Content,
 			CreateAt:       time.Now(),
 			UpdatedAt:      time.Now(),

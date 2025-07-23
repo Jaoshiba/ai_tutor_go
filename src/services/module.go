@@ -56,8 +56,8 @@ func (ms *ModuleService) CreateModule(file *multipart.FileHeader, ctx *fiber.Ctx
 	module := entities.ModuleDataModel{
 		ModuleId:   uuid.NewString(),
 		ModuleName: file.Filename,
-		RoadmapId:  "",
-		UserId:     "",
+		RoadmapId:  uuid.NewString(),
+		UserId:     uuid.NewString(),
 		CreatedAt:  time.Now(),
 		UpdatedAt:  time.Now(),
 	}
