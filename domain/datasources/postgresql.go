@@ -4,7 +4,8 @@ import (
 	"database/sql"
 	"fmt"
 	"log"
-    
+	"os"
+
 	_ "github.com/lib/pq"
 )
 
@@ -17,14 +18,14 @@ import (
 // )
 
 func NewPostgresql() *sql.DB {
-	host := "interchange.proxy.rlwy.net"
-	port := 25977
-	user := "postgres"
-	password := "oMclFKTHjJEFEJaDUhoIedagkygDAEBZ"
-	dbname := "railway"
+	host := os.Getenv("POSTGRESQL_HOST")
+	port := os.Getenv("POSTGRESQL_PORT")
+	user := os.Getenv("POSTGRESQL_USER")
+	password := os.Getenv("POSTGRESQL_PASSWORD")
+	dbname := os.Getenv("POSTGRESQL_DBNAME")
 
 	psqlInfo := fmt.Sprintf(
-		"host=%s port=%d user=%s password=%s dbname=%s sslmode=disable",
+		"host=%s port=%s user=%s password=%s dbname=%s sslmode=disable",
 		host, port, user, password, dbname,
 	)
 

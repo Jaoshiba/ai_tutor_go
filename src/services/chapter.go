@@ -10,22 +10,31 @@ import (
 	"time"
 
 	"go-fiber-template/domain/entities"
+	"go-fiber-template/domain/repositories"
 
 	"github.com/google/uuid"
 	"google.golang.org/genai"
 )
 
-type IChapter interface {
-	ChapterrizedText(text string) ([]entities.ChapterDataModel, error)
+type ChapterServices struct {
+	ChapterRepository repositories.IChapterRepository
 }
 
-func ChapterrizedText(text string) ([]entities.ChapterDataModel, error) {
+type IChapterService interface {
+	ChapterrizedText(text string) error
+}
 
-	var chapters []entities.ChapterDataModel
+func NewChapterServices(chapterRepository repositories.IChapterRepository) IChapterService {
+	return &ChapterServices{
+		ChapterRepository: chapterRepository,
+	}
+}
+
+func (c *ChapterServices) ChapterrizedText(text string) error {
 
 	gemini_api_key := (os.Getenv("GEMINI_API_KEY"))
 	if gemini_api_key == "" {
-		return chapters, nil
+		return nil
 	}
 
 	ctx := context.Background()
@@ -35,7 +44,7 @@ func ChapterrizedText(text string) ([]entities.ChapterDataModel, error) {
 		Backend: genai.BackendGeminiAPI,
 	})
 	if err != nil {
-		return chapters, err
+		return err
 	}
 
 	promt := fmt.Sprintf(`Please divide the following Thai text into logical chapters or sections.
@@ -85,14 +94,15 @@ func ChapterrizedText(text string) ([]entities.ChapterDataModel, error) {
 		nil,
 	)
 	if err != nil {
-		return chapters, err
+		fmt.Println("Error generating chapters:", err)
+		return err
 	}
 
 	chaps := removeJsonBlock(result.Text())
 	fmt.Println("Finished your chapterize...")
 
 	if chaps == "" {
-		return chapters, fmt.Errorf("no chapters found in the response")
+		return fmt.Errorf("no chapters found in the response")
 	}
 
 	var response entities.GeminiResponse
@@ -100,20 +110,29 @@ func ChapterrizedText(text string) ([]entities.ChapterDataModel, error) {
 	err = json.Unmarshal([]byte(chaps), &response)
 	if err != nil {
 		fmt.Println("Error unmarshalling JSON:", err)
-		return chapters, err
+		return err
 	}
 
 	for _, chapter := range response.Chapters {
 		ch := entities.ChapterDataModel{
-			ChapterId:   uuid.NewString(),
-			ChapterName: chapter.ChapterName,
-			Content:     chapter.Content,
-			CreateAt:    time.Now(),
+			ChapterId:      uuid.NewString(),
+			ChapterName:    chapter.ChapterName,
+			UserID:         "",
+			RoadmapId:      "",
+			ChapterContent: chapter.Content,
+			CreateAt:       time.Now(),
+			UpdatedAt:      time.Now(),
+			IsFinished:     false,
 		}
-		chapters = append(chapters, ch)
+		//save chapters to databse
+		fmt.Println("Inserting chapter:", ch.ChapterId)
+		err = c.ChapterRepository.InsertChapter(ch)
+		if err != nil {
+			return err
+		}
 	}
 
-	return chapters, nil
+	return nil
 }
 
 func removeJsonBlock(text string) string {

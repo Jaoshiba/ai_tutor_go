@@ -3,7 +3,6 @@ package services
 import (
 	"bytes"
 	"fmt"
-	"go-fiber-template/domain/entities"
 	"strings"
 
 	"io"
@@ -13,32 +12,39 @@ import (
 	"github.com/ledongthuc/pdf"
 )
 
+type FileService struct {
+	ChapterServices IChapterService
+}
 type IFileService interface {
-	GetDocx_DocData(file *multipart.FileHeader) ([]entities.ChapterDataModel, error)
-	GetPdfData(file *multipart.FileHeader) ([]entities.ChapterDataModel, error)
+	GetDocx_DocData(file *multipart.FileHeader) error
+	GetPdfData(file *multipart.FileHeader) error
 }
 
-func GetDocx_DocData(file *multipart.FileHeader) ([]entities.ChapterDataModel, error) {
+func NewFileService(chapterServices IChapterService) IFileService {
+	return &FileService{
+		ChapterServices: chapterServices,
+	}
+}
 
-	var chapters []entities.ChapterDataModel
+func (f *FileService) GetDocx_DocData(file *multipart.FileHeader) error {
 
 	fmt.Println("GetDocx_DocData func")
 	openedFile, err := file.Open()
 	if err != nil {
-		return chapters, err
+		return err
 	}
 	defer openedFile.Close()
 
 	fileBytes, err := io.ReadAll(openedFile)
 	if err != nil {
-		return chapters, err
+		return err
 	}
 
 	reader := bytes.NewReader(fileBytes)
 
 	doc, err := document.Read(reader, reader.Size())
 	if err != nil {
-		return chapters, err
+		return err
 	}
 
 	var text string
@@ -49,34 +55,32 @@ func GetDocx_DocData(file *multipart.FileHeader) ([]entities.ChapterDataModel, e
 
 	}
 
-	chapters, err = ChapterrizedText(text)
+	err = f.ChapterServices.ChapterrizedText(text)
 	if err != nil {
-		return chapters, err
+		return err
 	}
 
-	return chapters, nil
+	return nil
 }
 
-func GetPdfData(file *multipart.FileHeader) ([]entities.ChapterDataModel, error) {
-
-	var chapters []entities.ChapterDataModel
+func (f *FileService) GetPdfData(file *multipart.FileHeader) error {
 
 	openedFile, err := file.Open()
 	if err != nil {
-		return chapters, err
+		return err
 	}
 	defer openedFile.Close()
 
 	fileBytes, err := io.ReadAll(openedFile)
 	if err != nil {
-		return chapters, err
+		return err
 	}
 
 	reader := bytes.NewReader(fileBytes)
 
 	pdfReader, err := pdf.NewReader(reader, reader.Size())
 	if err != nil {
-		return chapters, err
+		return err
 	}
 
 	var alltext string
@@ -89,7 +93,7 @@ func GetPdfData(file *multipart.FileHeader) ([]entities.ChapterDataModel, error)
 
 		content, err := page.GetPlainText(nil)
 		if err != nil {
-			return chapters, err
+			return err
 		}
 
 		alltext += content
@@ -98,10 +102,10 @@ func GetPdfData(file *multipart.FileHeader) ([]entities.ChapterDataModel, error)
 
 	alltext = strings.ReplaceAll(alltext, "\n", "")
 
-	chapters, err = ChapterrizedText(alltext)
+	err = f.ChapterServices.ChapterrizedText(alltext)
 	if err != nil {
-		return chapters, err
+		return err
 	}
 
-	return chapters, nil
+	return nil
 }

@@ -13,15 +13,17 @@ import (
 
 type ModuleService struct {
 	modulesRepository repo.IModuleRepository
+	FileService       IFileService
 }
 
 type IModuleService interface {
 	CreateModule(file *multipart.FileHeader, ctx *fiber.Ctx) error
 }
 
-func NewModuleService(modulesRepository repo.IModuleRepository) IModuleService {
+func NewModuleService(modulesRepository repo.IModuleRepository, fileService IFileService) IModuleService {
 	return &ModuleService{
 		modulesRepository: modulesRepository,
+		FileService:       fileService,
 	}
 }
 
@@ -29,27 +31,25 @@ func (ms *ModuleService) CreateModule(file *multipart.FileHeader, ctx *fiber.Ctx
 	filetype := file.Header.Get("Content-Type")
 	fmt.Println("File header: ", filetype)
 
+	fmt.Println("Extracting file content....")
+
 	var chapters []entities.ChapterDataModel
 	err := error(nil)
 	if filetype == "application/pdf" {
-		chapters, err = GetPdfData(file)
+		err = ms.FileService.GetPdfData(file)
 		if err != nil {
 			return err
 		}
 
 	} else if filetype == "application/vnd.openxmlformats-officedocument.wordprocessingml.document" || filetype == "application/msword" {
-		chapters, err = GetDocx_DocData(file)
+		err = ms.FileService.GetDocx_DocData(file)
 		if err != nil {
+			fmt.Print("error docx type")
 			return err
 		}
 
 	}
-	// fmt.Println("Extracted chapters: ", chapters)
-
-	exams, err := ExamGenerate(chapters)
-	if err != nil {
-		return err
-	}
+	fmt.Println("Extracted chapters: ", chapters)
 
 	fmt.Println("before module creation")
 
@@ -57,8 +57,7 @@ func (ms *ModuleService) CreateModule(file *multipart.FileHeader, ctx *fiber.Ctx
 		ModuleId:   uuid.NewString(),
 		ModuleName: file.Filename,
 		RoadmapId:  "",
-		Chapters:   chapters,
-		Exam:       exams,
+		UserId:     "",
 		CreatedAt:  time.Now(),
 		UpdatedAt:  time.Now(),
 	}
