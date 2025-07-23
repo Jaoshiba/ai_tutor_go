@@ -41,7 +41,7 @@ func NewHTTPGateway(
 	GatewayAuth(*gateway, app)
 	GatewayGoogleAuth(*gateway, app)
 	GatewayUsers(*gateway, app)
-	GatewayModules(*gateway, app)
+	//GatewayModules(*gateway, app)
 }
 
 // LogoutHandler (ไม่มีการเปลี่ยนแปลง)
@@ -58,6 +58,8 @@ func (h *HTTPGateway) LogoutHandler(c *fiber.Ctx) error {
 		"message": "Logged out successfully",
 	})
 }
+
+
 
 // GetMeDataHandler (ไม่มีการเปลี่ยนแปลง)
 // (สมมติว่าคุณได้เพิ่ม User struct และ GetUserData ใน services/users.go แล้ว)
