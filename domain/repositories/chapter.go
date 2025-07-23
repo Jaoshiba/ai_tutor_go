@@ -27,7 +27,7 @@ func (repo *chaptersRepository) InsertChapter(chapter entities.ChapterDataModel)
 	query := `
 INSERT INTO chapters (
 	chapterid, chaptername, userid, roadmapid, chaptercontent, isfinished, createat, updateat
-) VALUES ($1, $2, 9b5a09f2-0a21-4f27-952f-71d485bf2d61, $4, $5, $6, $7, $8)`
+) VALUES ($1, $2, $3, $4, $5, $6, $7, $8)`
 
 	_, err := repo.db.ExecContext(context.Background(), query,
 		chapter.ChapterId,

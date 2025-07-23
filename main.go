@@ -1,5 +1,3 @@
-// main.go
-
 package main
 
 import (
@@ -25,46 +23,51 @@ import (
 )
 
 func main() {
+	// โหลด .env
 	err := godotenv.Load()
 	if err != nil {
 		log.Fatal("Error loading .env file")
 	}
 
+	// สร้าง Fiber app
 	app := fiber.New(configuration.NewFiberConfiguration())
 	middlewares.Logger(app)
 	app.Use(recover.New())
 
 	// CORS Configuration
 	app.Use(cors.New(cors.Config{
-		AllowOrigins:     os.Getenv("FRONTEND_URL") + ", http://localhost:1818"+", http://localhost:3000" ,// ระบุ URL ของ Next.js Frontend และ Backend เอง
+		AllowOrigins:     os.Getenv("FRONTEND_URL") + ", http://localhost:1818" + ", http://localhost:3000",
 		AllowHeaders:     "Origin, Content-Type, Accept, Authorization",
 		AllowMethods:     "GET,POST,HEAD,PUT,DELETE,PATCH",
 		AllowCredentials: true, // สำคัญมากสำหรับ Cookie
 	}))
 
-	postgresql := ds.NewPostgresql()
+	// ดึง JWT_SECRET_KEY จาก .env
+	jwtSecret := os.Getenv("JWT_SECRET_KEY")
+	if jwtSecret == "" {
+		log.Fatal("JWT_SECRET_KEY is not set in .env")
+	}
+	// สร้าง JWT Middleware
 
+	// Connect PostgreSQL
+	postgresql := ds.NewPostgresql()
 	fmt.Printf("PostgreSQL DB instance before passing to repo: %p\n", postgresql)
 
+	// สร้าง Repositories
 	userRepo := repo.NewUsersRepositoryPostgres(postgresql)
 	fileRepo := repo.NewModulesRepository(postgresql)
 	chapterRepo := repo.NewChapterRepository(postgresql)
 
 	// สร้าง Services
-	jwtSecret := os.Getenv("JWT_SECRET_KEY")
-	if jwtSecret == "" {
-		log.Fatal("JWT_SECRET_KEY is not set in .env")
-	}
-	svAuth := authService.NewAuthService(userRepo) // สร้าง AuthService
-	sv0 := sv.NewUsersService(userRepo)    // สร้าง UsersServic
-	svGoogleAuth := authService.NewGoogleOAuthService(svAuth) // สร้าง GoogleOAuthService โดยฉีด AuthService
+	svAuth := authService.NewAuthService(userRepo)
+	sv0 := sv.NewUsersService(userRepo)
+	svGoogleAuth := authService.NewGoogleOAuthService(svAuth)
 	svChapter := sv.NewChapterServices(chapterRepo)
-	svFile := sv.NewFileService(svChapter) // สร้าง ChapterService
+	svFile := sv.NewFileService(svChapter)
 	sv1 := sv.NewModuleService(fileRepo, svFile)
 
-	// สร้าง Gateway และผูก Routes ทั้งหมด
-	// ต้องส่ง AuthService และ UserService เข้าไปใน NewHTTPGateway ด้วย
-	gw.NewHTTPGateway(app, sv0, sv1, svGoogleAuth, svAuth, svChapter, svFile) // <--- ตรวจสอบพารามิเตอร์
+	// ส่ง middleware เข้า Gateway ด้วย
+	gw.NewHTTPGateway(app, sv0, sv1, svGoogleAuth, svAuth, svChapter, svFile)
 
 	// ให้บริการไฟล์ static (เช่น dashboard.html)
 	app.Use("/dashboard", filesystem.New(filesystem.Config{
@@ -74,6 +77,7 @@ func main() {
 		Index:      "dashboard.html",
 	}))
 
+	// เริ่มฟังที่พอร์ต
 	PORT := os.Getenv("PORT")
 	if PORT == "" {
 		PORT = "1818"

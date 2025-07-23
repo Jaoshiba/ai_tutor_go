@@ -29,6 +29,7 @@ type IAuthService interface {
 	ValidateJWT(tokenString string) (*UserClaims, error)
 	CheckJWT(c *fiber.Ctx) error
 	Login(email, password string, ctx *fiber.Ctx) (entities.LoginResponse, error)
+	AuthMiddleware() fiber.Handler
 }
 
 type authService struct {
@@ -181,4 +182,35 @@ func (s *authService) Login(email, password string, ctx *fiber.Ctx) (entities.Lo
 		Success: true,
 		Data:    respData,
 	}, nil
+}
+
+func (s *authService) AuthMiddleware() fiber.Handler {
+	return func(c *fiber.Ctx) error {
+		jwtCookie := c.Cookies("jwt")
+		if jwtCookie == "" {
+			return c.Status(fiber.StatusUnauthorized).JSON(fiber.Map{
+				"message": "Unauthorized: Missing JWT token",
+			})
+		}
+
+		claims, err := s.ValidateJWT(jwtCookie)
+		if err != nil {
+			if strings.Contains(err.Error(), "token is expired") {
+				return c.Status(fiber.StatusUnauthorized).JSON(fiber.Map{
+					"message": "Unauthorized: Token expired",
+				})
+			}
+			return c.Status(fiber.StatusUnauthorized).JSON(fiber.Map{
+				"message": fmt.Sprintf("Unauthorized: Invalid token (%s)", err.Error()),
+			})
+		}
+
+		// Store user claims in Fiber context for subsequent handlers
+		// เก็บ user claims ไว้ใน Fiber context สำหรับ handler ถัดไป
+		c.Locals("user", claims) // คุณสามารถเก็บ claims โดยตรงได้
+		c.Locals("userID", claims.UserID)
+		c.Locals("userEmail", claims.Email)
+
+		return c.Next() // Continue to the next handler
+	}
 }
