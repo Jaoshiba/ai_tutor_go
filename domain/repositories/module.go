@@ -21,15 +21,15 @@ func NewModulesRepository(db *sql.DB) IModuleRepository {
 	}
 }
 
-func (db *modulesRepository) InsertModule(module entities.ModuleDataModel) error {
+func (repo *modulesRepository) InsertModule(module entities.ModuleDataModel) error {
 
 	fmt.Println("InsertModule called with module:", module)
 	query := `
 		INSERT INTO modules (
-			moduleid, modulename, roadmapid, userid, createdat, updatedat
+			moduleid, modulename, roadmapid, userid, createat, updateat
 		) VALUES ($1, $2, $3, $4, $5, $6)`
 
-	_, err := db.db.ExecContext(context.Background(), query,
+	result, err := repo.db.ExecContext(context.Background(), query,
 		module.ModuleId,
 		module.ModuleName,
 		module.RoadmapId,
@@ -37,6 +37,7 @@ func (db *modulesRepository) InsertModule(module entities.ModuleDataModel) error
 		module.CreatedAt,
 		module.UpdatedAt,
 	)
+	fmt.Println("result: ", result)
 	if err != nil {
 		return err
 	}
