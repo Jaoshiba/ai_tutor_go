@@ -26,6 +26,7 @@ func NewHTTPGateway(app *fiber.App, users service.IUsersService, modules service
 		AuthService:       authService,
 	}
 
+	GatewayAuth(*gateway, app)
 	GatewayGoogleAuth(*gateway, app)
 	GatewayUsers(*gateway, app)
 	GatewayModules(*gateway, app)
