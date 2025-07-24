@@ -36,7 +36,7 @@ func main() {
 
 	// CORS Configuration
 	app.Use(cors.New(cors.Config{
-		AllowOrigins:     os.Getenv("FRONTEND_URL") + ", http://localhost:1818"+", http://localhost:3000" ,// ระบุ URL ของ Next.js Frontend และ Backend เอง
+		AllowOrigins:     os.Getenv("FRONTEND_URL") + ", http://localhost:1818" + ", http://localhost:3000", // ระบุ URL ของ Next.js Frontend และ Backend เอง
 		AllowHeaders:     "Origin, Content-Type, Accept, Authorization",
 		AllowMethods:     "GET,POST,HEAD,PUT,DELETE,PATCH",
 		AllowCredentials: true, // สำคัญมากสำหรับ Cookie
@@ -55,8 +55,8 @@ func main() {
 	if jwtSecret == "" {
 		log.Fatal("JWT_SECRET_KEY is not set in .env")
 	}
-	svAuth := authService.NewAuthService(userRepo) // สร้าง AuthService
-	sv0 := sv.NewUsersService(userRepo)    // สร้าง UsersServic
+	svAuth := authService.NewAuthService(userRepo)            // สร้าง AuthService
+	sv0 := sv.NewUsersService(userRepo)                       // สร้าง UsersServic
 	svGoogleAuth := authService.NewGoogleOAuthService(svAuth) // สร้าง GoogleOAuthService โดยฉีด AuthService
 	svChapter := sv.NewChapterServices(chapterRepo)
 	svFile := sv.NewFileService(svChapter) // สร้าง ChapterService
