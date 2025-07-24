@@ -41,7 +41,9 @@ func NewHTTPGateway(
 	GatewayAuth(*gateway, app)
 	GatewayGoogleAuth(*gateway, app)
 	GatewayUsers(*gateway, app)
-	//GatewayModules(*gateway, app)
+	
+	GatewayModules(*gateway, app)
+	GatewayProtected(*gateway, app)
 }
 
 // LogoutHandler (ไม่มีการเปลี่ยนแปลง)
