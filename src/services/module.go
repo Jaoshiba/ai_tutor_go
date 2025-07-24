@@ -36,13 +36,13 @@ func (ms *ModuleService) CreateModule(file *multipart.FileHeader, ctx *fiber.Ctx
 	var chapters []entities.ChapterDataModel
 	err := error(nil)
 	if filetype == "application/pdf" {
-		err = ms.FileService.GetPdfData(file)
+		err = ms.FileService.GetPdfData(file, ctx)
 		if err != nil {
 			return err
 		}
 
 	} else if filetype == "application/vnd.openxmlformats-officedocument.wordprocessingml.document" || filetype == "application/msword" {
-		err = ms.FileService.GetDocx_DocData(file)
+		err = ms.FileService.GetDocx_DocData(file, ctx)
 		if err != nil {
 			fmt.Print("error docx type")
 			return err
@@ -53,11 +53,17 @@ func (ms *ModuleService) CreateModule(file *multipart.FileHeader, ctx *fiber.Ctx
 
 	fmt.Println("before module creation")
 
+	userIdRaw := ctx.Locals("userID")
+	userIdStr, ok := userIdRaw.(string)
+	if !ok || userIdStr == "" {
+		return fiber.NewError(fiber.StatusUnauthorized, "Invalid or missing user ID")
+	}
+	fmt.Println("user id is : ", userIdStr)
 	module := entities.ModuleDataModel{
 		ModuleId:   uuid.NewString(),
 		ModuleName: file.Filename,
 		RoadmapId:  uuid.NewString(),
-		UserId:     uuid.NewString(),
+		UserId:     userIdStr,
 		CreatedAt:  time.Now(),
 		UpdatedAt:  time.Now(),
 	}

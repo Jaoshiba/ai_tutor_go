@@ -22,22 +22,28 @@ func GatewayUsers(gateway HTTPGateway, app *fiber.App) {
 // GatewayGoogleAuth สำหรับเส้นทาง Google OAuth (สาธารณะ)
 func GatewayGoogleAuth(gateway HTTPGateway, app *fiber.App) {
 	api := app.Group("/api/auth/google")
-	api.Get("/login", gateway.GoogleLoginHandler)    // เส้นทางสาธารณะ: เริ่มต้นการล็อกอินด้วย Google
-	api.Get("/callback", gateway.GoogleCallback) // เส้นทางสาธารณะ: Callback จาก Google OAuth
+	api.Get("/login", gateway.GoogleLoginHandler) // เส้นทางสาธารณะ: เริ่มต้นการล็อกอินด้วย Google
+	api.Get("/callback", gateway.GoogleCallback)  // เส้นทางสาธารณะ: Callback จาก Google OAuth
 }
 
 // GatewayAuth สำหรับเส้นทางที่เกี่ยวข้องกับการตรวจสอบสิทธิ์ (Login เป็นสาธารณะ, อื่นๆ จะถูกย้ายไป Protected)
 func GatewayAuth(gateway HTTPGateway, app *fiber.App) {
 	authAPI := app.Group("/api/auth")
 	authAPI.Post("/login", gateway.Login) // เส้นทางสาธารณะ: ล็อกอิน
+	authAPI.Get("/status/check", gateway.AuthService.CheckJWT)
 	// เส้นทาง Logout และ Check Status ถูกย้ายไปที่ GatewayProtected เนื่องจากต้องการการตรวจสอบสิทธิ์
+}
+
+func GatewayModules(gateway HTTPGateway, app *fiber.App) {
+	api := app.Group("/api/v1/modules")
+	api.Post("/upload", gateway.UploadFile)
 }
 
 // GatewayProtected สำหรับเส้นทางทั้งหมดที่ต้องการการตรวจสอบสิทธิ์ (Protected Routes)
 func GatewayProtected(gateway HTTPGateway, app *fiber.App) {
 	// สร้าง Group ของ routes ที่ต้องการการตรวจสอบสิทธิ์
 	// ใช้ "/api/v1" เป็น Prefix เพื่อให้สอดคล้องกับโครงสร้าง URL ที่คุณมี
-	protected := app.Group("/api/v1")
+	protected := app.Group("/api/v1/protected")
 
 	// 💡 นี่คือจุดที่คุณเรียกใช้ AuthMiddleware()
 	// ทุก route ที่อยู่ภายใต้ group 'protected' จะต้องผ่าน AuthMiddleware ก่อนถึงจะเข้าถึง handler ได้
@@ -53,7 +59,8 @@ func GatewayProtected(gateway HTTPGateway, app *fiber.App) {
 	// protected.Delete("/users/:id", gateway.DeleteUser)   // ถ้ามี: ลบผู้ใช้ (ต้องล็อกอิน)
 
 	// Routes สำหรับ Modules (ที่ต้องการการป้องกัน)
-	protected.Post("/modules/upload", gateway.UploadFile) // อัปโหลดไฟล์ (ต้องล็อกอิน)
+	
+	protected.Post("/modules/upload", gateway.UploadFile)      // อัปโหลดไฟล์ (ต้องล็อกอิน)
 	protected.Post("/modules/text", func(c *fiber.Ctx) error { // ตัวอย่าง route (ต้องล็อกอิน)
 		return c.SendString("Protected module text route!")
 	})
@@ -70,6 +77,5 @@ func GatewayProtected(gateway HTTPGateway, app *fiber.App) {
 
 	// Routes ที่เกี่ยวข้องกับการตรวจสอบสิทธิ์ที่ต้องการการป้องกัน (เช่น Logout, Check Status)
 	// เนื่องจากคุณต้องการให้ AuthService จัดการ CheckJWT, และ Logout ก็ควรต้องล็อกอินอยู่แล้ว
-	protected.Post("/auth/logout", gateway.LogoutHandler)      // ล็อกเอาท์ (ต้องล็อกอิน)
-	protected.Get("/auth/status/check", gateway.AuthService.CheckJWT) // ตรวจสอบสถานะ JWT (ต้องล็อกอิน)
+	protected.Post("/auth/logout", gateway.LogoutHandler) // ล็อกเอาท์ (ต้องล็อกอิน) // ตรวจสอบสถานะ JWT (ต้องล็อกอิน)
 }
