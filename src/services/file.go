@@ -16,8 +16,8 @@ type FileService struct {
 	ChapterServices IChapterService
 }
 type IFileService interface {
-	GetDocx_DocData(file *multipart.FileHeader) error
-	GetPdfData(file *multipart.FileHeader) error
+	GetDocx_DocData(file *multipart.FileHeader) (string, error)
+	GetPdfData(file *multipart.FileHeader) (string, error)
 }
 
 func NewFileService(chapterServices IChapterService) IFileService {
@@ -26,61 +26,61 @@ func NewFileService(chapterServices IChapterService) IFileService {
 	}
 }
 
-func (f *FileService) GetDocx_DocData(file *multipart.FileHeader) error {
+func (f *FileService) GetDocx_DocData(file *multipart.FileHeader) (string, error) {
 
 	fmt.Println("GetDocx_DocData func")
 	openedFile, err := file.Open()
 	if err != nil {
-		return err
+		return "", err
 	}
 	defer openedFile.Close()
 
 	fileBytes, err := io.ReadAll(openedFile)
 	if err != nil {
-		return err
+		return "", err
 	}
 
 	reader := bytes.NewReader(fileBytes)
 
 	doc, err := document.Read(reader, reader.Size())
 	if err != nil {
-		return err
+		return "", err
 	}
 
-	var text string
+	var alltext string
 	for _, para := range doc.Paragraphs() {
 		for _, run := range para.Runs() {
-			text += run.Text() + "\n"
+			alltext += run.Text() + "\n"
 		}
 
 	}
 
-	err = f.ChapterServices.ChapterrizedText(text)
+	err = f.ChapterServices.ChapterrizedText(alltext)
 	if err != nil {
-		return err
+		return "", err
 	}
 
-	return nil
+	return alltext, nil
 }
 
-func (f *FileService) GetPdfData(file *multipart.FileHeader) error {
+func (f *FileService) GetPdfData(file *multipart.FileHeader) (string, error) {
 
 	openedFile, err := file.Open()
 	if err != nil {
-		return err
+		return "", err
 	}
 	defer openedFile.Close()
 
 	fileBytes, err := io.ReadAll(openedFile)
 	if err != nil {
-		return err
+		return "", err
 	}
 
 	reader := bytes.NewReader(fileBytes)
 
 	pdfReader, err := pdf.NewReader(reader, reader.Size())
 	if err != nil {
-		return err
+		return "", err
 	}
 
 	var alltext string
@@ -93,7 +93,7 @@ func (f *FileService) GetPdfData(file *multipart.FileHeader) error {
 
 		content, err := page.GetPlainText(nil)
 		if err != nil {
-			return err
+			return "", err
 		}
 
 		alltext += content
@@ -104,8 +104,8 @@ func (f *FileService) GetPdfData(file *multipart.FileHeader) error {
 
 	err = f.ChapterServices.ChapterrizedText(alltext)
 	if err != nil {
-		return err
+		return "", err
 	}
 
-	return nil
+	return alltext, nil
 }

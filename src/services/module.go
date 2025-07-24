@@ -36,13 +36,13 @@ func (ms *ModuleService) CreateModule(file *multipart.FileHeader, ctx *fiber.Ctx
 	var chapters []entities.ChapterDataModel
 	err := error(nil)
 	if filetype == "application/pdf" {
-		err = ms.FileService.GetPdfData(file)
+		_, err = ms.FileService.GetPdfData(file)
 		if err != nil {
 			return err
 		}
 
 	} else if filetype == "application/vnd.openxmlformats-officedocument.wordprocessingml.document" || filetype == "application/msword" {
-		err = ms.FileService.GetDocx_DocData(file)
+		_, err = ms.FileService.GetDocx_DocData(file)
 		if err != nil {
 			fmt.Print("error docx type")
 			return err
