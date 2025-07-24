@@ -20,7 +20,7 @@ func GatewayUsers(gateway HTTPGateway, app *fiber.App) {
 func GatewayRoadmap(gateway HTTPGateway, app *fiber.App) {
 	api := app.Group("/api/v1/roadmap")
 	//api.Use(middlewares.JWTAuthMiddleware(gateway.AuthService))
-	api.Post("/createRoadmap", gateway.CreateRoadmap)
+	api.Post("/create", gateway.CreateRoadmap)
 }
 
 func GatewayModules(gateway HTTPGateway, app *fiber.App) {
