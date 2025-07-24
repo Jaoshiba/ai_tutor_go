@@ -17,6 +17,12 @@ func GatewayUsers(gateway HTTPGateway, app *fiber.App) {
 	api.Get("/me", gateway.GetMeDataHandler) // Endpoint สำหรับดึงข้อมูลผู้ใช้ที่ล็อกอินอยู่
 }
 
+func GatewayRoadmap(gateway HTTPGateway, app *fiber.App) {
+	api := app.Group("/api/v1/roadmap")
+	//api.Use(middlewares.JWTAuthMiddleware(gateway.AuthService))
+	api.Post("/createRoadmap", gateway.CreateRoadmap)
+}
+
 func GatewayModules(gateway HTTPGateway, app *fiber.App) {
 	api := app.Group("/api/v1/modules")
 	//api.Use(middlewares.JWTAuthMiddleware(gateway.AuthService))

@@ -18,6 +18,7 @@ type HTTPGateway struct {
 	AuthService       auth.IAuthService
 	ChapterService    service.IChapterService
 	FileService       service.IFileService
+	RoadmapService    service.IRoadmapService
 }
 
 func NewHTTPGateway(
@@ -28,6 +29,7 @@ func NewHTTPGateway(
 	authService auth.IAuthService,
 	chapterService service.IChapterService,
 	fileService service.IFileService,
+	roadmapService service.IRoadmapService,
 ) {
 	gateway := &HTTPGateway{
 		UserService:       users,
@@ -36,12 +38,14 @@ func NewHTTPGateway(
 		AuthService:       authService,
 		ChapterService:    chapterService,
 		FileService:       fileService,
+		RoadmapService:    roadmapService,
 	}
 
 	GatewayAuth(*gateway, app)
 	GatewayGoogleAuth(*gateway, app)
 	GatewayUsers(*gateway, app)
 	GatewayModules(*gateway, app)
+	GatewayRoadmap(*gateway, app)
 }
 
 // LogoutHandler (ไม่มีการเปลี่ยนแปลง)
