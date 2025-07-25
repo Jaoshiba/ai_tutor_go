@@ -15,7 +15,16 @@ type RoadmapDataModel struct {
 }
 
 type RoadmapRequestBody struct {
-	RoadmapName string `json:"roadmap_name" db:"roadmapname"`
+	RoadmapName string `json:"roadmapName" db:"roadmapname"`
 	Description string `json:"description" db:"description"`
 	Confirmed   bool   `json:"confirmed" db:"confirmed"`
+}
+
+type RoadmapGeminiResponse struct {
+	Modules []GenModule `json:"modules"`
+}
+
+type GenModule struct {
+	Title       string `json:"title"`
+	Description string `json:"description"`
 }

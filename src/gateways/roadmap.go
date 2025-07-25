@@ -2,6 +2,7 @@ package gateways
 
 import (
 	"encoding/json"
+	"fmt"
 	"go-fiber-template/domain/entities"
 
 	"github.com/gofiber/fiber/v2"
@@ -15,18 +16,24 @@ func (h *HTTPGateway) CreateRoadmap(ctx *fiber.Ctx) error {
 	}
 	jsonbody := ctx.FormValue("jsonbody")
 
+	fmt.Println("jsonbody: ", jsonbody)
+
 	var roadmapjsonBody entities.RoadmapRequestBody
 
-	err = json.Unmarshal([]byte(jsonbody), &entities.RoadmapRequestBody{})
+	err = json.Unmarshal([]byte(jsonbody), &roadmapjsonBody)
 	if err != nil {
 		return ctx.Status(fiber.StatusUnprocessableEntity).JSON(entities.ResponseMessage{Message: "invalid json body"})
 	}
 
-	if roadmapjsonBody.RoadmapName == "" || roadmapjsonBody.Description == "" {
-		return ctx.Status(fiber.StatusUnprocessableEntity).JSON(entities.ResponseMessage{Message: "invalid json body u missed smt"})
+	roadmapName := roadmapjsonBody.RoadmapName
+	description := roadmapjsonBody.Description
+	if roadmapName == "" {
+		return ctx.Status(fiber.StatusUnprocessableEntity).JSON(entities.ResponseMessage{Message: "invalid json body u missed roadmap name"})
+	} else if description == "" {
+		return ctx.Status(fiber.StatusUnprocessableEntity).JSON(entities.ResponseMessage{Message: "invalid json body u missed description"})
 	}
 
-	err = h.RoadmapService.CreateRoadmap(roadmapjsonBody, file)
+	err = h.RoadmapService.CreateRoadmap(roadmapjsonBody, file, ctx)
 	if err != nil {
 		return ctx.Status(fiber.StatusBadRequest).JSON(entities.ResponseModel{
 			Message: "failed to create roadmap on CreateRoadmap",

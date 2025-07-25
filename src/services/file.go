@@ -3,30 +3,23 @@ package services
 import (
 	"bytes"
 	"fmt"
-	"strings"
-
 	"io"
 	"mime/multipart"
+	"regexp"
+	"strings"
 
 	"baliance.com/gooxml/document"
+	"github.com/gofiber/fiber/v2"
 	"github.com/ledongthuc/pdf"
 )
 
-type FileService struct {
-	ChapterServices IChapterService
-}
+// IFileService defines the interface for file service operations.
 type IFileService interface {
-	GetDocx_DocData(file *multipart.FileHeader) (string, error)
-	GetPdfData(file *multipart.FileHeader) (string, error)
+	GetDocx_DocData(file *multipart.FileHeader, ctx *fiber.Ctx) (string, error)
+	GetPdfData(file *multipart.FileHeader, ctx *fiber.Ctx) (string, error)
 }
 
-func NewFileService(chapterServices IChapterService) IFileService {
-	return &FileService{
-		ChapterServices: chapterServices,
-	}
-}
-
-func (f *FileService) GetDocx_DocData(file *multipart.FileHeader) (string, error) {
+func GetDocx_DocData(file *multipart.FileHeader, ctx *fiber.Ctx) (string, error) {
 
 	fmt.Println("GetDocx_DocData func")
 	openedFile, err := file.Open()
@@ -52,18 +45,17 @@ func (f *FileService) GetDocx_DocData(file *multipart.FileHeader) (string, error
 		for _, run := range para.Runs() {
 			alltext += run.Text() + "\n"
 		}
-
 	}
 
-	err = f.ChapterServices.ChapterrizedText(alltext)
-	if err != nil {
-		return "", err
-	}
+	// err = f.ChapterServices.ChapterrizedText(ctx, alltext)
+	// if err != nil {
+	// 	return "", err
+	// }
 
 	return alltext, nil
 }
 
-func (f *FileService) GetPdfData(file *multipart.FileHeader) (string, error) {
+func GetPdfData(file *multipart.FileHeader, ctx *fiber.Ctx) (string, error) {
 
 	openedFile, err := file.Open()
 	if err != nil {
@@ -71,19 +63,25 @@ func (f *FileService) GetPdfData(file *multipart.FileHeader) (string, error) {
 	}
 	defer openedFile.Close()
 
+	fmt.Println("GetPdfData func call with file: ", file.Filename)
+
 	fileBytes, err := io.ReadAll(openedFile)
 	if err != nil {
 		return "", err
 	}
 
+	// fmt.Println("fileBytes: ", fileBytes)
+
 	reader := bytes.NewReader(fileBytes)
+
+	fmt.Println("reader: ", reader)
 
 	pdfReader, err := pdf.NewReader(reader, reader.Size())
 	if err != nil {
 		return "", err
 	}
 
-	var alltext string
+	var allText string // Renamed from alltext for consistency
 	for i := 1; i <= pdfReader.NumPage(); i++ {
 		page := pdfReader.Page(i)
 		fmt.Println("page: ", i)
@@ -95,17 +93,27 @@ func (f *FileService) GetPdfData(file *multipart.FileHeader) (string, error) {
 		if err != nil {
 			return "", err
 		}
-
-		alltext += content
-
+		allText += content
 	}
 
-	alltext = strings.ReplaceAll(alltext, "\n", "")
+	allText = strings.ReplaceAll(allText, "\n", "")
+	fmt.Println("allText: ", allText)
 
-	err = f.ChapterServices.ChapterrizedText(alltext)
-	if err != nil {
-		return "", err
+	// Pass the Fiber context (fCtx) to ChapterrizedText
+	// err = f.ChapterServices.ChapterrizedText(ctx, allText) // fCtx is passed here
+	// if err != nil {
+	// 	return "", err
+	// }
+
+	return allText, nil
+}
+
+func RemoveJsonBlock(text string) string {
+	markdownJsonContentRegex := regexp.MustCompile("(?s)```json\\s*(.*?)\\s*```")
+	matches := markdownJsonContentRegex.FindStringSubmatch(text)
+
+	if len(matches) > 1 {
+		return matches[1]
 	}
-
-	return alltext, nil
+	return text
 }

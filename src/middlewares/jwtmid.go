@@ -1,24 +1,28 @@
-// middlewares/jwtmid.go
+// src/middlewares/jwt_middleware.go
 package middlewares
 
-// import (
-//     "go-fiber-template/src/services/auth"
-//     "github.com/gofiber/fiber/v2"
-// )
+import (
+	"github.com/gofiber/fiber/v2"
+	"github.com/golang-jwt/jwt/v5"
+)
 
-// func JWTAuthMiddleware(authService auth.IAuthService) fiber.Handler {
-//     return func(c *fiber.Ctx) error {
-//         token := c.Get("Authorization")
-//         if token == "" {
-//             return c.Status(fiber.StatusUnauthorized).JSON("no token")
-//         }
+// ฟังก์ชันที่รับ JWT Secret แล้ว return Fiber middleware function
+func NewJWTMiddleware(secret string) fiber.Handler {
+	return func(c *fiber.Ctx) error {
+		tokenStr := c.Cookies("jwt")
+		if tokenStr == "" {
+			return c.Status(fiber.StatusUnauthorized).JSON(fiber.Map{"error": "Missing JWT"})
+		}
 
-//         claims, err := authService.ValidateJWT(token[7:]) // ตัด "Bearer "
-//         if err != nil {
-//             return c.Status(fiber.StatusUnauthorized).JSON("")
-//         }
+		token, err := jwt.Parse(tokenStr, func(token *jwt.Token) (interface{}, error) {
+			return []byte(secret), nil
+		})
 
-//         c.Locals("user", claims)
-//         return c.Next()
-//     }
-// }
+		if err != nil || !token.Valid {
+			return c.Status(fiber.StatusUnauthorized).JSON(fiber.Map{"error": "Invalid JWT"})
+		}
+
+		c.Locals("user", token.Claims)
+		return c.Next()
+	}
+}

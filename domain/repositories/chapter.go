@@ -29,6 +29,7 @@ func (repo *chaptersRepository) InsertChapter(chapter entities.ChapterDataModel)
 		chapterid, chaptername, userid, roadmapid, chaptercontent, isfinished, createat, updateat
 	) VALUES ($1, $2, $3, $4, $5, $6, $7, $8)`
 
+	fmt.Println("userid in chap repo : ", chapter.UserID)
 	_, err := repo.db.ExecContext(context.Background(), query,
 		chapter.ChapterId,
 		chapter.ChapterName,
