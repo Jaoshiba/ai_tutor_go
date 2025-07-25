@@ -88,7 +88,7 @@ func QuestionsCreate(content string) ([]entities.QuestionDataModel, error) {
 		return questions, fmt.Errorf("no content returned from Gemini")
 	}
 
-	questionsFromGemini := removeJsonBlock(result.Text())
+	questionsFromGemini := RemoveJsonBlock(result.Text())
 	fmt.Println("Questions from Gemini: ", questionsFromGemini)
 	if questionsFromGemini == "" {
 		fmt.Println("Error parsing questions from Gemini: no content returned")

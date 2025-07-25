@@ -17,3 +17,8 @@ func (h *HTTPGateway) UploadFile(ctx *fiber.Ctx) error {
 
 	return ctx.Status(fiber.StatusOK).JSON(entities.ResponseModel{Message: "Completed create module from your file"})
 }
+
+// func (h *HTTPGateway) GenCourse(ctx *fiber.Ctx) error{
+// 	// jwt := ctx.Cookies('jwt')
+
+// }

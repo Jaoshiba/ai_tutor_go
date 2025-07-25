@@ -2,6 +2,7 @@ package services
 
 import (
 	"context"
+	"encoding/json"
 	"fmt"
 	"go-fiber-template/domain/entities"
 	repo "go-fiber-template/domain/repositories"
@@ -9,6 +10,7 @@ import (
 	"os"
 	"time"
 
+	"github.com/gofiber/fiber/v2"
 	"github.com/google/uuid"
 	"google.golang.org/genai"
 )
@@ -19,50 +21,51 @@ type roadMapService struct {
 }
 
 type IRoadmapService interface {
-	CreateRoadmap(roadmapJsonBody entities.RoadmapRequestBody, file *multipart.FileHeader) error //add userId ด้วย
+	CreateRoadmap(roadmapJsonBody entities.RoadmapRequestBody, file *multipart.FileHeader, ctx *fiber.Ctx) error //add userId ด้วย
 }
 
-func NewRoadmapService(roadMapRepo repo.IroadmapRepository, filrService IFileService) *roadMapService {
+func NewRoadmapService(roadMapRepo repo.IroadmapRepository) IRoadmapService {
 	return &roadMapService{
 		RoadMapRepo: roadMapRepo,
-		FileService: filrService,
 	}
 }
 
-func (rs *roadMapService) CreateRoadmap(roadmapJsonBody entities.RoadmapRequestBody, file *multipart.FileHeader) error {
+func (rs *roadMapService) CreateRoadmap(roadmapJsonBody entities.RoadmapRequestBody, file *multipart.FileHeader, ctx *fiber.Ctx) error {
 
 	//get content from additional file
 	filetype := file.Header.Get("Content-Type")
 	var content string
 	if filetype == "application/pdf" {
-		content, err := rs.FileService.GetPdfData(file)
+		fileContent, err := GetPdfData(file, ctx)
 		if err != nil {
 			return err
 		}
-		content = content
+		content = fileContent
 
 	} else if filetype == "application/vnd.openxmlformats-officedocument.wordprocessingml.document" || filetype == "application/msword" {
-		content, err := rs.FileService.GetDocx_DocData(file)
+		fileContent, err := GetDocx_DocData(file, ctx)
 		if err != nil {
 			fmt.Print("error docx type")
 			return err
 		}
-		content = content
+		content = fileContent
 
 	}
 	gemini_api_key := (os.Getenv("GEMINI_API_KEY"))
 	if gemini_api_key == "" {
 		return nil
 	}
-	ctx := context.Background()
 
-	client, err := genai.NewClient(ctx, &genai.ClientConfig{
+	bctx := context.Background()
+
+	client, err := genai.NewClient(bctx, &genai.ClientConfig{
 		APIKey:  gemini_api_key,
 		Backend: genai.BackendGeminiAPI,
 	})
 	if err != nil {
 		return err
 	}
+	fmt.Println("Creating Roadmap...")
 	//send to create roadmap
 	promt := fmt.Sprintf(`ฉันมีข้อมูลเบื้องต้น 3 อย่างที่ได้จากผู้ใช้:
 
@@ -75,17 +78,10 @@ func (rs *roadMapService) CreateRoadmap(roadmapJsonBody entities.RoadmapRequestB
 
 		ช่วยจัดรูปแบบข้อมูลให้ออกมาเป็น JSON หรือโครงสร้างที่สามารถนำไปใช้กับระบบต่อได้ (เช่นในเว็บแอป) ตัวอย่างโครงสร้างที่ต้องการ:
 		{
-		"title": "ชื่อของ Roadmap",
-		"description": "คำอธิบาย",
 		"modules": [
 			{
 			"title": "ชื่อ Module 1",
 			"description": "คำอธิบายของ Module 1",
-			"topics": [
-				"หัวข้อที่ 1",
-				"หัวข้อที่ 2",
-				...
-			]
 			},
 			...
 		]
@@ -99,8 +95,9 @@ func (rs *roadMapService) CreateRoadmap(roadmapJsonBody entities.RoadmapRequestB
 		กรุณาสร้าง roadmap โดยอิงจากชื่อ, คำอธิบาย และเนื้อหาที่ให้ไว้ด้านบน และ **ขอเป็นภาษาไทยเป็นหลัก**`,
 		roadmapJsonBody.RoadmapName, roadmapJsonBody.Description, content)
 
+	bctx = context.Background()
 	result, err := client.Models.GenerateContent(
-		ctx,
+		bctx,
 		"gemini-2.5-flash",
 		genai.Text(promt),
 		nil,
@@ -109,8 +106,19 @@ func (rs *roadMapService) CreateRoadmap(roadmapJsonBody entities.RoadmapRequestB
 		fmt.Println("Error generating chapters:", err)
 		return err
 	}
+	roadmapString := RemoveJsonBlock(result.Text())
+	if roadmapString == "" {
+		return err
+	}
 
-	fmt.Println("result: ", result)
+	var geminiRes entities.RoadmapGeminiResponse
+	err = json.Unmarshal([]byte(roadmapString), &geminiRes)
+	if err != nil {
+		return err
+	}
+
+
+	fmt.Println("result: ", geminiRes)
 
 	//save roadmap to DB
 	roadmap := entities.RoadmapDataModel{
