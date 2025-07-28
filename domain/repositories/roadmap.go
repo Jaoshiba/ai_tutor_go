@@ -6,31 +6,31 @@ import (
 	"go-fiber-template/domain/entities"
 )
 
-type roadMapRepository struct {
+type courseRepository struct {
 	db *sql.DB
 }
 
-type IroadmapRepository interface {
-	InsertRoadmap(roadmap entities.RoadmapDataModel) error
+type IcourseRepository interface {
+	InsertCourse(course entities.CourseDataModel) error
 }
 
-func NewRoadmapRepository(db *sql.DB) IroadmapRepository {
-	return &roadMapRepository{
+func NewCourseRepository(db *sql.DB) IcourseRepository {
+	return &courseRepository{
 		db: db,
 	}
 }
 
-func (repo *roadMapRepository) InsertRoadmap(roadmap entities.RoadmapDataModel) error {
+func (repo *courseRepository) InsertCourse(course entities.CourseDataModel) error {
 	query := `
-	INSERT INTO roadmaps (
-		roadmapid, roadmapname, userid, createat, updateat
+	INSERT INTO courses (
+		courseid, coursename, userid, createat, updateat
 	) VALUES ($1, $2, $3, $4, $5)`
 	_, err := repo.db.ExecContext(context.Background(), query,
-		roadmap.RoadmapID,
-		roadmap.RoadmapName,
-		roadmap.UserId,
-		roadmap.CreatedAt,
-		roadmap.UpdatedAt,
+		course.CourseID,
+		course.CourseName,
+		course.UserId,
+		course.CreatedAt,
+		course.UpdatedAt,
 	)
 	if err != nil {
 		return err

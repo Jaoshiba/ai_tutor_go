@@ -4,9 +4,9 @@ import (
 	"time"
 )
 
-type RoadmapDataModel struct {
-	RoadmapID   string    `json:"roadmap_id" db:"roadmapid"`
-	RoadmapName string    `json:"roadmap_name" db:"roadmapname"`
+type CourseDataModel struct {
+	CourseID    string    `json:"course_id" db:"courseid"`
+	CourseName  string    `json:"course_name" db:"coursename"`
 	Description string    `json:"description" db:"description"`
 	Confirmed   bool      `json:"confirmed" db:"confirmed"`
 	UserId      string    `json:"user_id" db:"userid"`
@@ -14,13 +14,13 @@ type RoadmapDataModel struct {
 	UpdatedAt   time.Time `json:"updated_at"`
 }
 
-type RoadmapRequestBody struct {
-	RoadmapName string `json:"roadmapName" db:"roadmapname"`
+type CourseRequestBody struct {
+	CourseName  string `json:"courseName" db:"coursename"`
 	Description string `json:"description" db:"description"`
 	Confirmed   bool   `json:"confirmed" db:"confirmed"`
 }
 
-type RoadmapGeminiResponse struct {
+type CourseGeminiResponse struct {
 	Modules []GenModule `json:"modules"`
 }
 

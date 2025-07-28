@@ -26,13 +26,13 @@ func (repo *modulesRepository) InsertModule(module entities.ModuleDataModel) err
 	fmt.Println("InsertModule called with module:", module)
 	query := `
 		INSERT INTO modules (
-			moduleid, modulename, roadmapid, userid, createat, updateat
+			moduleid, modulename, courseid, userid, createat, updateat
 		) VALUES ($1, $2, $3, $4, $5, $6)`
 
 	result, err := repo.db.ExecContext(context.Background(), query,
 		module.ModuleId,
 		module.ModuleName,
-		module.RoadmapId,
+		module.CourseId,
 		module.UserId,
 		module.CreatedAt,
 		module.UpdatedAt,

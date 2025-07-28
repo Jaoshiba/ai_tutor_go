@@ -58,7 +58,7 @@ func main() {
 	userRepo := repo.NewUsersRepositoryPostgres(postgresql)
 	fileRepo := repo.NewModulesRepository(postgresql)
 	chapterRepo := repo.NewChapterRepository(postgresql)
-	roadmapRepo := repo.NewRoadmapRepository(postgresql)
+	courseRepo := repo.NewCourseRepository(postgresql)
 
 	// สร้าง Services
 	jwtSecret = os.Getenv("JWT_SECRET_KEY")
@@ -71,11 +71,11 @@ func main() {
 
 	svChapter := sv.NewChapterServices(chapterRepo)
 	sv1 := sv.NewModuleService(fileRepo, svChapter)
-	svRoadmap := sv.NewRoadmapService(roadmapRepo)
+	svCourse := sv.NewCourseService(courseRepo)
 
 	// สร้าง Gateway และผูก Routes ทั้งหมด
 	// ต้องส่ง AuthService และ UserService เข้าไปใน NewHTTPGateway ด้วย
-	gw.NewHTTPGateway(app, sv0, sv1, svGoogleAuth, svAuth, svChapter, svRoadmap) // <--- ตรวจสอบพารามิเตอร์
+	gw.NewHTTPGateway(app, sv0, sv1, svGoogleAuth, svAuth, svChapter, svCourse) // <--- ตรวจสอบพารามิเตอร์
 
 	// ให้บริการไฟล์ static (เช่น dashboard.html)
 	app.Use("/dashboard", filesystem.New(filesystem.Config{
