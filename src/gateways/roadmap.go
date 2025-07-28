@@ -33,7 +33,7 @@ func (h *HTTPGateway) CreateRoadmap(ctx *fiber.Ctx) error {
 		return ctx.Status(fiber.StatusUnprocessableEntity).JSON(entities.ResponseMessage{Message: "invalid json body u missed description"})
 	}
 
-	err = h.RoadmapService.CreateRoadmap(roadmapjsonBody, file, ctx)
+	err = h.RoadmapService.CreateRoadmap(roadmapjsonBody, file, true, ctx)
 	if err != nil {
 		return ctx.Status(fiber.StatusBadRequest).JSON(entities.ResponseModel{
 			Message: "failed to create roadmap on CreateRoadmap",

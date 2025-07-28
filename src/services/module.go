@@ -17,7 +17,7 @@ type ModuleService struct {
 }
 
 type IModuleService interface {
-	CreateModule(file *multipart.FileHeader, ctx *fiber.Ctx) error
+	CreateModule(file *multipart.FileHeader, roadmapname string, ctx *fiber.Ctx) error
 }
 
 func NewModuleService(modulesRepository repo.IModuleRepository, chapterservice IChapterService) IModuleService {
@@ -27,7 +27,7 @@ func NewModuleService(modulesRepository repo.IModuleRepository, chapterservice I
 	}
 }
 
-func (ms *ModuleService) CreateModule(file *multipart.FileHeader, ctx *fiber.Ctx) error {
+func (ms *ModuleService) CreateModule(file *multipart.FileHeader, roadmapname string, ctx *fiber.Ctx) error {
 	filetype := file.Header.Get("Content-Type")
 	fmt.Println("File header: ", filetype)
 
