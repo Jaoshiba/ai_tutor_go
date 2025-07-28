@@ -105,15 +105,15 @@ func (c *ChapterServices) ChapterrizedText(fCtx *fiber.Ctx, text string) error {
 		return fiber.NewError(fiber.StatusUnauthorized, "Invalid or missing user ID in context")
 	}
 
-	// Consider if RoadmapId should be passed from the controller or generated here
-	roadmapID := uuid.NewString()
+	// Consider if CourseId should be passed from the controller or generated here
+	courseID := uuid.NewString()
 
 	for _, chapter := range response.Chapters {
 		ch := entities.ChapterDataModel{
 			ChapterId:      uuid.NewString(),
 			ChapterName:    chapter.ChapterName,
 			UserID:         userIDStr,
-			RoadmapId:      roadmapID,
+			CourseId:       courseID,
 			ChapterContent: chapter.Content,
 			CreateAt:       time.Now(),
 			UpdatedAt:      time.Now(),

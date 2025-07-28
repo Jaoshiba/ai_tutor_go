@@ -15,22 +15,22 @@ import (
 	"google.golang.org/genai"
 )
 
-type roadMapService struct {
-	RoadMapRepo repo.IroadmapRepository
+type courseService struct {
+	CourseRepo  repo.IcourseRepository
 	FileService IFileService
 }
 
-type IRoadmapService interface {
-	CreateRoadmap(roadmapJsonBody entities.RoadmapRequestBody, file *multipart.FileHeader, ctx *fiber.Ctx) error //add userId ด้วย
+type ICourseService interface {
+	CreateCourse(courseJsonBody entities.CourseRequestBody, file *multipart.FileHeader, ctx *fiber.Ctx) error //add userId ด้วย
 }
 
-func NewRoadmapService(roadMapRepo repo.IroadmapRepository) IRoadmapService {
-	return &roadMapService{
-		RoadMapRepo: roadMapRepo,
+func NewCourseService(courseRepo repo.IcourseRepository) ICourseService {
+	return &courseService{
+		CourseRepo: courseRepo,
 	}
 }
 
-func (rs *roadMapService) CreateRoadmap(roadmapJsonBody entities.RoadmapRequestBody, file *multipart.FileHeader, ctx *fiber.Ctx) error {
+func (rs *courseService) CreateCourse(courseJsonBody entities.CourseRequestBody, file *multipart.FileHeader, ctx *fiber.Ctx) error {
 
 	//get content from additional file
 	filetype := file.Header.Get("Content-Type")
@@ -65,16 +65,16 @@ func (rs *roadMapService) CreateRoadmap(roadmapJsonBody entities.RoadmapRequestB
 	if err != nil {
 		return err
 	}
-	fmt.Println("Creating Roadmap...")
-	//send to create roadmap
+	fmt.Println("Creating Course...")
+	//send to create course
 	promt := fmt.Sprintf(`ฉันมีข้อมูลเบื้องต้น 3 อย่างที่ได้จากผู้ใช้:
 
-		ชื่อ Roadmap: %s
+		ชื่อ Course: %s
 
-		คำอธิบาย Roadmap: %s
+		คำอธิบาย Course: %s
 
 		เนื้อหาที่ได้จากไฟล์แนบ: %s 
-		ฉันต้องการให้คุณช่วยสร้าง Roadmap การเรียนรู้ ที่เหมาะสม โดยแบ่งเนื้อหาออกเป็น Module หรือหัวข้อหลัก ๆ ที่ควรเรียน พร้อมเรียงลำดับตามความเหมาะสมในการเรียนรู้
+		ฉันต้องการให้คุณช่วยสร้าง Course การเรียนรู้ ที่เหมาะสม โดยแบ่งเนื้อหาออกเป็น Module หรือหัวข้อหลัก ๆ ที่ควรเรียน พร้อมเรียงลำดับตามความเหมาะสมในการเรียนรู้
 
 		ช่วยจัดรูปแบบข้อมูลให้ออกมาเป็น JSON หรือโครงสร้างที่สามารถนำไปใช้กับระบบต่อได้ (เช่นในเว็บแอป) ตัวอย่างโครงสร้างที่ต้องการ:
 		{
@@ -92,8 +92,8 @@ func (rs *roadMapService) CreateRoadmap(roadmapJsonBody entities.RoadmapRequestB
 
 		ไม่ต้องใส่ข้อมูลที่ไม่แน่ใจ เช่น ลิงก์ หรือไฟล์แนบ
 
-		กรุณาสร้าง roadmap โดยอิงจากชื่อ, คำอธิบาย และเนื้อหาที่ให้ไว้ด้านบน และ **ขอเป็นภาษาไทยเป็นหลัก**`,
-		roadmapJsonBody.RoadmapName, roadmapJsonBody.Description, content)
+		กรุณาสร้าง course โดยอิงจากชื่อ, คำอธิบาย และเนื้อหาที่ให้ไว้ด้านบน และ **ขอเป็นภาษาไทยเป็นหลัก**`,
+		courseJsonBody.CourseName, courseJsonBody.Description, content)
 
 	bctx = context.Background()
 	result, err := client.Models.GenerateContent(
@@ -106,33 +106,32 @@ func (rs *roadMapService) CreateRoadmap(roadmapJsonBody entities.RoadmapRequestB
 		fmt.Println("Error generating chapters:", err)
 		return err
 	}
-	roadmapString := RemoveJsonBlock(result.Text())
-	if roadmapString == "" {
+	courseString := RemoveJsonBlock(result.Text())
+	if courseString == "" {
 		return err
 	}
 
-	var geminiRes entities.RoadmapGeminiResponse
-	err = json.Unmarshal([]byte(roadmapString), &geminiRes)
+	var geminiRes entities.CourseGeminiResponse
+	err = json.Unmarshal([]byte(courseString), &geminiRes)
 	if err != nil {
 		return err
 	}
 
-
 	fmt.Println("result: ", geminiRes)
 
-	//save roadmap to DB
-	roadmap := entities.RoadmapDataModel{
-		RoadmapID:   uuid.NewString(),
-		RoadmapName: roadmapJsonBody.RoadmapName,
-		Description: roadmapJsonBody.Description,
-		Confirmed:   roadmapJsonBody.Confirmed,
+	//save course to DB
+	course := entities.CourseDataModel{
+		CourseID:    uuid.NewString(),
+		CourseName:  courseJsonBody.CourseName,
+		Description: courseJsonBody.Description,
+		Confirmed:   courseJsonBody.Confirmed,
 		UserId:      uuid.NewString(),
 		CreatedAt:   time.Now(),
 		UpdatedAt:   time.Now(),
 	}
-	err = rs.RoadMapRepo.InsertRoadmap(roadmap)
+	err = rs.CourseRepo.InsertCourse(course)
 	if err != nil {
-		fmt.Println("error insert roadmap")
+		fmt.Println("error insert course")
 		return err
 	}
 
