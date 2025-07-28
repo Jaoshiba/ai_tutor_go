@@ -6,6 +6,7 @@ import (
 	"os"
 	"time"
 
+	ds "go-fiber-template/domain/datasources"
 	"go-fiber-template/domain/entities"
 	"go-fiber-template/domain/repositories"
 
@@ -19,7 +20,7 @@ type ChapterServices struct {
 }
 
 type IChapterService interface {
-	ChapterrizedText(fCtx *fiber.Ctx, text string) error
+	ChapterrizedText(ctx *fiber.Ctx, courseId string, text string) error
 }
 
 func NewChapterServices(chapterRepository repositories.IChapterRepository) IChapterService {
@@ -28,14 +29,14 @@ func NewChapterServices(chapterRepository repositories.IChapterRepository) IChap
 	}
 }
 
-func (c *ChapterServices) ChapterrizedText(fCtx *fiber.Ctx, text string) error {
+func (c *ChapterServices) ChapterrizedText(ctx *fiber.Ctx, courseId string, text string) error {
 
 	gemini_api_key := os.Getenv("GEMINI_API_KEY")
 	if gemini_api_key == "" {
 		return fmt.Errorf("GEMINI_API_KEY not set")
 	}
 
-	genaiCtx := fCtx.Context()
+	genaiCtx := ctx.Context()
 
 	client, err := genai.NewClient(genaiCtx, &genai.ClientConfig{
 		APIKey:  gemini_api_key,
@@ -99,14 +100,18 @@ func (c *ChapterServices) ChapterrizedText(fCtx *fiber.Ctx, text string) error {
 		return err
 	}
 
-	userIDRaw := fCtx.Locals("userID")
+	userIDRaw := ctx.Locals("userID")
 	userIDStr, ok := userIDRaw.(string)
 	if !ok || userIDStr == "" {
 		return fiber.NewError(fiber.StatusUnauthorized, "Invalid or missing user ID in context")
 	}
 
-	// Consider if RoadmapId should be passed from the controller or generated here
-	courseId := uuid.NewString()
+	nameSpaceName := userIDRaw.(string)
+
+	fmt.Println("nameSpaceName: ", nameSpaceName)
+
+	//save data to pinecone
+	ds.NewPincecone(ctx)
 
 	for _, chapter := range response.Chapters {
 		ch := entities.ChapterDataModel{

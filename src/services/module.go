@@ -51,7 +51,9 @@ func (ms *ModuleService) CreateModule(file *multipart.FileHeader, roadmapname st
 		content = fileContent
 
 	}
-	err := ms.ChapterServices.ChapterrizedText(ctx, content)
+
+	couresId := uuid.NewString()
+	err := ms.ChapterServices.ChapterrizedText(ctx, couresId, content)
 	if err != nil {
 		return err
 	}
@@ -65,7 +67,7 @@ func (ms *ModuleService) CreateModule(file *multipart.FileHeader, roadmapname st
 	}
 	fmt.Println("user id is : ", userIdStr)
 	module := entities.ModuleDataModel{
-		ModuleId:   uuid.NewString(),
+		ModuleId:   couresId,
 		ModuleName: file.Filename,
 		RoadmapId:  uuid.NewString(),
 		UserId:     userIdStr,
