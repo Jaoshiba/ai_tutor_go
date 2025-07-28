@@ -10,6 +10,7 @@ import (
 
 func (h *HTTPGateway) CreateCourse(ctx *fiber.Ctx) error {
 
+	
 	file, err := ctx.FormFile("file")
 	if err != nil {
 		return ctx.Status(fiber.StatusUnprocessableEntity).JSON(entities.ResponseMessage{Message: "invalid file"})
@@ -41,4 +42,8 @@ func (h *HTTPGateway) CreateCourse(ctx *fiber.Ctx) error {
 	}
 
 	return ctx.Status(fiber.StatusOK).JSON(entities.ResponseModel{Message: "Completed create Course from your promts"})
+}
+
+func (h *HTTPGateway) checkValidCourse(c *fiber.Ctx) {
+
 }

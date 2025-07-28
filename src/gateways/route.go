@@ -67,9 +67,7 @@ func GatewayProtected(gateway HTTPGateway, app *fiber.App) {
 	// Routes สำหรับ Modules (ที่ต้องการการป้องกัน)
 
 	protected.Post("/modules/upload", gateway.UploadFile)      // อัปโหลดไฟล์ (ต้องล็อกอิน)
-	protected.Post("/modules/text", func(c *fiber.Ctx) error { // ตัวอย่าง route (ต้องล็อกอิน)
-		return c.SendString("Protected module text route!")
-	})
+	protected.Post("/create/course/search", gateway.CreateCourse)
 	// protected.Get("/modules", gateway.GetAllModules)     // ถ้ามี: ดึงข้อมูลโมดูลทั้งหมด (ต้องล็อกอิน)
 	// protected.Get("/modules/:id", gateway.GetModuleByID) // ถ้ามี: ดึงข้อมูลโมดูลตาม ID (ต้องล็อกอิน)
 	// protected.Put("/modules/:id", gateway.UpdateModule)  // ถ้ามี: อัปเดตโมดูล (ต้องล็อกอิน)

@@ -36,7 +36,7 @@ func (rs *courseService) CreateCourse(courseJsonBody entities.CourseRequestBody,
 	filetype := file.Header.Get("Content-Type")
 	var content string
 	if filetype == "application/pdf" {
-		fileContent, err := GetPdfData(file, ctx)
+		fileContent, err := GetPdfData(file, ctx) 
 		if err != nil {
 			return err
 		}
@@ -49,7 +49,6 @@ func (rs *courseService) CreateCourse(courseJsonBody entities.CourseRequestBody,
 			return err
 		}
 		content = fileContent
-
 	}
 	gemini_api_key := (os.Getenv("GEMINI_API_KEY"))
 	if gemini_api_key == "" {
