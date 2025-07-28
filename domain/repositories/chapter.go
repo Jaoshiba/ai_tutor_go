@@ -26,7 +26,7 @@ func (repo *chaptersRepository) InsertChapter(chapter entities.ChapterDataModel)
 	fmt.Println("InsertChapter called with chapter:", chapter)
 	query := `
 	INSERT INTO chapters (
-		chapterid, chaptername, userid, roadmapid, chaptercontent, isfinished, createat, updateat
+		chapterid, chaptername, userid, courseid, chaptercontent, isfinished, createat, updateat
 	) VALUES ($1, $2, $3, $4, $5, $6, $7, $8)`
 
 	fmt.Println("userid in chap repo : ", chapter.UserID)
@@ -34,7 +34,7 @@ func (repo *chaptersRepository) InsertChapter(chapter entities.ChapterDataModel)
 		chapter.ChapterId,
 		chapter.ChapterName,
 		chapter.UserID,
-		chapter.RoadmapId,
+		chapter.CouseId,
 		chapter.ChapterContent,
 		chapter.IsFinished,
 		chapter.CreateAt,

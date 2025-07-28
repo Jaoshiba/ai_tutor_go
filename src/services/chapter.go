@@ -106,14 +106,14 @@ func (c *ChapterServices) ChapterrizedText(fCtx *fiber.Ctx, text string) error {
 	}
 
 	// Consider if RoadmapId should be passed from the controller or generated here
-	roadmapID := uuid.NewString()
+	courseId := uuid.NewString()
 
 	for _, chapter := range response.Chapters {
 		ch := entities.ChapterDataModel{
 			ChapterId:      uuid.NewString(),
 			ChapterName:    chapter.ChapterName,
 			UserID:         userIDStr,
-			RoadmapId:      roadmapID,
+			CouseId:        courseId,
 			ChapterContent: chapter.Content,
 			CreateAt:       time.Now(),
 			UpdatedAt:      time.Now(),
