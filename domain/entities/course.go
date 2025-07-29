@@ -5,8 +5,8 @@ import (
 )
 
 type CourseDataModel struct {
-	CourseID    string    `json:"course_id" db:"courseid"`
-	CourseName  string    `json:"course_name" db:"title"`
+	CourseID    string    `json:"course_id" db:"id"`
+	Title       string    `json:"Title" db:"title"`
 	Description string    `json:"description" db:"description"`
 	Confirmed   bool      `json:"confirmed" db:"confirmed"`
 	UserId      string    `json:"user_id" db:"userid"`
@@ -15,8 +15,8 @@ type CourseDataModel struct {
 }
 
 type CourseRequestBody struct {
-	CourseName  string `json:"courseName" db:"title"`
-	Description string `json:"description" db:"description"`
+	Title       string `json:"Title" db:"title"`
+	Description string `json:"Description" db:"description"`
 	Confirmed   bool   `json:"confirmed" db:"confirmed"`
 }
 

@@ -12,9 +12,9 @@ func (h *HTTPGateway) CreateCourse(ctx *fiber.Ctx) error {
 
 	
 	file, err := ctx.FormFile("file")
-	if err != nil {
-		return ctx.Status(fiber.StatusUnprocessableEntity).JSON(entities.ResponseMessage{Message: "invalid file"})
-	}
+	// if err != nil {
+	// 	return ctx.Status(fiber.StatusUnprocessableEntity).JSON(entities.ResponseMessage{Message: "invalid file"})
+	// }
 	jsonbody := ctx.FormValue("jsonbody")
 
 	fmt.Println("jsonbody: ", jsonbody)
@@ -26,8 +26,10 @@ func (h *HTTPGateway) CreateCourse(ctx *fiber.Ctx) error {
 		return ctx.Status(fiber.StatusUnprocessableEntity).JSON(entities.ResponseMessage{Message: "invalid json body"})
 	}
 
-	courseName := coursejsonBody.CourseName
+	courseName := coursejsonBody.Title
+	fmt.Println(courseName)
 	description := coursejsonBody.Description
+	fmt.Println(description)
 	if courseName == "" {
 		return ctx.Status(fiber.StatusUnprocessableEntity).JSON(entities.ResponseMessage{Message: "invalid json body u missed course name"})
 	} else if description == "" {

@@ -23,11 +23,12 @@ func NewCourseRepository(db *sql.DB) IcourseRepository {
 func (repo *courseRepository) InsertCourse(course entities.CourseDataModel) error {
 	query := `
 	INSERT INTO courses (
-		courseid, coursename, userid, createat, updateat
-	) VALUES ($1, $2, $3, $4, $5)`
+		id, title, description, userid, createat, updateat
+	) VALUES ($1, $2, $3, $4, $5, $6)`
 	_, err := repo.db.ExecContext(context.Background(), query,
 		course.CourseID,
-		course.CourseName,
+		course.Title,
+		course.Description,
 		course.UserId,
 		course.CreatedAt,
 		course.UpdatedAt,
