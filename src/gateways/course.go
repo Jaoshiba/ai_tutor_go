@@ -9,8 +9,6 @@ import (
 )
 
 func (h *HTTPGateway) CreateCourse(ctx *fiber.Ctx) error {
-
-	
 	file, err := ctx.FormFile("file")
 	// if err != nil {
 	// 	return ctx.Status(fiber.StatusUnprocessableEntity).JSON(entities.ResponseMessage{Message: "invalid file"})
@@ -46,6 +44,24 @@ func (h *HTTPGateway) CreateCourse(ctx *fiber.Ctx) error {
 	return ctx.Status(fiber.StatusOK).JSON(entities.ResponseModel{Message: "Completed create Course from your promts"})
 }
 
-func (h *HTTPGateway) checkValidCourse(c *fiber.Ctx) {
+func (h *HTTPGateway) GetCourseByUser(c *fiber.Ctx) error {
+	userID := c.Locals("userID")
+	if userID == nil { 
+		return c.Status(fiber.StatusUnauthorized).JSON(entities.ResponseMessage{Message: "User ID not found in context"})
+	}
 
+	
+	userIDStr, ok := userID.(string)
+	if !ok || userIDStr == "" {
+		return c.Status(fiber.StatusUnprocessableEntity).JSON(entities.ResponseMessage{Message: "Invalid user ID in context"})
+	}
+
+	courses, err := h.CourseService.GetCourses(c)
+	if err != nil {
+		return c.Status(fiber.StatusInternalServerError).JSON(entities.ResponseMessage{Message: "Failed to retrieve courses"})
+	}
+	return c.Status(fiber.StatusOK).JSON(fiber.Map{
+		"message": "Courses retrieved successfully",
+		"data":    courses,
+	})
 }

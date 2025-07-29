@@ -22,6 +22,9 @@ type courseService struct {
 
 type ICourseService interface {
 	CreateCourse(courseJsonBody entities.CourseRequestBody, file *multipart.FileHeader, ctx *fiber.Ctx) error //add userId ด้วย
+	GetCourses(ctx *fiber.Ctx) ([]entities.CourseDataModel, error)
+
+
 }
 
 func NewCourseService(courseRepo repo.IcourseRepository) ICourseService {
@@ -29,6 +32,29 @@ func NewCourseService(courseRepo repo.IcourseRepository) ICourseService {
 		CourseRepo: courseRepo,
 	}
 }
+
+func (rs *courseService) GetCourses(ctx *fiber.Ctx) ([]entities.CourseDataModel, error) {
+	userID := ctx.Locals("userID").(string) // Get userId from context locals
+
+	if userID == "" {
+		return nil, fmt.Errorf("user ID is missing from context")
+	}
+
+	course, err := rs.CourseRepo.GetCoursesByUserID(userID)
+	if err != nil {
+		return nil, fmt.Errorf("failed to get course: %w", err)
+	}
+
+
+	fmt.Println("course data : ", course)
+
+
+	if course == nil {
+		return nil, fiber.ErrNotFound // Return a Fiber-specific error if not found
+	}
+	return course, nil
+}
+
 
 func (rs *courseService) CreateCourse(courseJsonBody entities.CourseRequestBody, file *multipart.FileHeader, ctx *fiber.Ctx) error {
 

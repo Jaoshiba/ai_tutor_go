@@ -68,6 +68,8 @@ func GatewayProtected(gateway HTTPGateway, app *fiber.App) {
 
 	protected.Post("/modules/upload", gateway.UploadFile)      // อัปโหลดไฟล์ (ต้องล็อกอิน)
 	protected.Post("/create/course/search", gateway.CreateCourse)
+
+	protected.Get("/courses", gateway.GetCourseByUser)
 	// protected.Get("/modules", gateway.GetAllModules)     // ถ้ามี: ดึงข้อมูลโมดูลทั้งหมด (ต้องล็อกอิน)
 	// protected.Get("/modules/:id", gateway.GetModuleByID) // ถ้ามี: ดึงข้อมูลโมดูลตาม ID (ต้องล็อกอิน)
 	// protected.Put("/modules/:id", gateway.UpdateModule)  // ถ้ามี: อัปเดตโมดูล (ต้องล็อกอิน)
