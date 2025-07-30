@@ -10,7 +10,6 @@ import (
 	openai "github.com/sashabaranov/go-openai"
 	"google.golang.org/protobuf/types/known/structpb"
 
-	cohere "github.com/cohere-ai/cohere-go/v2"
 	cohereClient "github.com/cohere-ai/cohere-go/v2/client"
 )
 
