@@ -4,6 +4,7 @@ go 1.24.1
 
 require (
 	baliance.com/gooxml v1.0.1
+	github.com/cohere-ai/cohere-go/v2 v2.14.1
 	github.com/goccy/go-json v0.10.2
 	github.com/gofiber/fiber/v2 v2.51.0
 	github.com/golang-jwt/jwt/v5 v5.2.2
@@ -11,9 +12,12 @@ require (
 	github.com/joho/godotenv v1.5.1
 	github.com/ledongthuc/pdf v0.0.0-20250511090121-5959a4027728
 	github.com/lib/pq v1.10.9
+	github.com/pinecone-io/go-pinecone/v4 v4.1.2
+	github.com/sashabaranov/go-openai v1.40.5
 	golang.org/x/crypto v0.33.0
 	golang.org/x/oauth2 v0.30.0
 	google.golang.org/genai v1.14.0
+	google.golang.org/protobuf v1.34.2
 )
 
 require (
@@ -22,6 +26,8 @@ require (
 	cloud.google.com/go/compute/metadata v0.5.0 // indirect
 	github.com/andybalholm/brotli v1.0.5 // indirect
 	github.com/apapsch/go-jsonmerge/v2 v2.0.0 // indirect
+	github.com/aws/aws-sdk-go-v2 v1.30.3 // indirect
+	github.com/aws/smithy-go v1.20.3 // indirect
 	github.com/davecgh/go-spew v1.1.1 // indirect
 	github.com/golang/groupcache v0.0.0-20210331224755-41bb18bfe9da // indirect
 	github.com/google/go-cmp v0.6.0 // indirect
@@ -33,7 +39,6 @@ require (
 	github.com/mattn/go-isatty v0.0.20 // indirect
 	github.com/mattn/go-runewidth v0.0.15 // indirect
 	github.com/oapi-codegen/runtime v1.1.1 // indirect
-	github.com/pinecone-io/go-pinecone/v4 v4.1.2 // indirect
 	github.com/pmezard/go-difflib v1.0.0 // indirect
 	github.com/rivo/uniseg v0.2.0 // indirect
 	github.com/stretchr/testify v1.8.4 // indirect
@@ -47,6 +52,5 @@ require (
 	google.golang.org/genproto/googleapis/api v0.0.0-20240903143218-8af14fe29dc1 // indirect
 	google.golang.org/genproto/googleapis/rpc v0.0.0-20240903143218-8af14fe29dc1 // indirect
 	google.golang.org/grpc v1.66.2 // indirect
-	google.golang.org/protobuf v1.34.2 // indirect
 	gopkg.in/yaml.v3 v3.0.1 // indirect
 )

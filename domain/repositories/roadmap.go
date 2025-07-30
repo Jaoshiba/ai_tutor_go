@@ -22,7 +22,11 @@ func NewRoadmapRepository(db *sql.DB) IroadmapRepository {
 
 func (repo *roadMapRepository) InsertRoadmap(roadmap entities.RoadmapDataModel) error {
 	query := `
+<<<<<<< HEAD
 	INSERT INTO roadmaps (
+=======
+	INSERT INTO courses (
+>>>>>>> 30ad2e96acce18db588b014eb5bc54da36bef1aa
 		roadmapid, roadmapname, userid, createat, updateat
 	) VALUES ($1, $2, $3, $4, $5)`
 	_, err := repo.db.ExecContext(context.Background(), query,

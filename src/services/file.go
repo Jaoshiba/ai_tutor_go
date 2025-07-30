@@ -74,8 +74,6 @@ func GetPdfData(file *multipart.FileHeader, ctx *fiber.Ctx) (string, error) {
 
 	reader := bytes.NewReader(fileBytes)
 
-	fmt.Println("reader: ", reader)
-
 	pdfReader, err := pdf.NewReader(reader, reader.Size())
 	if err != nil {
 		return "", err
