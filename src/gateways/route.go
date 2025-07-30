@@ -38,6 +38,7 @@ func GatewayRoadmap(gateway HTTPGateway, app *fiber.App) {
 	api := app.Group("/api/v1/roadmap")
 	//api.Use(middlewares.JWTAuthMiddleware(gateway.AuthService))
 	api.Post("/create", gateway.CreateRoadmap)
+	api.Get("/pineconetest", gateway.TestPinecone)
 }
 
 func GatewayModules(gateway HTTPGateway, app *fiber.App) {
@@ -65,7 +66,7 @@ func GatewayProtected(gateway HTTPGateway, app *fiber.App) {
 	// protected.Delete("/users/:id", gateway.DeleteUser)   // ถ้ามี: ลบผู้ใช้ (ต้องล็อกอิน)
 
 	// Routes สำหรับ Modules (ที่ต้องการการป้องกัน)
-	
+
 	// protected.Post("/modules/upload", gateway.UploadFile)      // อัปโหลดไฟล์ (ต้องล็อกอิน)
 	protected.Post("/modules/text", func(c *fiber.Ctx) error { // ตัวอย่าง route (ต้องล็อกอิน)
 		return c.SendString("Protected module text route!")

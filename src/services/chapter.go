@@ -3,29 +3,35 @@ package services
 import (
 	"encoding/json"
 	"fmt"
+	"log"
 	"os"
 	"time"
 
-	ds "go-fiber-template/domain/datasources"
 	"go-fiber-template/domain/entities"
 	"go-fiber-template/domain/repositories"
 
 	"github.com/gofiber/fiber/v2" // Import Fiber to use its context
 	"github.com/google/uuid"
+	"github.com/sashabaranov/go-openai"
 	"google.golang.org/genai"
+
+	cohere "github.com/cohere-ai/cohere-go/v2"
+	cohereClient "github.com/cohere-ai/cohere-go/v2/client"
 )
 
 type ChapterServices struct {
 	ChapterRepository repositories.IChapterRepository
+	PineconeRepo      repositories.IPineconeRepository
 }
 
 type IChapterService interface {
 	ChapterrizedText(ctx *fiber.Ctx, courseId string, text string) error
 }
 
-func NewChapterServices(chapterRepository repositories.IChapterRepository) IChapterService {
+func NewChapterServices(chapterRepository repositories.IChapterRepository, pineconeRepo repositories.IPineconeRepository) IChapterService {
 	return &ChapterServices{
 		ChapterRepository: chapterRepository,
+		PineconeRepo:      pineconeRepo,
 	}
 }
 
@@ -90,6 +96,7 @@ func (c *ChapterServices) ChapterrizedText(ctx *fiber.Ctx, courseId string, text
 	fmt.Println("Finished your chapterize...")
 
 	if chaps == "" {
+		fmt.Println("No chapters found in the response")
 		return fmt.Errorf("no chapters found in the response")
 	}
 
@@ -100,18 +107,22 @@ func (c *ChapterServices) ChapterrizedText(ctx *fiber.Ctx, courseId string, text
 		return err
 	}
 
-	userIDRaw := ctx.Locals("userID")
-	userIDStr, ok := userIDRaw.(string)
-	if !ok || userIDStr == "" {
-		return fiber.NewError(fiber.StatusUnauthorized, "Invalid or missing user ID in context")
+	// userIDRaw := ctx.Locals("userID")
+	// userIDStr, ok := userIDRaw.(string)
+	// if !ok || userIDStr == "" {
+	// 	return fiber.NewError(fiber.StatusUnauthorized, "Invalid or missing user ID in context")
+	// }
+
+	userIDStr := uuid.NewString()
+	fmt.Println("User ID:", userIDStr)
+
+	coheereapikey := os.Getenv("COHERE_API_KEY")
+	if coheereapikey == "" {
+		log.Fatal("COHERE_API_KEY is not set in .env")
 	}
+	co := cohereClient.NewAwsClient(cohereClient.WithToken(coheereapikey))
 
-	nameSpaceName := userIDRaw.(string)
-
-	fmt.Println("nameSpaceName: ", nameSpaceName)
-
-	//save data to pinecone
-	ds.NewPincecone(ctx)
+	fmt.Println("creating openai succesful")
 
 	for _, chapter := range response.Chapters {
 		ch := entities.ChapterDataModel{
@@ -127,6 +138,13 @@ func (c *ChapterServices) ChapterrizedText(ctx *fiber.Ctx, courseId string, text
 		fmt.Println("Inserting chapter:", ch.ChapterId)
 		err = c.ChapterRepository.InsertChapter(ch)
 		if err != nil {
+			fmt.Println("Error inserting chapter:", err)
+			return err
+		}
+		//save data to pinecone
+		err = c.PineconeRepo.UpsertVector(ch, co, ctx)
+		if err != nil {
+			fmt.Println("Error inserting chapter:", err)
 			return err
 		}
 	}

@@ -18,6 +18,7 @@ type HTTPGateway struct {
 	AuthService       auth.IAuthService
 	ChapterService    service.IChapterService
 	RoadmapService    service.IRoadmapService
+	PineconeService   service.IPineconeService
 }
 
 func NewHTTPGateway(
@@ -28,6 +29,7 @@ func NewHTTPGateway(
 	authService auth.IAuthService,
 	chapterService service.IChapterService,
 	roadmapService service.IRoadmapService,
+	pineconeService service.IPineconeService,
 ) {
 	gateway := &HTTPGateway{
 		UserService:       users,
@@ -36,6 +38,7 @@ func NewHTTPGateway(
 		AuthService:       authService,
 		ChapterService:    chapterService,
 		RoadmapService:    roadmapService,
+		PineconeService:   pineconeService,
 	}
 
 	GatewayAuth(*gateway, app)

@@ -53,12 +53,19 @@ func main() {
 	// Connect PostgreSQL
 	postgresql := ds.NewPostgresql()
 	fmt.Printf("PostgreSQL DB instance before passing to repo: %p\n", postgresql)
+	pineconeIdxConn, err := ds.NewPincecone()
+	if err != nil {
+		log.Fatalf("Failed to connect to Pinecone: %v", err)
+	}
+
+	
 
 	// สร้าง Repositories
 	userRepo := repo.NewUsersRepositoryPostgres(postgresql)
 	fileRepo := repo.NewModulesRepository(postgresql)
 	chapterRepo := repo.NewChapterRepository(postgresql)
 	roadmapRepo := repo.NewRoadmapRepository(postgresql)
+	pineconeRepo := repo.NewPineconeRepository(pineconeIdxConn)
 
 	// สร้าง Services
 	jwtSecret = os.Getenv("JWT_SECRET_KEY")
@@ -69,13 +76,14 @@ func main() {
 	sv0 := sv.NewUsersService(userRepo)                       // สร้าง UsersServic
 	svGoogleAuth := authService.NewGoogleOAuthService(svAuth) // สร้าง GoogleOAuthService โดยฉีด AuthService
 
-	svChapter := sv.NewChapterServices(chapterRepo)
+	svPinecone := sv.NewPineconeService(pineconeRepo)
+	svChapter := sv.NewChapterServices(chapterRepo, pineconeRepo)
 	sv1 := sv.NewModuleService(fileRepo, svChapter)
 	svRoadmap := sv.NewRoadmapService(roadmapRepo)
 
 	// สร้าง Gateway และผูก Routes ทั้งหมด
 	// ต้องส่ง AuthService และ UserService เข้าไปใน NewHTTPGateway ด้วย
-	gw.NewHTTPGateway(app, sv0, sv1, svGoogleAuth, svAuth, svChapter, svRoadmap) // <--- ตรวจสอบพารามิเตอร์
+	gw.NewHTTPGateway(app, sv0, sv1, svGoogleAuth, svAuth, svChapter, svRoadmap, svPinecone) // <--- ตรวจสอบพารามิเตอร์
 
 	// ให้บริการไฟล์ static (เช่น dashboard.html)
 	app.Use("/dashboard", filesystem.New(filesystem.Config{

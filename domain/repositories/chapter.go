@@ -41,7 +41,7 @@ func (repo *chaptersRepository) InsertChapter(chapter entities.ChapterDataModel)
 		chapter.UpdatedAt,
 	)
 	if err != nil {
-		fmt.Print(err)
+		fmt.Print("Error inserting chapter: ", err)
 		return err
 	}
 	return nil
