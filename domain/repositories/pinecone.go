@@ -18,7 +18,7 @@ type PineconeRepository struct {
 }
 
 type IPineconeRepository interface {
-	UpsertVector(chapter entities.ChapterDataModel, co *cohereClient.Client, ctx *fiber.Ctx) error
+	UpsertVector(chapter entities.ChapterDataModel, co *cohereClient.Client, ctx *fiber.Ctx, userId string) error
 }
 
 func NewPineconeRepository(pineconeIdxConn *pinecone.IndexConnection) IPineconeRepository {
@@ -27,7 +27,7 @@ func NewPineconeRepository(pineconeIdxConn *pinecone.IndexConnection) IPineconeR
 	}
 }
 
-func (pc *PineconeRepository) UpsertVector(chapter entities.ChapterDataModel, co *cohereClient.Client, ctx *fiber.Ctx) error {
+func (pc *PineconeRepository) UpsertVector(chapter entities.ChapterDataModel, co *cohereClient.Client, ctx *fiber.Ctx, userId string) error {
 	fmt.Println("upsertVector call...")
 	// limit := uint32(100)
 	// namespaces, err := indexConn.ListNamespaces(ctx.Context(), &pinecone.ListNamespacesParams{
@@ -40,7 +40,6 @@ func (pc *PineconeRepository) UpsertVector(chapter entities.ChapterDataModel, co
 	//get userId to create namespace
 	// userIdRaw := ctx.Locals("userId")
 	// userId := userIdRaw.(string)
-	userId := uuid.NewString()
 	namespace := userId + "-namespace"
 
 	fmt.Println("namespace: ", namespace)
@@ -97,12 +96,12 @@ func (pc *PineconeRepository) UpsertVector(chapter entities.ChapterDataModel, co
 	return nil
 }
 
-func EmbeddingText(co *cohereClient.Client, text string, ctx *fiber.Ctx) ([]float64, error) {
+func EmbeddingText(co *cohereClient.Client, text string, ctx *fiber.Ctx) ([]float32, error) {
 	resp, err := co.V2.Embed(
 		ctx.Context(),
 		&cohere.V2EmbedRequest{
 			Texts:          []string{text},
-			Model:          "embed-v4.0",
+			Model:          "embed-multilingual-v3.0",
 			InputType:      cohere.EmbedInputTypeSearchDocument,
 			EmbeddingTypes: []cohere.EmbeddingType{cohere.EmbeddingTypeFloat},
 		},
@@ -111,9 +110,12 @@ func EmbeddingText(co *cohereClient.Client, text string, ctx *fiber.Ctx) ([]floa
 		return nil, err
 	}
 
-	fmt.Println("resp: ", resp)
-	result := resp.Embeddings.Float
+	result := make([]float32, len(resp.Embeddings.Float[0]))
+	for i, v := range resp.Embeddings.Float[0] {
+		result[i] = float32(v)
+	}
 	return result, nil
+
 }
 
 /*

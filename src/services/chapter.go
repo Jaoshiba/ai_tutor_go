@@ -114,11 +114,14 @@ func (c *ChapterServices) ChapterrizedText(ctx *fiber.Ctx, courseId string, text
 	userIDStr := uuid.NewString()
 	fmt.Println("User ID:", userIDStr)
 
+	//create cohere client
 	coheereapikey := os.Getenv("COHERE_API_KEY")
 	if coheereapikey == "" {
 		log.Fatal("COHERE_API_KEY is not set in .env")
 	}
-	co := cohereClient.NewAwsClient(cohereClient.WithToken(coheereapikey))
+	co := cohereClient.NewClient(cohereClient.WithToken(coheereapikey))
+
+	userId := uuid.NewString()
 
 	fmt.Println("creating openai succesful")
 
@@ -140,7 +143,7 @@ func (c *ChapterServices) ChapterrizedText(ctx *fiber.Ctx, courseId string, text
 			return err
 		}
 		//save data to pinecone
-		err = c.PineconeRepo.UpsertVector(ch, co, ctx)
+		err = c.PineconeRepo.UpsertVector(ch, co, ctx, userId)
 		if err != nil {
 			fmt.Println("Error inserting chapter:", err)
 			return err
