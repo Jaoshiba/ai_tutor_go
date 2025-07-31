@@ -13,6 +13,7 @@ type ChapterDataModel struct {
 	IsFinished     bool      `json:"isFinished" db:"isfinished"`
 	CreateAt       time.Time `json:"createAt" db:"createat"`
 	UpdatedAt      time.Time `json:"updatedAt" db:"updatedat"`
+	ModuleId       string    `json:"moduleid" db:"moduleid"`  
 }
 
 type ResponseChapter struct {

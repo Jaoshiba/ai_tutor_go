@@ -4,7 +4,7 @@ import (
 	"fmt"
 	"go-fiber-template/domain/entities"
 	repo "go-fiber-template/domain/repositories"
-	"mime/multipart"
+	// "mime/multipart"
 	"time"
 
 	"github.com/gofiber/fiber/v2"
@@ -14,10 +14,12 @@ import (
 type ModuleService struct {
 	modulesRepository repo.IModuleRepository
 	ChapterServices   IChapterService
+	
 }
 
 type IModuleService interface {
-	CreateModule(file *multipart.FileHeader, ctx *fiber.Ctx) error
+	CreateModule(ctx *fiber.Ctx, moduleData *entities.GenModule) error
+	GetModulesByCourseID(courseID string) ([]entities.ModuleDataModel, error)
 }
 
 func NewModuleService(modulesRepository repo.IModuleRepository, chapterservice IChapterService) IModuleService {
@@ -27,53 +29,85 @@ func NewModuleService(modulesRepository repo.IModuleRepository, chapterservice I
 	}
 }
 
-func (ms *ModuleService) CreateModule(file *multipart.FileHeader, ctx *fiber.Ctx) error {
-	filetype := file.Header.Get("Content-Type")
-	fmt.Println("File header: ", filetype)
+func (ms *ModuleService) CreateModule(ctx *fiber.Ctx, moduleData *entities.GenModule) error {
+	// Generate a new ModuleId early, as it's needed for both the module and its chapters.
+	moduleId := uuid.NewString()
 
-	fmt.Println("Extracting file content....")
-
-	var content string
-	if filetype == "application/pdf" {
-		fileContent, err := GetPdfData(file, ctx)
-		if err != nil {
-			fmt.Println("error pdf type")
-			return err
-		}
-		content = fileContent
-
-	} else if filetype == "application/vnd.openxmlformats-officedocument.wordprocessingml.document" || filetype == "application/msword" {
-		fileContent, err := GetDocx_DocData(file, ctx)
-		if err != nil {
-			fmt.Print("error docx type")
-			return err
-		}
-		content = fileContent
-
-	}
-	err := ms.ChapterServices.ChapterrizedText(ctx, content)
-	if err != nil {
-		return err
-	}
-
-	fmt.Println("before module creation")
-
+	// --- 1. Safely retrieve userID from context ---
 	userIdRaw := ctx.Locals("userID")
+	// Always check for nil first, then perform type assertion.
+	if userIdRaw == nil {
+		fmt.Println("Error: User ID not found in context locals for ModuleService.")
+		return fiber.NewError(fiber.StatusUnauthorized, "User ID not found in context")
+	}
 	userIdStr, ok := userIdRaw.(string)
 	if !ok || userIdStr == "" {
+		fmt.Println("Error: Invalid or missing user ID format in context locals for ModuleService.")
 		return fiber.NewError(fiber.StatusUnauthorized, "Invalid or missing user ID")
 	}
-	fmt.Println("user id is : ", userIdStr)
-	module := entities.ModuleDataModel{
-		ModuleId:   uuid.NewString(),
-		ModuleName: file.Filename,
-		CourseId:   uuid.NewString(),
-		UserId:     userIdStr,
-		CreatedAt:  time.Now(),
-		UpdatedAt:  time.Now(),
+	fmt.Println("ModuleService: User ID is:", userIdStr)
+
+
+	courseIdRaw := ctx.Locals("courseID")
+	if courseIdRaw == nil {
+		fmt.Println("Error: Course ID not found in context locals for ModuleService.")
+		return fiber.NewError(fiber.StatusUnauthorized, "Course ID not found in context")
+	}
+	courseId, ok := courseIdRaw.(string)
+	if !ok || courseId == "" {
+		fmt.Println("Error: Invalid or missing course ID format in context locals for ModuleService.")
+		return fiber.NewError(fiber.StatusUnauthorized, "Invalid or missing course ID")
+	}
+	fmt.Println("ModuleService: Course ID is:", courseId)
+
+	// --- 3. Validate moduleData and its Topics ---
+	if moduleData == nil {
+		fmt.Println("Error: moduleData is nil.")
+		return fmt.Errorf("module data cannot be nil")
 	}
 
-	fmt.Println("Module to be inserted: ")
+	module := entities.ModuleDataModel{
+		ModuleId:    moduleId,
+		ModuleName:  moduleData.Title,       // Use Title from Gemini's response
+		CourseId:    courseId,               // Use CourseId retrieved from context
+		UserId:      userIdStr,              // Use UserId retrieved from context
+		CreatedAt:   time.Now(),
+		UpdatedAt:   time.Now(),
+		Description: moduleData.Description, // Use Description from Gemini's response
+	}
 
-	return ms.modulesRepository.InsertModule(module)
+	fmt.Println("Module to be inserted:", module)
+
+
+	err := ms.modulesRepository.InsertModule(module)
+	if err != nil {
+		fmt.Printf("Error inserting module %s into repository: %v\n", moduleId, err)
+		return err // Return the error if module insertion fails.
+	}
+	fmt.Println("Module successfully inserted into database.")
+
+
+
+	for i, topic := range moduleData.Topics {
+		fmt.Printf("Processing topic %d for module %s: \"%s\"\n", i+1, moduleId, topic)
+
+		err := ms.ChapterServices.ChapterrizedText(ctx, topic, moduleId)
+		if err != nil {
+			fmt.Printf("Error chapterizing topic \"%s\" for module %s: %v\n", topic, moduleId, err)
+
+			return err
+		}
+	}
+
+	fmt.Println("All chapters processed for module", moduleId) // This log should be after the loop.
+
+	return nil 
+}
+func (ms *ModuleService) GetModulesByCourseID(courseID string) ([]entities.ModuleDataModel, error) {
+	 
+	modules, err := ms.modulesRepository.GetModulesByCourseID(courseID)
+	if err != nil {
+		return nil, fmt.Errorf("failed to retrieve modules from repository for course %s: %w", courseID, err)
+	}
+	return modules, nil
 }

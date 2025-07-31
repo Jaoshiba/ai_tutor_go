@@ -3,7 +3,9 @@ package repositories
 import (
 	"context"
 	"database/sql"
+	"fmt"
 	"go-fiber-template/domain/entities"
+	
 )
 
 type courseRepository struct {
@@ -13,6 +15,7 @@ type courseRepository struct {
 type IcourseRepository interface {
 	InsertCourse(course entities.CourseDataModel) error
 	GetCoursesByUserID(userId string) ([]entities.CourseDataModel, error)
+	GetCourseByID(courseID string) (*entities.CourseDataModel, error)
 }
 
 func NewCourseRepository(db *sql.DB) IcourseRepository {
@@ -69,8 +72,33 @@ func (repo *courseRepository) GetCoursesByUserID(userId string) ([]entities.Cour
 	}
 
 	if err = rows.Err(); err != nil {
-		return nil, err // Check for any errors during row iteration
+		return nil, err
 	}
 
 	return courses, nil
+}
+
+func (repo *courseRepository) GetCourseByID(courseID string) (*entities.CourseDataModel, error) {
+    query := `
+        SELECT id, title, description, confirmed, userid, createat, updateat
+        FROM courses
+        WHERE id = $1
+    `
+    var course entities.CourseDataModel
+
+    err := repo.db.QueryRowContext(context.Background(), query, courseID).Scan(
+        &course.CourseID,
+        &course.Title,
+        &course.Description,
+        &course.Confirmed,
+        &course.UserId,
+        &course.CreatedAt, // สแกนตรงเข้า time.Time
+        &course.UpdatedAt, // สแกนตรงเข้า time.Time
+    )
+    if err != nil {
+        return nil, fmt.Errorf("failed to get course by ID %s: %w", courseID, err)
+    }
+
+    // ไม่จำเป็นต้องแปลง string เป็น time.Time แล้ว
+    return &course, nil
 }

@@ -38,6 +38,7 @@ func GatewayCourse(gateway HTTPGateway, app *fiber.App) {
 	api := app.Group("/api/v1/course")
 	//api.Use(middlewares.JWTAuthMiddleware(gateway.AuthService))
 	api.Post("/create", gateway.CreateCourse)
+	api.Get("/:courseId", gateway.GetCourseDetail)
 }
 
 func GatewayModules(gateway HTTPGateway, app *fiber.App) {

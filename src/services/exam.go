@@ -10,6 +10,7 @@ import (
 
 type ExamService struct {
 	examRepository repo.IExamRepository
+	QuestionService QuestionService
 }
 
 type IExamService interface {

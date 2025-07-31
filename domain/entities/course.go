@@ -21,10 +21,36 @@ type CourseRequestBody struct {
 }
 
 type CourseGeminiResponse struct {
+	CourseName string `json:"course_name"`
+	CourseDescription string `json:"course_description"`
 	Modules []GenModule `json:"modules"`
 }
 
 type GenModule struct {
 	Title       string `json:"title"`
 	Description string `json:"description"`
+	Topics      []string `json:"topics"`
+}
+
+type ModuleDetail struct {
+	ModuleId    string          `json:"module_id"`
+	ModuleName  string          `json:"module_name"`
+	Description string          `json:"description"`
+	Chapters    []ChapterDetail `json:"chapters"`
+	// คุณอาจจะเพิ่ม CreatedAt, UpdatedAt ถ้าต้องการแสดง
+}
+type ChapterDetail struct {
+	ChapterId      string `json:"chapter_id"`
+	ChapterName    string `json:"chapter_name"`
+	ChapterContent string `json:"chapter_content"`
+	IsFinished     bool   `json:"is_finished"`
+	// คุณอาจจะเพิ่ม CreatedAt, UpdatedAt ถ้าต้องการแสดง
+}
+type CourseDetailResponse struct {
+	CourseID    string         `json:"course_id"`
+	Title       string         `json:"title"`
+	Description string         `json:"description"`
+	Confirmed   bool           `json:"confirmed"`
+	Modules     []ModuleDetail `json:"modules"`
+	// คุณอาจจะเพิ่ม UserId, CreatedAt, UpdatedAt ถ้าต้องการแสดง
 }

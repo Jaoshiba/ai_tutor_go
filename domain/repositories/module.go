@@ -5,6 +5,8 @@ import (
 	"database/sql"
 	"fmt"
 	"go-fiber-template/domain/entities"
+	
+	
 )
 
 type modulesRepository struct {
@@ -13,6 +15,7 @@ type modulesRepository struct {
 
 type IModuleRepository interface {
 	InsertModule(module entities.ModuleDataModel) error
+	GetModulesByCourseID(courseID string) ([]entities.ModuleDataModel, error)
 }
 
 func NewModulesRepository(db *sql.DB) IModuleRepository {
@@ -26,8 +29,8 @@ func (repo *modulesRepository) InsertModule(module entities.ModuleDataModel) err
 	fmt.Println("InsertModule called with module:", module)
 	query := `
 		INSERT INTO modules (
-			moduleid, modulename, courseid, userid, createat, updateat
-		) VALUES ($1, $2, $3, $4, $5, $6)`
+			moduleid, modulename, courseid, userid, createat, updateat, description
+		) VALUES ($1, $2, $3, $4, $5, $6, $7)`
 
 	result, err := repo.db.ExecContext(context.Background(), query,
 		module.ModuleId,
@@ -36,10 +39,51 @@ func (repo *modulesRepository) InsertModule(module entities.ModuleDataModel) err
 		module.UserId,
 		module.CreatedAt,
 		module.UpdatedAt,
+		module.Description,
 	)
 	fmt.Println("result: ", result)
 	if err != nil {
 		return err
 	}
 	return nil
+}
+
+func (repo *modulesRepository) GetModulesByCourseID(courseID string) ([]entities.ModuleDataModel, error) {
+    query := `
+        SELECT moduleid, modulename, courseid, userid, createat, updateat, description
+        FROM modules
+        WHERE courseid = $1
+        ORDER BY createat
+    `
+    rows, err := repo.db.QueryContext(context.Background(), query, courseID)
+    if err != nil {
+        return nil, fmt.Errorf("failed to query modules by course ID %s: %w", courseID, err)
+    }
+    defer rows.Close()
+
+    var modules []entities.ModuleDataModel
+    for rows.Next() {
+        var module entities.ModuleDataModel
+        // สแกนตรงเข้าสู่ฟิลด์ที่เป็น time.Time ของ struct ได้เลย
+        if err := rows.Scan(
+            &module.ModuleId,
+            &module.ModuleName,
+            &module.CourseId,
+            &module.UserId,
+            &module.CreatedAt, // สแกนตรงนี้
+            &module.UpdatedAt, // สแกนตรงนี้
+            &module.Description,
+        ); err != nil {
+            return nil, fmt.Errorf("failed to scan module row: %w", err)
+        }
+
+        // ไม่ต้องมีการแปลง string เป็น time.Time อีกแล้ว
+        modules = append(modules, module)
+    }
+
+    if err = rows.Err(); err != nil {
+        return nil, fmt.Errorf("error during modules row iteration: %w", err)
+    }
+
+    return modules, nil
 }

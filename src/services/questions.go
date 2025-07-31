@@ -10,6 +10,10 @@ import (
 	"google.golang.org/genai"
 )
 
+type QuestionService struct {
+	
+}
+
 type IQuestionService interface {
 	QuestionsCreate(content string) ([]entities.QuestionDataModel, error)
 }

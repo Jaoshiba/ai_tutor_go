@@ -14,9 +14,32 @@ import (
 )
 
 // IFileService defines the interface for file service operations.
-type IFileService interface {
-	GetDocx_DocData(file *multipart.FileHeader, ctx *fiber.Ctx) (string, error)
-	GetPdfData(file *multipart.FileHeader, ctx *fiber.Ctx) (string, error)
+// type IFileService interface {
+// 	GetDocx_DocData(file *multipart.FileHeader, ctx *fiber.Ctx) (string, error)
+// 	GetPdfData(file *multipart.FileHeader, ctx *fiber.Ctx) (string, error)
+// 	ReadFileData(file *multipart.FileHeader, ctx *fiber.Ctx) (string, error)
+// 	RemoveJsonBlock(text string) string 
+// }
+
+
+
+func ReadFileData(file *multipart.FileHeader, ctx *fiber.Ctx) (string, error) {
+	parts := strings.Split(file.Filename, ".")
+	if len(parts) < 2 {
+		return "", fmt.Errorf("could not determine file type for %s: no file extension found", file.Filename)
+	}
+	extension := strings.ToLower(parts[len(parts)-1])
+
+	switch extension {
+	case "docx", "doc":
+		fmt.Println("Detected DOCX/DOC file.")
+		return GetDocx_DocData(file, ctx)
+	case "pdf":
+		fmt.Println("Detected PDF file.")
+		return GetPdfData(file, ctx)
+	default:
+		return "", fmt.Errorf("unsupported file type: %s", extension)
+	}
 }
 
 func GetDocx_DocData(file *multipart.FileHeader, ctx *fiber.Ctx) (string, error) {

@@ -60,6 +60,10 @@ func main() {
 	chapterRepo := repo.NewChapterRepository(postgresql)
 	courseRepo := repo.NewCourseRepository(postgresql)
 
+	if userRepo == nil || fileRepo == nil || chapterRepo == nil || courseRepo == nil {
+        log.Fatalf("One or more repositories failed to initialize and are NIL.")
+    }
+
 	// สร้าง Services
 	jwtSecret = os.Getenv("JWT_SECRET_KEY")
 	if jwtSecret == "" {
@@ -69,9 +73,13 @@ func main() {
 	sv0 := sv.NewUsersService(userRepo)                       // สร้าง UsersServic
 	svGoogleAuth := authService.NewGoogleOAuthService(svAuth) // สร้าง GoogleOAuthService โดยฉีด AuthService
 
+
+	geminiService := sv.NewGeminiService()
+
+
 	svChapter := sv.NewChapterServices(chapterRepo)
 	sv1 := sv.NewModuleService(fileRepo, svChapter)
-	svCourse := sv.NewCourseService(courseRepo)
+	svCourse := sv.NewCourseService(courseRepo, sv1 , geminiService , svChapter)
 
 	// สร้าง Gateway และผูก Routes ทั้งหมด
 	// ต้องส่ง AuthService และ UserService เข้าไปใน NewHTTPGateway ด้วย

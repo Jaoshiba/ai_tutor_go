@@ -10,9 +10,11 @@ import (
 
 func (h *HTTPGateway) CreateCourse(ctx *fiber.Ctx) error {
 	file, err := ctx.FormFile("file")
-	// if err != nil {
-	// 	return ctx.Status(fiber.StatusUnprocessableEntity).JSON(entities.ResponseMessage{Message: "invalid file"})
-	// }
+	if err != nil {
+		fmt.Println("No file uploaded:", err)
+		file = nil // ป้องกัน panic ถ้าไม่มีไฟล์ส่งมา
+	}
+
 	jsonbody := ctx.FormValue("jsonbody")
 
 	fmt.Println("jsonbody: ", jsonbody)
@@ -34,6 +36,8 @@ func (h *HTTPGateway) CreateCourse(ctx *fiber.Ctx) error {
 		return ctx.Status(fiber.StatusUnprocessableEntity).JSON(entities.ResponseMessage{Message: "invalid json body u missed description"})
 	}
 
+	fmt.Println("Before create in gateway")
+
 	err = h.CourseService.CreateCourse(coursejsonBody, file, ctx)
 	if err != nil {
 		return ctx.Status(fiber.StatusBadRequest).JSON(entities.ResponseModel{
@@ -46,11 +50,10 @@ func (h *HTTPGateway) CreateCourse(ctx *fiber.Ctx) error {
 
 func (h *HTTPGateway) GetCourseByUser(c *fiber.Ctx) error {
 	userID := c.Locals("userID")
-	if userID == nil { 
+	if userID == nil {
 		return c.Status(fiber.StatusUnauthorized).JSON(entities.ResponseMessage{Message: "User ID not found in context"})
 	}
 
-	
 	userIDStr, ok := userID.(string)
 	if !ok || userIDStr == "" {
 		return c.Status(fiber.StatusUnprocessableEntity).JSON(entities.ResponseMessage{Message: "Invalid user ID in context"})
@@ -64,4 +67,37 @@ func (h *HTTPGateway) GetCourseByUser(c *fiber.Ctx) error {
 		"message": "Courses retrieved successfully",
 		"data":    courses,
 	})
+}
+
+func (h *HTTPGateway) GetCourseDetail(c *fiber.Ctx) error {
+	fmt.Println("Hello im in gateway at start")
+	// 1. ดึง CourseID จาก URL parameter
+	// สมมติว่า URL endpoint คือ /api/v1/courses/:courseId
+	courseID := c.Params("courseId")
+	if courseID == "" {
+		return fiber.NewError(fiber.StatusBadRequest, "Course ID is required")
+	}
+	fmt.Println("Hello im in gateway at start")
+
+	fmt.Printf("Attempting to get details for Course ID: %s\n", courseID)
+
+	fmt.Println("Hello im in gateway at start")
+	// 2. เรียกใช้ CourseService.GetCourseDetail
+	courseDetail, err := h.CourseService.GetCourseDetail(c, courseID)
+	if err != nil {
+		fmt.Println("Hello im in gateway at start")
+		// จัดการข้อผิดพลาดจาก Service Layer
+		// Fiber.Error จะถูกแปลงเป็น HTTP status code โดย Fiber middleware อัตโนมัติ
+		if fiberErr, ok := err.(*fiber.Error); ok {
+			fmt.Printf("Service error for Course ID %s: %s (Status: %d)\n", courseID, fiberErr.Message, fiberErr.Code)
+			return fiberErr
+		}
+		// สำหรับ error ทั่วไปที่ไม่ใช่ Fiber.Error ให้ return Internal Server Error
+		fmt.Printf("Unexpected error getting course details for Course ID %s: %v\n", courseID, err)
+		return fiber.NewError(fiber.StatusInternalServerError, fmt.Sprintf("Failed to get course details: %v", err))
+	}
+
+	// 3. ส่งคืนข้อมูลในรูปแบบ JSON
+	fmt.Printf("Successfully retrieved details for Course ID: %s\n", courseID)
+	return c.Status(fiber.StatusOK).JSON(courseDetail)
 }
