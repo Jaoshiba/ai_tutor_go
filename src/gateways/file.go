@@ -13,16 +13,16 @@ func (h *HTTPGateway) UploadFile(ctx *fiber.Ctx) error {
 		return ctx.Status(fiber.StatusUnprocessableEntity).JSON(entities.ResponseMessage{Message: "invalid file"})
 	}
 
-	roadmapname := ctx.FormValue("roadmapname")
-	if roadmapname == "" {
-		return ctx.Status(fiber.StatusBadRequest).JSON(entities.ResponseMessage{Message: "Roadmapname required"})
+	Coursename := ctx.FormValue("Coursename")
+	if Coursename == "" {
+		return ctx.Status(fiber.StatusBadRequest).JSON(entities.ResponseMessage{Message: "Coursename required"})
 	}
 
-	var roadmapjsonBody entities.RoadmapRequestBody
+	var CoursejsonBody entities.CourseRequestBody
 
-	h.RoadmapService.CreateRoadmap(roadmapjsonBody, file, false, ctx)
+	h.CourseService.CreateCourse(CoursejsonBody, file, false, ctx)
 
-	h.ModuleService.CreateModule(file, roadmapname, ctx)
+	// h.ModuleService.CreateModule(file, Coursename, ctx)
 
 	return ctx.Status(fiber.StatusOK).JSON(entities.ResponseModel{Message: "Completed create module from your file"})
 }

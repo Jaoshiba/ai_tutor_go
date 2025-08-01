@@ -10,6 +10,8 @@ import (
 	"go-fiber-template/domain/entities"
 	"go-fiber-template/domain/repositories"
 
+	"log"
+
 	"github.com/gofiber/fiber/v2" // Import Fiber to use its context
 	"github.com/google/uuid"
 	"google.golang.org/genai"
@@ -21,9 +23,16 @@ type ChapterServices struct {
 
 type IChapterService interface {
 	ChapterrizedText(ctx *fiber.Ctx, courseId string, text string) error
+	GetChaptersByModuleID(moduleID string) ([]entities.ChapterDataModel, error)
 }
 
 func NewChapterServices(chapterRepository repositories.IChapterRepository) IChapterService {
+	if chapterRepository == nil {
+		log.Fatal("❌ ChapterServices initialized with nil repository") // บรรทัดนี้คุณมีอยู่แล้ว
+	} else {
+		fmt.Println("✅ ChapterServices initialized with non-nil repository.")                   // เพิ่มบรรทัดนี้
+		fmt.Printf("ChapterRepository instance in NewChapterServices: %p\n", chapterRepository) // เพิ่มบรรทัดนี้
+	}
 	return &ChapterServices{
 		ChapterRepository: chapterRepository,
 	}
@@ -118,13 +127,16 @@ func (c *ChapterServices) ChapterrizedText(ctx *fiber.Ctx, courseId string, text
 			ChapterId:      uuid.NewString(),
 			ChapterName:    chapter.ChapterName,
 			UserID:         userIDStr,
-			CouseId:        courseId,
+			CourseId:       courseId,
 			ChapterContent: chapter.Content,
 			CreateAt:       time.Now(),
 			UpdatedAt:      time.Now(),
 			IsFinished:     false,
 		}
 		fmt.Println("Inserting chapter:", ch.ChapterId)
+
+		fmt.Println("chapter : ", chapter)
+
 		err = c.ChapterRepository.InsertChapter(ch)
 		if err != nil {
 			return err
@@ -132,4 +144,16 @@ func (c *ChapterServices) ChapterrizedText(ctx *fiber.Ctx, courseId string, text
 	}
 
 	return nil
+}
+func (c *ChapterServices) GetChaptersByModuleID(moduleID string) ([]entities.ChapterDataModel, error) {
+	fmt.Println("im in chap service")
+	fmt.Println(moduleID)
+	if c.ChapterRepository == nil {
+		log.Fatal("❌ ChapterRepository is nil in ChapterServices")
+	}
+	chapters, err := c.ChapterRepository.GetChaptersByModuleID(moduleID)
+	if err != nil {
+		return nil, fmt.Errorf("failed to retrieve chapters from repository for module %s: %w", moduleID, err)
+	}
+	return chapters, nil
 }

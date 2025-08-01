@@ -17,7 +17,7 @@ type HTTPGateway struct {
 	GoogleAuthService auth.IGoogleOAuth
 	AuthService       auth.IAuthService
 	ChapterService    service.IChapterService
-	RoadmapService    service.IRoadmapService
+	CourseService     service.ICourseService
 }
 
 func NewHTTPGateway(
@@ -27,7 +27,7 @@ func NewHTTPGateway(
 	googleAuth auth.IGoogleOAuth,
 	authService auth.IAuthService,
 	chapterService service.IChapterService,
-	roadmapService service.IRoadmapService,
+	courseService service.ICourseService,
 ) {
 	gateway := &HTTPGateway{
 		UserService:       users,
@@ -35,7 +35,7 @@ func NewHTTPGateway(
 		GoogleAuthService: googleAuth,
 		AuthService:       authService,
 		ChapterService:    chapterService,
-		RoadmapService:    roadmapService,
+		CourseService:     courseService,
 	}
 
 	GatewayAuth(*gateway, app)
@@ -43,7 +43,7 @@ func NewHTTPGateway(
 	GatewayUsers(*gateway, app)
 
 	GatewayModules(*gateway, app)
-	GatewayRoadmap(*gateway, app)
+	GatewayCourse(*gateway, app)
 	GatewayProtected(*gateway, app)
 
 }

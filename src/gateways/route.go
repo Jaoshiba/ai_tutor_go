@@ -34,10 +34,11 @@ func GatewayAuth(gateway HTTPGateway, app *fiber.App) {
 	// เส้นทาง Logout และ Check Status ถูกย้ายไปที่ GatewayProtected เนื่องจากต้องการการตรวจสอบสิทธิ์
 }
 
-func GatewayRoadmap(gateway HTTPGateway, app *fiber.App) {
-	api := app.Group("/api/v1/roadmap")
+func GatewayCourse(gateway HTTPGateway, app *fiber.App) {
+	api := app.Group("/api/v1/course")
 	//api.Use(middlewares.JWTAuthMiddleware(gateway.AuthService))
-	api.Post("/create", gateway.CreateRoadmap)
+	api.Post("/create", gateway.CreateCourse)
+	api.Get("/:courseId", gateway.GetCourseDetail)
 }
 
 func GatewayModules(gateway HTTPGateway, app *fiber.App) {
@@ -65,11 +66,11 @@ func GatewayProtected(gateway HTTPGateway, app *fiber.App) {
 	// protected.Delete("/users/:id", gateway.DeleteUser)   // ถ้ามี: ลบผู้ใช้ (ต้องล็อกอิน)
 
 	// Routes สำหรับ Modules (ที่ต้องการการป้องกัน)
-	
-	// protected.Post("/modules/upload", gateway.UploadFile)      // อัปโหลดไฟล์ (ต้องล็อกอิน)
-	protected.Post("/modules/text", func(c *fiber.Ctx) error { // ตัวอย่าง route (ต้องล็อกอิน)
-		return c.SendString("Protected module text route!")
-	})
+
+	protected.Post("/modules/upload", gateway.UploadFile)      // อัปโหลดไฟล์ (ต้องล็อกอิน)
+	protected.Post("/create/course/search", gateway.CreateCourse)
+
+	protected.Get("/courses", gateway.GetCourseByUser)
 	// protected.Get("/modules", gateway.GetAllModules)     // ถ้ามี: ดึงข้อมูลโมดูลทั้งหมด (ต้องล็อกอิน)
 	// protected.Get("/modules/:id", gateway.GetModuleByID) // ถ้ามี: ดึงข้อมูลโมดูลตาม ID (ต้องล็อกอิน)
 	// protected.Put("/modules/:id", gateway.UpdateModule)  // ถ้ามี: อัปเดตโมดูล (ต้องล็อกอิน)
