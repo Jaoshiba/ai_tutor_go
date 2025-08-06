@@ -4,10 +4,11 @@ import (
 	"encoding/json"
 	"fmt"
 	"go-fiber-template/domain/entities"
-	"io/ioutil"
+	"io"
 	"net/http"
 	"net/url"
 	"os"
+	"path/filepath"
 )
 
 // SerpAPIResponse represents the structure of the JSON response from SerpAPI
@@ -52,7 +53,7 @@ func SearchDocuments(moduleName string, description string) (string, error) {
 	defer resp.Body.Close() // Ensure the response body is closed
 
 	// Read the response body
-	body, err := ioutil.ReadAll(resp.Body)
+	body, err := io.ReadAll(resp.Body)
 	if err != nil {
 		return "", fmt.Errorf("ไม่สามารถอ่านเนื้อหาการตอบกลับได้: %w", err)
 	}
@@ -69,7 +70,53 @@ func SearchDocuments(moduleName string, description string) (string, error) {
 		return "", fmt.Errorf("ไม่สามารถแยกวิเคราะห์ JSON ได้: %w", err)
 	}
 
+	for i, result := range serpAPIResponse.OrganicResults {
+		if i >= 2 {
+			break
+		}
+		documentLink := result.Link
+		doucmentTitle := result.Title
+
+		fmt.Println("Getting file from URL:", documentLink)
+		docPath, err := GetFileFromUrl(doucmentTitle, documentLink)
+		if err != nil {
+			return "", fmt.Errorf("ไม่สามารถดาวน์โหลดไฟล์จาก URL ได้: %w", err)
+		}
+		file, err := os.ReadFile(docPath)
+		fmt.Println("File content:", string(file))
+		fmt.Printf("Finished Get file from url: %s\n", docPath)
+
+	}
+
 	fmt.Println("SerpAPI Response:", serpAPIResponse)
 
 	return "", nil
+}
+
+func GetFileFromUrl(fileTitle string, fileUrl string) (string, error) {
+
+	downloadDir := "fileDocs"
+	fullPath := filepath.Join(downloadDir, fileTitle)
+	out, err := os.Create(fullPath)
+	if err != nil {
+		return "", fmt.Errorf("ไม่สามารถสร้างไฟล์: %w", err)
+	}
+	defer out.Close()
+
+	resp, err := http.Get(fileUrl)
+	if err != nil {
+		return "", fmt.Errorf("ไม่สามารถดึงไฟล์จาก URL ได้: %w", err)
+	}
+	defer resp.Body.Close()
+
+	if resp.StatusCode != http.StatusOK {
+		return "", fmt.Errorf("ไม่สามารถเข้าถึงไฟล์ได้: สถานะ %d", resp.StatusCode)
+	}
+
+	_, err = io.Copy(out, resp.Body)
+	if err != nil {
+		return "", fmt.Errorf("ไม่สามารถคัดลอกไฟล์ได้: %w", err)
+	}
+
+	return fullPath, nil
 }

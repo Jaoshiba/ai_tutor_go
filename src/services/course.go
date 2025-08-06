@@ -65,17 +65,14 @@ func (rs *courseService) CreateCourse(courseJsonBody entities.CourseRequestBody,
 
 	fmt.Println("Im here")
 
-	var serpres entities.SerpAPIResponse
+	// var serpres entities.SerpAPIResponse
 
-	serpres, err := SearchDocuments(courseJsonBody.Title, courseJsonBody.Description)
+	txt, err := SearchDocuments(courseJsonBody.Title, courseJsonBody.Description)
 	if err != nil {
 		return fmt.Errorf("failed to search documents: %w", err)
 	}
 
-	for _, result := range res.OrganicResults {
-		fmt.Println("Title:", result.Title)
-		fmt.Println("Link:", result.Link)
-	}
+	fmt.Println("Search result: ", txt)
 
 	return err
 
