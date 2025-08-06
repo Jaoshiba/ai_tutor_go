@@ -1,4 +1,4 @@
-// package gateways
+package gateways
 
 // import (
 // 	"encoding/json"

@@ -65,6 +65,20 @@ func (rs *courseService) CreateCourse(courseJsonBody entities.CourseRequestBody,
 
 	fmt.Println("Im here")
 
+	var serpres entities.SerpAPIResponse
+
+	serpres, err := SearchDocuments(courseJsonBody.Title, courseJsonBody.Description)
+	if err != nil {
+		return fmt.Errorf("failed to search documents: %w", err)
+	}
+
+	for _, result := range res.OrganicResults {
+		fmt.Println("Title:", result.Title)
+		fmt.Println("Link:", result.Link)
+	}
+
+	return err
+
 	fmt.Println("Extracting file content....")
 
 	var content string
@@ -132,7 +146,7 @@ func (rs *courseService) CreateCourse(courseJsonBody entities.CourseRequestBody,
 			fmt.Println(err)
 		}
 		fmt.Println("--- ข้อมูลหลังจาก Unmarshal ไปยัง Go struct ---")
-		fmt.Printf("Course Name: %s\n", courses.CourseName)
+		fmt.Printf("Course Name: %s\n", courseJsonBody.Title)
 		fmt.Printf("Number of Modules: %d\n", len(courses.Modules))
 		fmt.Printf("First Module Title: %s\n", courses.Modules[0].Title)
 		fmt.Println("---------------------------------------------")
@@ -207,6 +221,9 @@ func (rs *courseService) CreateCourse(courseJsonBody entities.CourseRequestBody,
 			Content:     content,
 		}
 		err = rs.ModuleService.CreateModule(ctx, &moduleData)
+		if err != nil {
+			return err
+		}
 
 	}
 

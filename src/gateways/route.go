@@ -67,7 +67,7 @@ func GatewayProtected(gateway HTTPGateway, app *fiber.App) {
 
 	// Routes สำหรับ Modules (ที่ต้องการการป้องกัน)
 
-	protected.Post("/modules/upload", gateway.UploadFile)      // อัปโหลดไฟล์ (ต้องล็อกอิน)
+	protected.Post("/modules/upload", gateway.UploadFile) // อัปโหลดไฟล์ (ต้องล็อกอิน)
 	protected.Post("/create/course/search", gateway.CreateCourse)
 
 	protected.Get("/courses", gateway.GetCourseByUser)
