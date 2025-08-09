@@ -96,7 +96,7 @@ func SearchDocuments(moduleName string, description string, ctx *fiber.Ctx) (str
 
 		fmt.Println(file.Filename)
 
-		content, err := ReadFileData(file, ctx)
+		content, err := ReadFileData(docPath, ctx)
 		if err != nil {
 			fmt.Println("Error reading file data:", err)
 			return "", fmt.Errorf("ไม่สามารถอ่านข้อมูลไฟล์: %w", err)

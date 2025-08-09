@@ -82,7 +82,12 @@ func (rs *courseService) CreateCourse(courseJsonBody entities.CourseRequestBody,
 	if fromCoures {
 		if file != nil {
 			fmt.Println("Extracting file content....")
-			fileContent, err := ReadFileData(file, ctx)
+			docPath, err := SaveFileToDisk(file, ctx)
+			if err != nil {
+				fmt.Printf("Error saving file to disk: %v\n", err)
+				return err
+			}
+			fileContent, err := ReadFileData(docPath, ctx)
 			content = fileContent
 			if err != nil {
 				fmt.Printf("Error processing file with FileService: %v\n", err)
@@ -182,7 +187,8 @@ func (rs *courseService) CreateCourse(courseJsonBody entities.CourseRequestBody,
 
 		if file != nil {
 			fmt.Println("Extracting file content....")
-			fileContent, err := ReadFileData(file, ctx)
+			docPath, err := SaveFileToDisk(file, ctx)
+			fileContent, err := ReadFileData(docPath, ctx)
 			content = fileContent
 			if err != nil {
 				fmt.Printf("Error processing file with FileService: %v\n", err)

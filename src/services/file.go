@@ -5,6 +5,9 @@ import (
 	"fmt"
 	"io"
 	"mime/multipart"
+	"net/http"
+	"os"
+	"path/filepath"
 	"regexp"
 	"strings"
 
@@ -21,13 +24,28 @@ import (
 // 	RemoveJsonBlock(text string) string
 // }
 
-func ReadFileData(file *multipart.FileHeader, ctx *fiber.Ctx) (string, error) {
-	fmt.Println("File Header: ", file.Header)
+func ReadFileData(docPath string, ctx *fiber.Ctx) (string, error) {
 
-	filetype := file.Header.Get("content-type")
-	fmt.Println("File type: ", filetype)
+	file, err := os.Open(docPath)
+	if err != nil {
+		return "", err
+	}
+	defer file.Close()
 
-	switch filetype {
+	fileHeader := make([]byte, 512)
+	if _, err := file.Read(fileHeader); err != nil {
+		return "", fmt.Errorf("ไม่สามารถอ่านข้อมูลไฟล์: %w", err)
+	}
+
+	if _, err := file.Seek(0, io.SeekStart); err != nil {
+		return "", fmt.Errorf("ไม่สามารถรีเซ็ตตัวชี้ไฟล์: %w", err)
+	}
+
+	fileType := http.DetectContentType(fileHeader)
+
+	fmt.Println("File type: ", fileType)
+
+	switch fileType {
 	case "application/vnd.openxmlformats-officedocument.wordprocessingml.document", "application/msword":
 		fmt.Println("Detected DOCX/DOC file.")
 		return GetDocx_DocData(file, ctx)
@@ -35,20 +53,15 @@ func ReadFileData(file *multipart.FileHeader, ctx *fiber.Ctx) (string, error) {
 		fmt.Println("Detected PDF file.")
 		return GetPdfData(file, ctx)
 	default:
-		return "", fmt.Errorf("unsupported file type: %s", filetype)
+		return "", fmt.Errorf("unsupported file type: %s", fileType)
 	}
+
 }
 
-func GetDocx_DocData(file *multipart.FileHeader, ctx *fiber.Ctx) (string, error) {
-
+func GetDocx_DocData(file *os.File, ctx *fiber.Ctx) (string, error) {
 	fmt.Println("GetDocx_DocData func")
-	openedFile, err := file.Open()
-	if err != nil {
-		return "", err
-	}
-	defer openedFile.Close()
 
-	fileBytes, err := io.ReadAll(openedFile)
+	fileBytes, err := io.ReadAll(file)
 	if err != nil {
 		return "", err
 	}
@@ -67,50 +80,36 @@ func GetDocx_DocData(file *multipart.FileHeader, ctx *fiber.Ctx) (string, error)
 		}
 	}
 
-	// err = f.ChapterServices.ChapterrizedText(ctx, alltext)
-	// if err != nil {
-	// 	return "", err
-	// }
-
 	return alltext, nil
 }
 
-func GetPdfData(file *multipart.FileHeader, ctx *fiber.Ctx) (string, error) {
+func GetPdfData(file *os.File, ctx *fiber.Ctx) (string, error) {
+	fmt.Println("GetPdfData func call with file: ", file.Name())
 
-	openedFile, err := file.Open()
+	fileBytes, err := io.ReadAll(file)
 	if err != nil {
+		fmt.Println("Error reading file bytes:", err)
 		return "", err
 	}
-	defer openedFile.Close()
-
-	fmt.Println("GetPdfData func call with file: ", file.Filename)
-
-	fileBytes, err := io.ReadAll(openedFile)
-	if err != nil {
-		return "", err
-	}
-
-	// fmt.Println("fileBytes: ", fileBytes)
 
 	reader := bytes.NewReader(fileBytes)
 
-	fmt.Println("reader: ", reader)
-
 	pdfReader, err := pdf.NewReader(reader, reader.Size())
 	if err != nil {
+		fmt.Println("Error creating PDF reader:", err)
 		return "", err
 	}
 
-	var allText string // Renamed from alltext for consistency
+	var allText string
 	for i := 1; i <= pdfReader.NumPage(); i++ {
 		page := pdfReader.Page(i)
-		fmt.Println("page: ", i)
 		if page.V.IsNull() {
 			continue
 		}
 
 		content, err := page.GetPlainText(nil)
 		if err != nil {
+			fmt.Println("Error getting plain text from page:", err)
 			return "", err
 		}
 		allText += content
@@ -119,15 +118,8 @@ func GetPdfData(file *multipart.FileHeader, ctx *fiber.Ctx) (string, error) {
 	allText = strings.ReplaceAll(allText, "\n", "")
 	fmt.Println("allText: ", allText)
 
-	// Pass the Fiber context (fCtx) to ChapterrizedText
-	// err = f.ChapterServices.ChapterrizedText(ctx, allText) // fCtx is passed here
-	// if err != nil {
-	// 	return "", err
-	// }
-
 	return allText, nil
 }
-
 func RemoveJsonBlock(text string) string {
 	markdownJsonContentRegex := regexp.MustCompile("(?s)```json\\s*(.*?)\\s*```")
 	matches := markdownJsonContentRegex.FindStringSubmatch(text)
@@ -136,4 +128,29 @@ func RemoveJsonBlock(text string) string {
 		return matches[1]
 	}
 	return text
+}
+
+func SaveFileToDisk(file *multipart.FileHeader, ctx *fiber.Ctx) (string, error) {
+	// Open the file
+	openedFile, err := file.Open()
+	if err != nil {
+		return "", err
+	}
+	defer openedFile.Close()
+
+	// Create a new file on disk
+	downloadDir := "fileDocs"
+	docPath := filepath.Join(downloadDir, file.Filename)
+	diskFile, err := os.Create(docPath)
+	if err != nil {
+		return "", err
+	}
+	defer diskFile.Close()
+
+	// Copy the content to the new file
+	if _, err := io.Copy(diskFile, openedFile); err != nil {
+		return "", err
+	}
+
+	return docPath, nil
 }
