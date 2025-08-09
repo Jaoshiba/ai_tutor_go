@@ -5,7 +5,9 @@ import (
 	"fmt"
 	"go-fiber-template/domain/entities"
 	"io"
+	"mime/multipart"
 	"net/http"
+	"net/textproto"
 	"net/url"
 	"os"
 	"path/filepath"
@@ -119,4 +121,25 @@ func GetFileFromUrl(fileTitle string, fileUrl string) (string, error) {
 	}
 
 	return fullPath, nil
+}
+
+func ConvertFileTOMultipart(filePath string) (*multipart.FileHeader, error) {
+	file, err := os.Open(filePath)
+	if err != nil {
+		return nil, fmt.Errorf("ไม่สามารถเปิดไฟล์: %w", err)
+	}
+	defer file.Close()
+
+	fileStat, err := file.Stat()
+	if err != nil {
+		return nil, fmt.Errorf("ไม่สามารถอ่านข้อมูลไฟล์: %w", err)
+	}
+
+	fileHeader := &multipart.FileHeader{
+		Filename: fileStat.Name(),
+		Size:     fileStat.Size(),
+		Header:   make(textproto.MIMEHeader),
+	}
+
+	return fileHeader, nil
 }
