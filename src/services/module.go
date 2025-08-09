@@ -79,12 +79,12 @@ func (ms *ModuleService) CreateModule(ctx *fiber.Ctx, moduleData *entities.GenMo
 	fmt.Println("Module to be inserted:", module)
 
 
-	err := ms.modulesRepository.InsertModule(module)
-	if err != nil {
-		fmt.Printf("Error inserting module %s into repository: %v\n", moduleId, err)
-		return err // Return the error if module insertion fails.
-	}
-	fmt.Println("Module successfully inserted into database.")
+	// err := ms.modulesRepository.InsertModule(module)
+	// if err != nil {
+	// 	fmt.Printf("Error inserting module %s into repository: %v\n", moduleId, err)
+	// 	return err // Return the error if module insertion fails.
+	// }
+	// fmt.Println("Module successfully inserted into database.")
 
 
 
@@ -94,7 +94,6 @@ func (ms *ModuleService) CreateModule(ctx *fiber.Ctx, moduleData *entities.GenMo
 		err := ms.ChapterServices.ChapterrizedText(ctx, topic, moduleId)
 		if err != nil {
 			fmt.Printf("Error chapterizing topic \"%s\" for module %s: %v\n", topic, moduleId, err)
-
 			return err
 		}
 	}

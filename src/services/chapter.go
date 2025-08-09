@@ -133,10 +133,10 @@ func (c *ChapterServices) ChapterrizedText(fCtx *fiber.Ctx, text string, modulei
 		
 		fmt.Println("chapter : ", chapter)
 		
-		err = c.ChapterRepository.InsertChapter(ch)
-		if err != nil {
-			return err
-		}
+		// err = c.ChapterRepository.InsertChapter(ch)
+		// if err != nil {
+		// 	return err
+		// }
 	}
 
 	return nil

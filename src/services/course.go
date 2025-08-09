@@ -65,26 +65,31 @@ func (rs *courseService) CreateCourse(courseJsonBody entities.CourseRequestBody,
 
 	fmt.Println("Im here")
 
-	// fmt.Println("Extracting file content....")
-	// fmt.Println("Extracting file content....")
+	fmt.Println("Extracting file content....")
+	
 
-	// var fileContent string
-	// var err error
+	var fileContent string
+	var err error
 
-	// if file != nil {
-	// 	filetype := file.Header.Get("Content-Type")
-	// 	fmt.Println("File header: ", filetype)
+	if file != nil {
+		filetype := file.Header.Get("Content-Type")
+		fmt.Println("File header: ", filetype)
 
-	// 	fmt.Println("Extracting file content....")
-	// 	fileContent, err = rs.FileService.ReadFileData(file, ctx)
-	// 	if err != nil {
-	// 		fmt.Printf("Error processing file with FileService: %v\n", err)
-	// 		return err
-	// 	}
-	// } else {
-	// 	fmt.Println("No file uploaded, skipping file processing")
-	// 	fileContent = "" // or some default
-	// }
+		fmt.Println("Extracting file content....")
+		fileContent, err = ReadFileData(file, ctx)
+		if err != nil {
+			fmt.Printf("Error processing file with FileService: %v\n", err)
+			return err
+		}
+	} else {
+		fmt.Println("No file uploaded, skipping file processing")
+		fileContent = "" // or some default
+	}
+
+	if fileContent == ""{
+		fmt.Println("no file uploaded")
+	}
+	fmt.Println("File Contents : ",fileContent)
 
 	fmt.Println("adterrrrrrrr")
 
@@ -153,12 +158,12 @@ func (rs *courseService) CreateCourse(courseJsonBody entities.CourseRequestBody,
 	}
 
 	fmt.Println(course)
-	err = rs.CourseRepo.InsertCourse(course)
-	if err != nil {
-		fmt.Println("error insert course")
-		fmt.Println(err)
-		return err
-	}
+	// err = rs.CourseRepo.InsertCourse(course)
+	// if err != nil {
+	// 	fmt.Println("error insert course")
+	// 	fmt.Println(err)
+	// 	return err
+	// }
 
 	for _, moduleData := range courses.Modules {
 		fmt.Println("Module : ", moduleData)
