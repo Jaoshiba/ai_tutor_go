@@ -18,27 +18,24 @@ import (
 // 	GetDocx_DocData(file *multipart.FileHeader, ctx *fiber.Ctx) (string, error)
 // 	GetPdfData(file *multipart.FileHeader, ctx *fiber.Ctx) (string, error)
 // 	ReadFileData(file *multipart.FileHeader, ctx *fiber.Ctx) (string, error)
-// 	RemoveJsonBlock(text string) string 
+// 	RemoveJsonBlock(text string) string
 // }
 
-
-
 func ReadFileData(file *multipart.FileHeader, ctx *fiber.Ctx) (string, error) {
-	parts := strings.Split(file.Filename, ".")
-	if len(parts) < 2 {
-		return "", fmt.Errorf("could not determine file type for %s: no file extension found", file.Filename)
-	}
-	extension := strings.ToLower(parts[len(parts)-1])
+	fmt.Println("File Header: ", file.Header)
 
-	switch extension {
-	case "docx", "doc":
+	filetype := file.Header.Get("content-type")
+	fmt.Println("File type: ", filetype)
+
+	switch filetype {
+	case "application/vnd.openxmlformats-officedocument.wordprocessingml.document", "application/msword":
 		fmt.Println("Detected DOCX/DOC file.")
 		return GetDocx_DocData(file, ctx)
-	case "pdf":
+	case "application/pdf":
 		fmt.Println("Detected PDF file.")
 		return GetPdfData(file, ctx)
 	default:
-		return "", fmt.Errorf("unsupported file type: %s", extension)
+		return "", fmt.Errorf("unsupported file type: %s", filetype)
 	}
 }
 
