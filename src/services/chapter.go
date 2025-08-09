@@ -6,7 +6,6 @@ import (
 	"os"
 	"time"
 
-	ds "go-fiber-template/domain/datasources"
 	"go-fiber-template/domain/entities"
 	"go-fiber-template/domain/repositories"
 
@@ -15,10 +14,13 @@ import (
 	"github.com/gofiber/fiber/v2" // Import Fiber to use its context
 	"github.com/google/uuid"
 	"google.golang.org/genai"
+
+	cohereClient "github.com/cohere-ai/cohere-go/v2/client"
 )
 
 type ChapterServices struct {
 	ChapterRepository repositories.IChapterRepository
+	PineconeRepo      repositories.IPineconeRepository
 }
 
 type IChapterService interface {
@@ -26,7 +28,7 @@ type IChapterService interface {
 	GetChaptersByModuleID(moduleID string) ([]entities.ChapterDataModel, error)
 }
 
-func NewChapterServices(chapterRepository repositories.IChapterRepository) IChapterService {
+func NewChapterServices(chapterRepository repositories.IChapterRepository, pineconeRepo repositories.IPineconeRepository) IChapterService {
 	if chapterRepository == nil {
 		log.Fatal("❌ ChapterServices initialized with nil repository") // บรรทัดนี้คุณมีอยู่แล้ว
 	} else {
@@ -35,6 +37,7 @@ func NewChapterServices(chapterRepository repositories.IChapterRepository) IChap
 	}
 	return &ChapterServices{
 		ChapterRepository: chapterRepository,
+		PineconeRepo:      pineconeRepo,
 	}
 }
 
@@ -115,12 +118,16 @@ func (c *ChapterServices) ChapterrizedText(ctx *fiber.Ctx, courseId string, text
 		return fiber.NewError(fiber.StatusUnauthorized, "Invalid or missing user ID in context")
 	}
 
+	//create cohere client
+	coheereapikey := os.Getenv("COHERE_API_KEY")
+	if coheereapikey == "" {
+		log.Fatal("COHERE_API_KEY is not set in .env")
+	}
+	co := cohereClient.NewClient(cohereClient.WithToken(coheereapikey))
+
 	nameSpaceName := userIDRaw.(string)
 
 	fmt.Println("nameSpaceName: ", nameSpaceName)
-
-	//save data to pinecone
-	ds.NewPincecone(ctx)
 
 	for _, chapter := range response.Chapters {
 		ch := entities.ChapterDataModel{
@@ -141,6 +148,12 @@ func (c *ChapterServices) ChapterrizedText(ctx *fiber.Ctx, courseId string, text
 		if err != nil {
 			return err
 		}
+
+		err = c.PineconeRepo.UpsertVector(ch, co, ctx, userIDStr)
+		if err != nil {
+			fmt.Println("Error inserting chapter:", err)
+			return err
+		}
 	}
 
 	return nil
@@ -149,7 +162,7 @@ func (c *ChapterServices) GetChaptersByModuleID(moduleID string) ([]entities.Cha
 	fmt.Println("im in chap service")
 	fmt.Println(moduleID)
 	if c.ChapterRepository == nil {
-		log.Fatal("❌ ChapterRepository is nil in ChapterServices")
+		log.Fatal("ChapterRepository is nil in ChapterServices")
 	}
 	chapters, err := c.ChapterRepository.GetChaptersByModuleID(moduleID)
 	if err != nil {

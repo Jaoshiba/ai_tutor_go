@@ -53,16 +53,21 @@ func main() {
 	// Connect PostgreSQL
 	postgresql := ds.NewPostgresql()
 	fmt.Printf("PostgreSQL DB instance before passing to repo: %p\n", postgresql)
+	pineconeIdxConn, err := ds.NewPincecone()
+	if err != nil {
+		log.Fatalf("Failed to connect to Pinecone: %v", err)
+	}
 
 	// สร้าง Repositories
 	userRepo := repo.NewUsersRepositoryPostgres(postgresql)
 	fileRepo := repo.NewModulesRepository(postgresql)
 	chapterRepo := repo.NewChapterRepository(postgresql)
 	courseRepo := repo.NewCourseRepository(postgresql)
+	pineconeRepo := repo.NewPineconeRepository(pineconeIdxConn)
 
 	if userRepo == nil || fileRepo == nil || chapterRepo == nil || courseRepo == nil {
-        log.Fatalf("One or more repositories failed to initialize and are NIL.")
-    }
+		log.Fatalf("One or more repositories failed to initialize and are NIL.")
+	}
 
 	// สร้าง Services
 	jwtSecret = os.Getenv("JWT_SECRET_KEY")
@@ -73,13 +78,11 @@ func main() {
 	sv0 := sv.NewUsersService(userRepo)                       // สร้าง UsersServic
 	svGoogleAuth := authService.NewGoogleOAuthService(svAuth) // สร้าง GoogleOAuthService โดยฉีด AuthService
 
-
 	geminiService := sv.NewGeminiService()
 
-
-	svChapter := sv.NewChapterServices(chapterRepo)
+	svChapter := sv.NewChapterServices(chapterRepo, pineconeRepo)
 	sv1 := sv.NewModuleService(fileRepo, svChapter)
-	svCourse := sv.NewCourseService(courseRepo, sv1 , geminiService , svChapter)
+	svCourse := sv.NewCourseService(courseRepo, sv1, geminiService, svChapter)
 
 	// สร้าง Gateway และผูก Routes ทั้งหมด
 	// ต้องส่ง AuthService และ UserService เข้าไปใน NewHTTPGateway ด้วย
