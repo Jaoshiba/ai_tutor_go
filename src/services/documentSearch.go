@@ -11,6 +11,8 @@ import (
 	"net/url"
 	"os"
 	"path/filepath"
+
+	"github.com/gofiber/fiber/v2"
 )
 
 // SerpAPIResponse represents the structure of the JSON response from SerpAPI
@@ -18,7 +20,7 @@ import (
 
 // SearchAcademicDocuments uses SerpAPI to search for academic documents based on a module name and its description.
 // It takes the module name, description, and your SerpAPI key as input.
-func SearchDocuments(moduleName string, description string) (string, error) {
+func SearchDocuments(moduleName string, description string, ctx *fiber.Ctx) (string, error) {
 	// Base URL for SerpAPI
 	baseURL := "https://serpapi.com/search"
 
@@ -84,9 +86,22 @@ func SearchDocuments(moduleName string, description string) (string, error) {
 		if err != nil {
 			return "", fmt.Errorf("ไม่สามารถดาวน์โหลดไฟล์จาก URL ได้: %w", err)
 		}
-		file, err := os.ReadFile(docPath)
-		fmt.Println("File content:", string(file))
 		fmt.Printf("Finished Get file from url: %s\n", docPath)
+
+		file, err := ConvertFileTOMultipart(docPath)
+		if err != nil {
+			fmt.Println("Error converting file to multipart:", err)
+			return "", fmt.Errorf("ไม่สามารถแปลงไฟล์เป็น multipart ได้: %w", err)
+		}
+
+		fmt.Println(file.Filename)
+
+		content, err := ReadFileData(file, ctx)
+		if err != nil {
+			fmt.Println("Error reading file data:", err)
+			return "", fmt.Errorf("ไม่สามารถอ่านข้อมูลไฟล์: %w", err)
+		}
+		fmt.Println("File content:", content)
 
 	}
 

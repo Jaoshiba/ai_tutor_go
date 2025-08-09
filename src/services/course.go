@@ -67,7 +67,7 @@ func (rs *courseService) CreateCourse(courseJsonBody entities.CourseRequestBody,
 
 	// var serpres entities.SerpAPIResponse
 
-	txt, err := SearchDocuments(courseJsonBody.Title, courseJsonBody.Description)
+	txt, err := SearchDocuments(courseJsonBody.Title, courseJsonBody.Description, ctx)
 	if err != nil {
 		return fmt.Errorf("failed to search documents: %w", err)
 	}
