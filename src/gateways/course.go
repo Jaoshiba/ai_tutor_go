@@ -38,7 +38,7 @@ func (h *HTTPGateway) CreateCourse(ctx *fiber.Ctx) error {
 
 	fmt.Println("Before create in gateway")
 
-	err = h.CourseService.CreateCourse(coursejsonBody, file, ctx)
+	err = h.CourseService.CreateCourse(coursejsonBody, file, true, ctx)
 	if err != nil {
 		return ctx.Status(fiber.StatusBadRequest).JSON(entities.ResponseModel{
 			Message: "failed to create course on CreateCourse",

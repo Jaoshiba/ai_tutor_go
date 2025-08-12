@@ -6,7 +6,6 @@ import (
 	"fmt"
 	"go-fiber-template/domain/entities"
 	"log"
-	
 )
 
 type chaptersRepository struct {
@@ -19,23 +18,22 @@ type IChapterRepository interface {
 }
 
 func NewChapterRepository(db *sql.DB) IChapterRepository {
-    if db == nil {
-        log.Fatal("❌ NewChapterRepository got nil DB")
-    }
-    fmt.Println("✅ NewChapterRepository received DB:", db)
-    return &chaptersRepository{
-        db: db,
-    }
+	if db == nil {
+		log.Fatal("❌ NewChapterRepository got nil DB")
+	}
+	fmt.Println("✅ NewChapterRepository received DB:", db)
+	return &chaptersRepository{
+		db: db,
+	}
 }
-
 
 func (repo *chaptersRepository) InsertChapter(chapter entities.ChapterDataModel) error {
 
 	fmt.Println("InsertChapter called with chapter:", chapter)
 	query := `
 	INSERT INTO chapters (
-		chapterid, chaptername, userid, courseid, chaptercontent, isfinished, createat, updateat, moduleid
-	) VALUES ($1, $2, $3, $4, $5, $6, $7, $8, $9)`
+		chapterid, chaptername, userid, courseid, chaptercontent, isfinished, createat, updateat
+	) VALUES ($1, $2, $3, $4, $5, $6, $7, $8)`
 
 	fmt.Println("userid in chap repo : ", chapter.UserID)
 	_, err := repo.db.ExecContext(context.Background(), query,
@@ -81,7 +79,7 @@ func (repo *chaptersRepository) GetChaptersByModuleID(moduleID string) ([]entiti
 			&chapter.CourseId,
 			&chapter.ChapterContent,
 			&chapter.IsFinished,
-			&chapter.CreateAt, // สแกนตรงนี้
+			&chapter.CreateAt,  // สแกนตรงนี้
 			&chapter.UpdatedAt, // สแกนตรงนี้
 			&chapter.ModuleId,
 		); err != nil {

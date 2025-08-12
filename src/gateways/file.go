@@ -8,12 +8,21 @@ import (
 
 func (h *HTTPGateway) UploadFile(ctx *fiber.Ctx) error {
 
-	// file, err := ctx.FormFile("file")
-	// if err != nil {
-	// 	return ctx.Status(fiber.StatusUnprocessableEntity).JSON(entities.ResponseMessage{Message: "invalid file"})
-	// }
+	file, err := ctx.FormFile("file")
+	if err != nil {
+		return ctx.Status(fiber.StatusUnprocessableEntity).JSON(entities.ResponseMessage{Message: "invalid file"})
+	}
 
-	// h.ModuleService.CreateModule(file, ctx)
+	Coursename := ctx.FormValue("Coursename")
+	if Coursename == "" {
+		return ctx.Status(fiber.StatusBadRequest).JSON(entities.ResponseMessage{Message: "Coursename required"})
+	}
+
+	var CoursejsonBody entities.CourseRequestBody
+
+	h.CourseService.CreateCourse(CoursejsonBody, file, false, ctx)
+
+	// h.ModuleService.CreateModule(file, Coursename, ctx)
 
 	return ctx.Status(fiber.StatusOK).JSON(entities.ResponseModel{Message: "Completed create module from your file"})
 }

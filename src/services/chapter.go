@@ -6,13 +6,15 @@ import (
 	"os"
 	"time"
 
+	ds "go-fiber-template/domain/datasources"
 	"go-fiber-template/domain/entities"
 	"go-fiber-template/domain/repositories"
+
+	"log"
 
 	"github.com/gofiber/fiber/v2" // Import Fiber to use its context
 	"github.com/google/uuid"
 	"google.golang.org/genai"
-	"log"
 )
 
 type ChapterServices struct {
@@ -20,31 +22,30 @@ type ChapterServices struct {
 }
 
 type IChapterService interface {
-	ChapterrizedText(fCtx *fiber.Ctx, text string, moduleid string) error
+	ChapterrizedText(ctx *fiber.Ctx, courseId string, text string) error
 	GetChaptersByModuleID(moduleID string) ([]entities.ChapterDataModel, error)
 }
 
 func NewChapterServices(chapterRepository repositories.IChapterRepository) IChapterService {
-    if chapterRepository == nil {
-        log.Fatal("❌ ChapterServices initialized with nil repository") // บรรทัดนี้คุณมีอยู่แล้ว
-    } else {
-        fmt.Println("✅ ChapterServices initialized with non-nil repository.") // เพิ่มบรรทัดนี้
-        fmt.Printf("ChapterRepository instance in NewChapterServices: %p\n", chapterRepository) // เพิ่มบรรทัดนี้
-    }
-    return &ChapterServices{
-        ChapterRepository: chapterRepository,
-    }
+	if chapterRepository == nil {
+		log.Fatal("❌ ChapterServices initialized with nil repository") // บรรทัดนี้คุณมีอยู่แล้ว
+	} else {
+		fmt.Println("✅ ChapterServices initialized with non-nil repository.")                   // เพิ่มบรรทัดนี้
+		fmt.Printf("ChapterRepository instance in NewChapterServices: %p\n", chapterRepository) // เพิ่มบรรทัดนี้
+	}
+	return &ChapterServices{
+		ChapterRepository: chapterRepository,
+	}
 }
 
-
-func (c *ChapterServices) ChapterrizedText(fCtx *fiber.Ctx, text string, moduleid string) error {
+func (c *ChapterServices) ChapterrizedText(ctx *fiber.Ctx, courseId string, text string) error {
 
 	gemini_api_key := os.Getenv("GEMINI_API_KEY")
 	if gemini_api_key == "" {
 		return fmt.Errorf("GEMINI_API_KEY not set")
 	}
 
-	genaiCtx := fCtx.Context()
+	genaiCtx := ctx.Context()
 
 	client, err := genai.NewClient(genaiCtx, &genai.ClientConfig{
 		APIKey:  gemini_api_key,
@@ -108,29 +109,32 @@ func (c *ChapterServices) ChapterrizedText(fCtx *fiber.Ctx, text string, modulei
 		return err
 	}
 
-	userIDRaw := fCtx.Locals("userID")
+	userIDRaw := ctx.Locals("userID")
 	userIDStr, ok := userIDRaw.(string)
 	if !ok || userIDStr == "" {
 		return fiber.NewError(fiber.StatusUnauthorized, "Invalid or missing user ID in context")
 	}
 
-	// Consider if CourseId should be passed from the controller or generated here
-	courseID := uuid.NewString()
+	nameSpaceName := userIDRaw.(string)
+
+	fmt.Println("nameSpaceName: ", nameSpaceName)
+
+	//save data to pinecone
+	ds.NewPincecone(ctx)
 
 	for _, chapter := range response.Chapters {
 		ch := entities.ChapterDataModel{
 			ChapterId:      uuid.NewString(),
 			ChapterName:    chapter.ChapterName,
 			UserID:         userIDStr,
-			CourseId:       courseID,
+			CourseId:       courseId,
 			ChapterContent: chapter.Content,
 			CreateAt:       time.Now(),
 			UpdatedAt:      time.Now(),
 			IsFinished:     false,
-			ModuleId:       moduleid,
 		}
 		fmt.Println("Inserting chapter:", ch.ChapterId)
-		
+
 		fmt.Println("chapter : ", chapter)
 		
 		// err = c.ChapterRepository.InsertChapter(ch)
@@ -142,14 +146,14 @@ func (c *ChapterServices) ChapterrizedText(fCtx *fiber.Ctx, text string, modulei
 	return nil
 }
 func (c *ChapterServices) GetChaptersByModuleID(moduleID string) ([]entities.ChapterDataModel, error) {
-    fmt.Println("im in chap service")
+	fmt.Println("im in chap service")
 	fmt.Println(moduleID)
 	if c.ChapterRepository == nil {
-        log.Fatal("❌ ChapterRepository is nil in ChapterServices")
-    }
-    chapters, err := c.ChapterRepository.GetChaptersByModuleID(moduleID)
-    if err != nil {
-        return nil, fmt.Errorf("failed to retrieve chapters from repository for module %s: %w", moduleID, err)
-    }
-    return chapters, nil
+		log.Fatal("❌ ChapterRepository is nil in ChapterServices")
+	}
+	chapters, err := c.ChapterRepository.GetChaptersByModuleID(moduleID)
+	if err != nil {
+		return nil, fmt.Errorf("failed to retrieve chapters from repository for module %s: %w", moduleID, err)
+	}
+	return chapters, nil
 }

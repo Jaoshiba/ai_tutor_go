@@ -21,15 +21,13 @@ type CourseRequestBody struct {
 }
 
 type CourseGeminiResponse struct {
-	CourseName string `json:"course_name"`
-	CourseDescription string `json:"course_description"`
 	Modules []GenModule `json:"modules"`
 }
 
 type GenModule struct {
 	Title       string `json:"title"`
 	Description string `json:"description"`
-	Topics      []string `json:"topics"`
+	Content     string `json:"content"`
 }
 
 type ModuleDetail struct {
