@@ -124,7 +124,6 @@ Use the following information provided by the user: Course Name: [Course Name], 
 Please format the output as a JSON structure for easy integration into a web app, like this example: { "modules": [ { "title": "Module Title 1", "description": "Description for Module 1", }, { "title": "Module Title 2", "description": "Description for Module 2", }, ] } Make sure your response is primarily in Thai as requested.`,
 			courseJsonBody.Title, courseJsonBody.Description, content)
 
-
 		modules, err := rs.GeminiService.GenerateContentFromPrompt(ctx.Context(), prompt)
 		if err != nil {
 			return err
@@ -150,7 +149,6 @@ Please format the output as a JSON structure for easy integration into a web app
 		fmt.Println("---------------------------------------------")
 
 		fmt.Println("Module : heheheh : ", courses.Modules)
-
 
 		//on web
 		userid := ctx.Locals("userID")
@@ -178,7 +176,6 @@ Please format the output as a JSON structure for easy integration into a web app
 		// }
 		// ctx.Locals("userID", uuid.NewString())
 
-
 		err = rs.CourseRepo.InsertCourse(course)
 		if err != nil {
 			fmt.Println("error insert course")
@@ -187,22 +184,26 @@ Please format the output as a JSON structure for easy integration into a web app
 		}
 
 		// return err
-		for _, moduleData := range courses.Modules {
-			// fmt.Println("Module : ", moduleData)
-			moduleData.Content = content
-			//find title docs and insert into moduleData
-			content, err := SearchDocuments(moduleData.Title, moduleData.Description, ctx)
-			if err != nil {
-				return fmt.Errorf("failed to search documents for module: %w", err)
-			}
+		// for _, moduleData := range courses.Modules {
+		// 	// fmt.Println("Module : ", moduleData)
+		// 	moduleData.Content = content
+		// 	//find title docs and insert into moduleData
+		// 	content, err := SearchDocuments(moduleData.Title, moduleData.Description, ctx)
+		// 	if err != nil {
+		// 		return fmt.Errorf("failed to search documents for module: %w", err)
+		// 	}
 
-			moduleData.Content = content
+		// 	moduleData.Content = content
 
-			err = rs.ModuleService.CreateModule(ctx, &moduleData)
-			if err != nil {
-				return err
-			}
-		}
+		// 	err = rs.ModuleService.CreateModule(ctx, &moduleData)
+		// 	if err != nil {
+		// 		return err
+		// 	}
+		// }
+
+		content, err := SearchDocuments(courses.Modules[0].Title, courses.Modules[0].Description, ctx)
+		fmt.Println("content : ", content)
+
 	} else { //for file upload
 		var content string
 

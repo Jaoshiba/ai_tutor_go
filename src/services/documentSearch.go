@@ -6,12 +6,11 @@ import (
 	"fmt"
 	"go-fiber-template/domain/entities"
 	"io"
-	"mime/multipart"
 	"net/http"
-	"net/textproto"
 	"net/url"
 	"os"
 	"path/filepath"
+
 	// "regexp"
 	"strings"
 
@@ -24,8 +23,8 @@ var allowedExts = map[string]bool{
 	".docx": true,
 }
 var allowedCTs = map[string]string{
-	"application/pdf":                                                     ".pdf",
-	"application/msword":                                                  ".doc",
+	"application/pdf":    ".pdf",
+	"application/msword": ".doc",
 	"application/vnd.openxmlformats-officedocument.wordprocessingml.document": ".docx",
 }
 
@@ -96,9 +95,9 @@ func SearchDocuments(moduleName string, description string, ctx *fiber.Ctx) (str
 				fileExt := strings.ToLower(filepath.Ext(documentLink))
 
 				if !allowedExts[fileExt] {
-                    fmt.Printf("Skipping file from URL: %s - not a supported document type\n", documentLink)
-                    continue // ข้ามไปผลลัพธ์ถัดไป
-                }
+					fmt.Printf("Skipping file from URL: %s - not a supported document type\n", documentLink)
+					continue // ข้ามไปผลลัพธ์ถัดไป
+				}
 
 				documentTitle := sanitizeFilename(result.Title)
 
@@ -109,19 +108,12 @@ func SearchDocuments(moduleName string, description string, ctx *fiber.Ctx) (str
 				}
 				fmt.Printf("Finished Get file from url: %s\n", docPath)
 
-				file, err := ConvertFileTOMultipart(docPath)
-				if err != nil {
-					fmt.Println("Error converting file to multipart:", err)
-					continue
-				}
-				fmt.Println(file.Filename)
-
 				content, err := ReadFileData(docPath, ctx)
 				if err != nil {
 					fmt.Println("Error reading file data:", err)
 					continue
 				}
-				// fmt.Println("File content:", content)
+				fmt.Println("File content:", content)
 				return content, err
 			}
 
@@ -229,7 +221,6 @@ func isAllowedContentType(ct string) (ok bool, ext string) {
 	return
 }
 
-
 func GetFileFromUrl(fileTitle string, fileUrl string) (string, error) {
 	downloadDir := "fileDocs"
 	if err := os.MkdirAll(downloadDir, 0o755); err != nil {
@@ -264,24 +255,4 @@ func GetFileFromUrl(fileTitle string, fileUrl string) (string, error) {
 	}
 
 	return fullPath, nil
-}
-
-func ConvertFileTOMultipart(filePath string) (*multipart.FileHeader, error) {
-	file, err := os.Open(filePath)
-	if err != nil {
-		return nil, fmt.Errorf("ไม่สามารถเปิดไฟล์: %w", err)
-	}
-	defer file.Close()
-
-	fileStat, err := file.Stat()
-	if err != nil {
-		return nil, fmt.Errorf("ไม่สามารถอ่านข้อมูลไฟล์: %w", err)
-	}
-
-	fileHeader := &multipart.FileHeader{
-		Filename: fileStat.Name(),
-		Size:     fileStat.Size(),
-		Header:   make(textproto.MIMEHeader),
-	}
-	return fileHeader, nil
 }
