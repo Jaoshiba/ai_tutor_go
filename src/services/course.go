@@ -111,26 +111,17 @@ func (rs *courseService) CreateCourse(courseJsonBody entities.CourseRequestBody,
 
 			เนื้อหาจากไฟล์ที่เกียวข้อง %s
 
-			เนื้อหาที่ได้จากไฟล์แนบ: 
-			ฉันต้องการให้คุณช่วยสร้าง Course การเรียนรู้ ที่เหมาะสม โดยแบ่งเนื้อหาออกเป็น Module หรือหัวข้อหลัก ๆ ที่ควรเรียน พร้อมเรียงลำดับตามความเหมาะสมในการเรียนรู้
+			ChatGPT - Course Creation Prompt
 
-			ช่วยจัดรูปแบบข้อมูลให้ออกมาเป็น JSON หรือโครงสร้างที่สามารถนำไปใช้กับระบบต่อได้ (เช่นในเว็บแอป) ตัวอย่างโครงสร้างที่ต้องการ:
-			{
-			"modules": [
-				{
-				"title": "ชื่อ Module 1",
-				"description": "คำอธิบายของ Module 1",
-				},
-				{
-				"title": "ชื่อ Module 2",
-				"description": "คำอธิบายของ Module 1",
-				},
-			]
-			}
+You're tasked with creating a comprehensive learning course based on preliminary information provided by the user, including the course name, description, and relevant content.
 
-			เรียงลำดับ Modules จากพื้นฐานไปขั้นสูงตามความเหมาะสม
+Act as a knowledgeable course designer with expertise in curriculum development and instructional design, ensuring that the material is organized clearly and logically.
 
-			กรุณาสร้าง course โดยอิงจากชื่อ, คำอธิบาย และเนื้อหาที่ให้ไว้ด้านบน และ **ขอเป็นภาษาไทยเป็นหลัก**`,
+Your audience is educators, instructional designers, or anyone looking to create a structured learning experience for students.
+
+Use the following information provided by the user: Course Name: [Course Name], Course Description: [Course Description], and Content from Related File: [Content]. Your job is to create the course structure by breaking down the content into modules or main topics that should be learned, organizing them in an appropriate sequence from basic to advanced.
+
+Please format the output as a JSON structure for easy integration into a web app, like this example: { "modules": [ { "title": "Module Title 1", "description": "Description for Module 1", }, { "title": "Module Title 2", "description": "Description for Module 2", }, ] } Make sure your response is primarily in Thai as requested.`,
 			courseJsonBody.Title, courseJsonBody.Description, content)
 
 
@@ -161,17 +152,17 @@ func (rs *courseService) CreateCourse(courseJsonBody entities.CourseRequestBody,
 
 
 		//on web
-		// userid := ctx.Locals("userID")
+		userid := ctx.Locals("userID")
 
-		// course := entities.CourseDataModel{
-		// 	CourseID:    courseId,
-		// 	Title:       courseJsonBody.Title,
-		// 	Description: courseJsonBody.Description,
-		// 	Confirmed:   courseJsonBody.Confirmed,
-		// 	UserId:      userid.(string),
-		// 	CreatedAt:   time.Now(),
-		// 	UpdatedAt:   time.Now(),
-		// }
+		course := entities.CourseDataModel{
+			CourseID:    courseId,
+			Title:       courseJsonBody.Title,
+			Description: courseJsonBody.Description,
+			Confirmed:   courseJsonBody.Confirmed,
+			UserId:      userid.(string),
+			CreatedAt:   time.Now(),
+			UpdatedAt:   time.Now(),
+		}
 		// fmt.Println(course)
 
 		//mocked for postman test
@@ -184,19 +175,20 @@ func (rs *courseService) CreateCourse(courseJsonBody entities.CourseRequestBody,
 		// 	CreatedAt:   time.Now(),
 		// 	UpdatedAt:   time.Now(),
 		// }
-		ctx.Locals("userID", uuid.NewString())
+		// ctx.Locals("userID", uuid.NewString())
 
 
-		// err = rs.CourseRepo.InsertCourse(course)
-		// if err != nil {
-		// 	fmt.Println("error insert course")
-		// 	fmt.Println(err)
-		// 	return err
-		// }
+		err = rs.CourseRepo.InsertCourse(course)
+		if err != nil {
+			fmt.Println("error insert course")
+			fmt.Println(err)
+			return err
+		}
 
 		// return err
 		for _, moduleData := range courses.Modules {
-			fmt.Println("Module : ", moduleData)
+			// fmt.Println("Module : ", moduleData)
+			moduleData.Content = content
 			//find title docs and insert into moduleData
 
 			err := rs.ModuleService.CreateModule(ctx, &moduleData)

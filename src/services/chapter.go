@@ -5,7 +5,7 @@ import (
 	"fmt"
 	"os"
 	"time"
-
+ 
 	"go-fiber-template/domain/entities"
 	"go-fiber-template/domain/repositories"
 
@@ -15,7 +15,7 @@ import (
 	"github.com/google/uuid"
 	"google.golang.org/genai"
 
-	cohereClient "github.com/cohere-ai/cohere-go/v2/client"
+	// cohereClient "github.com/cohere-ai/cohere-go/v2/client"
 )
 
 type ChapterServices struct {
@@ -112,7 +112,13 @@ func (c *ChapterServices) ChapterrizedText(ctx *fiber.Ctx, courseId string, text
 		return err
 	}
 
+	moduleIdRaw := ctx.Locals("moduleID")
 	userIDRaw := ctx.Locals("userID")
+	moduleId, ok := moduleIdRaw.(string)
+	 if !ok || moduleId == "" {
+		return fiber.NewError(fiber.StatusUnauthorized, "Invalid or missing module ID in context")
+	}
+	
 	userIDStr, ok := userIDRaw.(string)
 	if !ok || userIDStr == "" {
 		return fiber.NewError(fiber.StatusUnauthorized, "Invalid or missing user ID in context")
@@ -123,7 +129,7 @@ func (c *ChapterServices) ChapterrizedText(ctx *fiber.Ctx, courseId string, text
 	if coheereapikey == "" {
 		log.Fatal("COHERE_API_KEY is not set in .env")
 	}
-	co := cohereClient.NewClient(cohereClient.WithToken(coheereapikey))
+	// co := cohereClient.NewClient(cohereClient.WithToken(coheereapikey))
 
 	nameSpaceName := userIDRaw.(string)
 
@@ -139,21 +145,22 @@ func (c *ChapterServices) ChapterrizedText(ctx *fiber.Ctx, courseId string, text
 			CreateAt:       time.Now(),
 			UpdatedAt:      time.Now(),
 			IsFinished:     false,
+			ModuleId: moduleId,
 		}
 		fmt.Println("Inserting chapter:", ch.ChapterId)
 
 		fmt.Println("chapter : ", chapter)
 
-		// err = c.ChapterRepository.InsertChapter(ch)
-		// if err != nil {
-		// 	return err
-		// }
-
-		err = c.PineconeRepo.UpsertVector(ch, co, ctx, userIDStr)
+		err = c.ChapterRepository.InsertChapter(ch)
 		if err != nil {
-			fmt.Println("Error inserting chapter:", err)
 			return err
 		}
+
+		// err = c.PineconeRepo.UpsertVector(ch, co, ctx, userIDStr)
+		// if err != nil {
+		// 	fmt.Println("Error inserting chapter:", err)
+		// 	return err
+		// }
 	}
 
 	return nil

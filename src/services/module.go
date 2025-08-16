@@ -31,8 +31,12 @@ func NewModuleService(modulesRepository repo.IModuleRepository, chapterservice I
 
 func (ms *ModuleService) CreateModule(ctx *fiber.Ctx, moduleData *entities.GenModule,) error {
 	// Generate a new ModuleId early, as it's needed for both the module and its chapters.
-	moduleId := uuid.NewString()
 
+	fmt.Println("moodule data in module : ", moduleData)
+
+	moduleId := uuid.NewString()
+	ctx.Locals("moduleID", moduleId)
+	
 	// --- 1. Safely retrieve userID from context ---
 	userIdRaw := ctx.Locals("userID")
 	// Always check for nil first, then perform type assertion.
@@ -78,14 +82,14 @@ func (ms *ModuleService) CreateModule(ctx *fiber.Ctx, moduleData *entities.GenMo
 
 	fmt.Println("Module to be inserted:", module)
 
-	// err := ms.modulesRepository.InsertModule(module)
-	// if err != nil {
-	// 	fmt.Printf("Error inserting module %s into repository: %v\n", moduleId, err)
-	// 	return err // Return the error if module insertion fails.
-	// }
-	// fmt.Println("Module successfully inserted into database.")
+	err := ms.modulesRepository.InsertModule(module)
+	if err != nil {
+		fmt.Printf("Error inserting module %s into repository: %v\n", moduleId, err)
+		return err // Return the error if module insertion fails.
+	}
+	fmt.Println("Module successfully inserted into database.")
 
-	err := ms.ChapterServices.ChapterrizedText(ctx, courseId, moduleData.Content)
+	err = ms.ChapterServices.ChapterrizedText(ctx, courseId, moduleData.Content)
 	if err != nil {
 		return err
 	}

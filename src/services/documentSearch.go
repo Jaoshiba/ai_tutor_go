@@ -18,6 +18,17 @@ import (
 	"github.com/gofiber/fiber/v2"
 )
 
+var allowedExts = map[string]bool{
+	".pdf":  true,
+	".doc":  true,
+	".docx": true,
+}
+var allowedCTs = map[string]string{
+	"application/pdf":                                                     ".pdf",
+	"application/msword":                                                  ".doc",
+	"application/vnd.openxmlformats-officedocument.wordprocessingml.document": ".docx",
+}
+
 // ==== ปรับฟังก์ชันหลัก ให้มี retry ====
 
 func SearchDocuments(moduleName string, description string, ctx *fiber.Ctx) (string, error) {
@@ -81,6 +92,14 @@ func SearchDocuments(moduleName string, description string, ctx *fiber.Ctx) (str
 					break
 				}
 				documentLink := result.Link
+
+				fileExt := strings.ToLower(filepath.Ext(documentLink))
+
+				if !allowedExts[fileExt] {
+                    fmt.Printf("Skipping file from URL: %s - not a supported document type\n", documentLink)
+                    continue // ข้ามไปผลลัพธ์ถัดไป
+                }
+
 				documentTitle := sanitizeFilename(result.Title)
 
 				fmt.Println("Getting file from URL:", documentLink)
@@ -202,6 +221,14 @@ Additional retry hint for this attempt:
 // }
 
 // ==== ของเดิม (เพิ่มเติมเล็กน้อย: สร้างโฟลเดอร์ถ้ายังไม่มี และเติมนามสกุลจาก URL ได้) ====
+
+func isAllowedContentType(ct string) (ok bool, ext string) {
+	// ตัดพารามิเตอร์ เช่น "; charset=binary"
+	ct = strings.ToLower(strings.TrimSpace(strings.Split(ct, ";")[0]))
+	ext, ok = allowedCTs[ct]
+	return
+}
+
 
 func GetFileFromUrl(fileTitle string, fileUrl string) (string, error) {
 	downloadDir := "fileDocs"
