@@ -20,6 +20,8 @@ func (h *HTTPGateway) UploadFile(ctx *fiber.Ctx) error {
 
 	var CoursejsonBody entities.CourseRequestBody
 
+	CoursejsonBody.Title = Coursename
+
 	h.CourseService.CreateCourse(CoursejsonBody, file, false, ctx)
 
 	// h.ModuleService.CreateModule(file, Coursename, ctx)

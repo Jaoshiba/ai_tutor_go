@@ -67,14 +67,17 @@ func (rs *courseService) CreateCourse(courseJsonBody entities.CourseRequestBody,
 
 	// var serpres entities.SerpAPIResponse
 
-	txt, err := SearchDocuments(courseJsonBody.Title, courseJsonBody.Description)
+	txt, err := SearchDocuments(courseJsonBody.Title, courseJsonBody.Description, ctx)
 	if err != nil {
 		return fmt.Errorf("failed to search documents: %w", err)
 	}
 
 	fmt.Println("Search result: ", txt)
 
-	return err
+	//จุดคั่น
+	// return err
+
+	// content := txt
 
 	fmt.Println("Extracting file content....")
 
@@ -82,7 +85,12 @@ func (rs *courseService) CreateCourse(courseJsonBody entities.CourseRequestBody,
 	if fromCoures {
 		if file != nil {
 			fmt.Println("Extracting file content....")
-			fileContent, err := ReadFileData(file, ctx)
+			docPath, err := SaveFileToDisk(file, ctx)
+			if err != nil {
+				fmt.Printf("Error saving file to disk: %v\n", err)
+				return err
+			}
+			fileContent, err := ReadFileData(docPath, ctx)
 			content = fileContent
 			if err != nil {
 				fmt.Printf("Error processing file with FileService: %v\n", err)
@@ -90,10 +98,10 @@ func (rs *courseService) CreateCourse(courseJsonBody entities.CourseRequestBody,
 			}
 		} else {
 			fmt.Println("No file uploaded, skipping file processing")
-			content = ""
+			content = txt
 		}
 
-		fmt.Println("adterrrrrrrr")
+		ctx.Locals("content", content)
 
 		prompt := fmt.Sprintf(`ฉันมีข้อมูลเบื้องต้น 3 อย่างที่ได้จากผู้ใช้:
 
@@ -125,6 +133,7 @@ func (rs *courseService) CreateCourse(courseJsonBody entities.CourseRequestBody,
 			กรุณาสร้าง course โดยอิงจากชื่อ, คำอธิบาย และเนื้อหาที่ให้ไว้ด้านบน และ **ขอเป็นภาษาไทยเป็นหลัก**`,
 			courseJsonBody.Title, courseJsonBody.Description, content)
 
+
 		modules, err := rs.GeminiService.GenerateContentFromPrompt(ctx.Context(), prompt)
 		if err != nil {
 			return err
@@ -132,7 +141,7 @@ func (rs *courseService) CreateCourse(courseJsonBody entities.CourseRequestBody,
 
 		courseId := uuid.NewString()
 		if courseId == "" {
-			fmt.Println("NUll courseid")
+			fmt.Println("NUll coursei")
 		}
 		ctx.Locals("courseID", courseId)
 
@@ -150,26 +159,44 @@ func (rs *courseService) CreateCourse(courseJsonBody entities.CourseRequestBody,
 
 		fmt.Println("Module : heheheh : ", courses.Modules)
 
-		userid := ctx.Locals("userID")
-		course := entities.CourseDataModel{
-			CourseID:    courseId,
-			Title:       courseJsonBody.Title,
-			Description: courseJsonBody.Description,
-			Confirmed:   courseJsonBody.Confirmed,
-			UserId:      userid.(string),
-			CreatedAt:   time.Now(),
-			UpdatedAt:   time.Now(),
-		}
-		fmt.Println(course)
-		err = rs.CourseRepo.InsertCourse(course)
-		if err != nil {
-			fmt.Println("error insert course")
-			fmt.Println(err)
-			return err
-		}
+
+		//on web
+		// userid := ctx.Locals("userID")
+
+		// course := entities.CourseDataModel{
+		// 	CourseID:    courseId,
+		// 	Title:       courseJsonBody.Title,
+		// 	Description: courseJsonBody.Description,
+		// 	Confirmed:   courseJsonBody.Confirmed,
+		// 	UserId:      userid.(string),
+		// 	CreatedAt:   time.Now(),
+		// 	UpdatedAt:   time.Now(),
+		// }
+		// fmt.Println(course)
+
+		//mocked for postman test
+		// course := entities.CourseDataModel{
+		// 	CourseID:    courseId,
+		// 	Title:       courseJsonBody.Title,
+		// 	Description: courseJsonBody.Description,
+		// 	Confirmed:   courseJsonBody.Confirmed,
+		// 	UserId:      userid.(string),
+		// 	CreatedAt:   time.Now(),
+		// 	UpdatedAt:   time.Now(),
+		// }
+		ctx.Locals("userID", uuid.NewString())
+
+
+		// err = rs.CourseRepo.InsertCourse(course)
+		// if err != nil {
+		// 	fmt.Println("error insert course")
+		// 	fmt.Println(err)
+		// 	return err
+		// }
+
+		// return err
 		for _, moduleData := range courses.Modules {
 			fmt.Println("Module : ", moduleData)
-
 			//find title docs and insert into moduleData
 
 			err := rs.ModuleService.CreateModule(ctx, &moduleData)
@@ -177,12 +204,13 @@ func (rs *courseService) CreateCourse(courseJsonBody entities.CourseRequestBody,
 				return err
 			}
 		}
-	} else {
+	} else { //for file upload
 		var content string
 
 		if file != nil {
 			fmt.Println("Extracting file content....")
-			fileContent, err := ReadFileData(file, ctx)
+			docPath, err := SaveFileToDisk(file, ctx)
+			fileContent, err := ReadFileData(docPath, ctx)
 			content = fileContent
 			if err != nil {
 				fmt.Printf("Error processing file with FileService: %v\n", err)
@@ -204,7 +232,6 @@ func (rs *courseService) CreateCourse(courseJsonBody entities.CourseRequestBody,
 			CreatedAt:   time.Now(),
 			UpdatedAt:   time.Now(),
 		}
-
 
 		fmt.Println(course)
 
@@ -258,12 +285,11 @@ func (rs *courseService) GetCourseDetail(ctx *fiber.Ctx, courseID string) (*enti
 	}
 
 	for _, moduleData := range modulesData {
-		fmt.Println("in chapgen loop")
+
 		chaptersData, err := rs.ChapterServices.GetChaptersByModuleID(moduleData.ModuleId)
 		if err != nil {
 			return nil, fmt.Errorf("failed to get chapters for module %s: %w", moduleData.ModuleId, err)
 		}
-		fmt.Println("in chapgen loop")
 
 		var chapterDetails []entities.ChapterDetail
 		for _, chapter := range chaptersData {
@@ -274,7 +300,6 @@ func (rs *courseService) GetCourseDetail(ctx *fiber.Ctx, courseID string) (*enti
 				IsFinished:     chapter.IsFinished,
 			})
 		}
-		fmt.Println("in chapgen loop")
 
 		courseDetail.Modules = append(courseDetail.Modules, entities.ModuleDetail{
 			ModuleId:    moduleData.ModuleId,
@@ -282,7 +307,7 @@ func (rs *courseService) GetCourseDetail(ctx *fiber.Ctx, courseID string) (*enti
 			Description: moduleData.Description,
 			Chapters:    chapterDetails,
 		})
-		fmt.Println("in chapgen loop")
+
 	}
 
 	return courseDetail, nil

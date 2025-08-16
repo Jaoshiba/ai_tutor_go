@@ -29,7 +29,7 @@ func NewModuleService(modulesRepository repo.IModuleRepository, chapterservice I
 	}
 }
 
-func (ms *ModuleService) CreateModule(ctx *fiber.Ctx, moduleData *entities.GenModule) error {
+func (ms *ModuleService) CreateModule(ctx *fiber.Ctx, moduleData *entities.GenModule,) error {
 	// Generate a new ModuleId early, as it's needed for both the module and its chapters.
 	moduleId := uuid.NewString()
 

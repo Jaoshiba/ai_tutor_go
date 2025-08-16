@@ -4,6 +4,7 @@ go 1.24.1
 
 require (
 	baliance.com/gooxml v1.0.1
+	github.com/cohere-ai/cohere-go/v2 v2.15.2
 	github.com/goccy/go-json v0.10.2
 	github.com/gofiber/fiber/v2 v2.51.0
 	github.com/golang-jwt/jwt/v5 v5.2.2
@@ -17,6 +18,7 @@ require (
 	golang.org/x/oauth2 v0.30.0
 	google.golang.org/api v0.239.0
 	google.golang.org/genai v1.17.0
+	google.golang.org/protobuf v1.36.6
 )
 
 require (
@@ -28,6 +30,8 @@ require (
 	cloud.google.com/go/longrunning v0.5.7 // indirect
 	github.com/andybalholm/brotli v1.0.5 // indirect
 	github.com/apapsch/go-jsonmerge/v2 v2.0.0 // indirect
+	github.com/aws/aws-sdk-go-v2 v1.30.3 // indirect
+	github.com/aws/smithy-go v1.20.3 // indirect
 	github.com/davecgh/go-spew v1.1.1 // indirect
 	github.com/felixge/httpsnoop v1.0.4 // indirect
 	github.com/go-logr/logr v1.4.3 // indirect
@@ -62,6 +66,5 @@ require (
 	google.golang.org/genproto/googleapis/api v0.0.0-20250603155806-513f23925822 // indirect
 	google.golang.org/genproto/googleapis/rpc v0.0.0-20250728155136-f173205681a0 // indirect
 	google.golang.org/grpc v1.74.2 // indirect
-	google.golang.org/protobuf v1.36.6 // indirect
 	gopkg.in/yaml.v3 v3.0.1 // indirect
 )
