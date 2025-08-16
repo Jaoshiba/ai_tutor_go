@@ -42,8 +42,9 @@ func NewCourseService(
 }
 
 func (rs *courseService) GetCourses(ctx *fiber.Ctx) ([]entities.CourseDataModel, error) {
-	userID := ctx.Locals("userID").(string) // Get userId from context locals
+	// userID := ctx.Locals("userID").(string) // Get userId from context locals
 
+	userID := uuid.NewString()
 	if userID == "" {
 		return nil, fmt.Errorf("user ID is missing from context")
 	}
@@ -111,19 +112,30 @@ func (rs *courseService) CreateCourse(courseJsonBody entities.CourseRequestBody,
 
 			เนื้อหาจากไฟล์ที่เกียวข้อง %s
 
-			ChatGPT - Course Creation Prompt
+			คุณได้รับมอบหมายให้สร้างหลักสูตรการเรียนรู้ที่ครอบคลุม โดยอิงจากข้อมูลเบื้องต้นที่ผู้ใช้ให้มา ซึ่งได้แก่ ชื่อหลักสูตร: [Course Name], คำอธิบายหลักสูตร: [Course Description], และ เนื้อหาจากไฟล์ที่เกี่ยวข้อง: [Content]
 
-You're tasked with creating a comprehensive learning course based on preliminary information provided by the user, including the course name, description, and relevant content.
+			สวมบทบาทเป็นนักออกแบบหลักสูตรที่มีความรู้ความเชี่ยวชาญด้านการพัฒนาหลักสูตรและการออกแบบการเรียนการสอน เพื่อให้แน่ใจว่าเนื้อหามีการจัดระเบียบอย่างชัดเจนและมีตรรกะ
 
-Act as a knowledgeable course designer with expertise in curriculum development and instructional design, ensuring that the material is organized clearly and logically.
+			กลุ่มเป้าหมายของคุณคือผู้สอน นักออกแบบการเรียนการสอน หรือผู้ที่ต้องการสร้างประสบการณ์การเรียนรู้ที่มีโครงสร้างสำหรับผู้เรียน
 
-Your audience is educators, instructional designers, or anyone looking to create a structured learning experience for students.
+			หน้าที่ของคุณคือการสร้างโครงสร้างหลักสูตรโดยแบ่งเนื้อหาออกเป็นโมดูลหรือหัวข้อหลักที่ควรเรียนรู้ และจัดลำดับให้เหมาะสมจากระดับพื้นฐานไปจนถึงระดับสูง พร้อมทั้งระบุวัตถุประสงค์หลักของการเรียนรู้หลักสูตรนี้
 
-Use the following information provided by the user: Course Name: [Course Name], Course Description: [Course Description], and Content from Related File: [Content]. Your job is to create the course structure by breaking down the content into modules or main topics that should be learned, organizing them in an appropriate sequence from basic to advanced.
-
-Please format the output as a JSON structure for easy integration into a web app, like this example: { "modules": [ { "title": "Module Title 1", "description": "Description for Module 1", }, { "title": "Module Title 2", "description": "Description for Module 2", }, ] } Make sure your response is primarily in Thai as requested.`,
+			โปรดจัดรูปแบบผลลัพธ์เป็นโครงสร้าง JSON เพื่อให้ง่ายต่อการนำไปใช้งานในเว็บแอป โดยมีรูปแบบดังนี้:
+			{
+			"purpose": "วัตถุประสงค์ของหลักสูตรนี้คือ...",
+			"modules": [
+				{
+				"title": "ชื่อโมดูล 1",
+				"description": "คำอธิบายสำหรับโมดูล 1"
+				},
+				{
+				"title": "ชื่อโมดูล 2",
+				"description": "คำอธิบายสำหรับโมดูล 2"
+				}
+				]
+			}
+			`,
 			courseJsonBody.Title, courseJsonBody.Description, content)
-
 
 		modules, err := rs.GeminiService.GenerateContentFromPrompt(ctx.Context(), prompt)
 		if err != nil {
@@ -151,16 +163,16 @@ Please format the output as a JSON structure for easy integration into a web app
 
 		fmt.Println("Module : heheheh : ", courses.Modules)
 
-
 		//on web
-		userid := ctx.Locals("userID")
+		// userid := ctx.Locals("userID")
+		userId := uuid.NewString()
 
 		course := entities.CourseDataModel{
 			CourseID:    courseId,
 			Title:       courseJsonBody.Title,
 			Description: courseJsonBody.Description,
 			Confirmed:   courseJsonBody.Confirmed,
-			UserId:      userid.(string),
+			UserId:      userId,
 			CreatedAt:   time.Now(),
 			UpdatedAt:   time.Now(),
 		}
@@ -177,7 +189,6 @@ Please format the output as a JSON structure for easy integration into a web app
 		// 	UpdatedAt:   time.Now(),
 		// }
 		// ctx.Locals("userID", uuid.NewString())
-
 
 		err = rs.CourseRepo.InsertCourse(course)
 		if err != nil {
@@ -198,10 +209,12 @@ Please format the output as a JSON structure for easy integration into a web app
 
 			moduleData.Content = content
 
-			err = rs.ModuleService.CreateModule(ctx, &moduleData)
-			if err != nil {
-				return err
-			}
+			fmt.Println("Module Data Content: ", moduleData.Content)
+
+			// err = rs.ModuleService.CreateModule(ctx, &moduleData)
+			// if err != nil {
+			// 	return err
+			// }
 		}
 	} else { //for file upload
 		var content string
@@ -226,13 +239,13 @@ Please format the output as a JSON structure for easy integration into a web app
 
 		courseId := uuid.NewString()
 		title := file.Filename
-		userid := ctx.Locals("userID")
+		userid := uuid.NewString()
 		course := entities.CourseDataModel{
 			CourseID:    courseId,
 			Title:       title,
 			Description: "",
 			Confirmed:   true,
-			UserId:      userid.(string),
+			UserId:      userid,
 			CreatedAt:   time.Now(),
 			UpdatedAt:   time.Now(),
 		}

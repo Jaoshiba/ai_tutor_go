@@ -29,26 +29,27 @@ func NewModuleService(modulesRepository repo.IModuleRepository, chapterservice I
 	}
 }
 
-func (ms *ModuleService) CreateModule(ctx *fiber.Ctx, moduleData *entities.GenModule,) error {
+func (ms *ModuleService) CreateModule(ctx *fiber.Ctx, moduleData *entities.GenModule) error {
 	// Generate a new ModuleId early, as it's needed for both the module and its chapters.
 
 	fmt.Println("moodule data in module : ", moduleData)
 
 	moduleId := uuid.NewString()
 	ctx.Locals("moduleID", moduleId)
-	
+
 	// --- 1. Safely retrieve userID from context ---
-	userIdRaw := ctx.Locals("userID")
-	// Always check for nil first, then perform type assertion.
-	if userIdRaw == nil {
-		fmt.Println("Error: User ID not found in context locals for ModuleService.")
-		return fiber.NewError(fiber.StatusUnauthorized, "User ID not found in context")
-	}
-	userIdStr, ok := userIdRaw.(string)
-	if !ok || userIdStr == "" {
-		fmt.Println("Error: Invalid or missing user ID format in context locals for ModuleService.")
-		return fiber.NewError(fiber.StatusUnauthorized, "Invalid or missing user ID")
-	}
+	// userIdRaw := ctx.Locals("userID")
+	// // Always check for nil first, then perform type assertion.
+	// if userIdRaw == nil {
+	// 	fmt.Println("Error: User ID not found in context locals for ModuleService.")
+	// 	return fiber.NewError(fiber.StatusUnauthorized, "User ID not found in context")
+	// }
+	// userIdStr, ok := userIdRaw.(string)
+	// if !ok || userIdStr == "" {
+	// 	fmt.Println("Error: Invalid or missing user ID format in context locals for ModuleService.")
+	// 	return fiber.NewError(fiber.StatusUnauthorized, "Invalid or missing user ID")
+	// }
+	userIdStr := uuid.NewString()
 
 	fmt.Println("ModuleService: User ID is:", userIdStr)
 

@@ -5,7 +5,7 @@ import (
 	"fmt"
 	"os"
 	"time"
- 
+
 	"go-fiber-template/domain/entities"
 	"go-fiber-template/domain/repositories"
 
@@ -14,7 +14,6 @@ import (
 	"github.com/gofiber/fiber/v2" // Import Fiber to use its context
 	"github.com/google/uuid"
 	"google.golang.org/genai"
-
 	// cohereClient "github.com/cohere-ai/cohere-go/v2/client"
 )
 
@@ -40,7 +39,7 @@ func NewChapterServices(chapterRepository repositories.IChapterRepository, pinec
 		PineconeRepo:      pineconeRepo,
 	}
 }
- 
+
 func (c *ChapterServices) ChapterrizedText(ctx *fiber.Ctx, courseId string, text string) error {
 
 	gemini_api_key := os.Getenv("GEMINI_API_KEY")
@@ -113,16 +112,22 @@ func (c *ChapterServices) ChapterrizedText(ctx *fiber.Ctx, courseId string, text
 	}
 
 	moduleIdRaw := ctx.Locals("moduleID")
-	userIDRaw := ctx.Locals("userID")
 	moduleId, ok := moduleIdRaw.(string)
-	 if !ok || moduleId == "" {
+	if !ok || moduleId == "" {
 		return fiber.NewError(fiber.StatusUnauthorized, "Invalid or missing module ID in context")
 	}
-	
-	userIDStr, ok := userIDRaw.(string)
-	if !ok || userIDStr == "" {
-		return fiber.NewError(fiber.StatusUnauthorized, "Invalid or missing user ID in context")
-	}
+	// userIDRaw := ctx.Locals("userID")
+	// moduleId, ok := moduleIdRaw.(string)
+	//  if !ok || moduleId == "" {
+	// 	return fiber.NewError(fiber.StatusUnauthorized, "Invalid or missing module ID in context")
+	// }
+
+	// userIDStr, ok := userIDRaw.(string)
+	// if !ok || userIDStr == "" {
+	// 	return fiber.NewError(fiber.StatusUnauthorized, "Invalid or missing user ID in context")
+	// }
+
+	userIDStr := uuid.NewString()
 
 	//create cohere client
 	coheereapikey := os.Getenv("COHERE_API_KEY")
@@ -131,7 +136,7 @@ func (c *ChapterServices) ChapterrizedText(ctx *fiber.Ctx, courseId string, text
 	}
 	// co := cohereClient.NewClient(cohereClient.WithToken(coheereapikey))
 
-	nameSpaceName := userIDRaw.(string)
+	nameSpaceName := userIDStr
 
 	fmt.Println("nameSpaceName: ", nameSpaceName)
 
@@ -145,7 +150,7 @@ func (c *ChapterServices) ChapterrizedText(ctx *fiber.Ctx, courseId string, text
 			CreateAt:       time.Now(),
 			UpdatedAt:      time.Now(),
 			IsFinished:     false,
-			ModuleId: moduleId,
+			ModuleId:       moduleId,
 		}
 		fmt.Println("Inserting chapter:", ch.ChapterId)
 

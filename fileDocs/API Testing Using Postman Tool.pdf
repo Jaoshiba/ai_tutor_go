@@ -1,0 +1,965 @@
+<!DOCTYPE html>
+<html >
+  <head>
+    <meta charset="utf-8">
+    <meta rel="search"
+          type="application/opensearchdescription+xml"
+          href="/open_search.xml"
+          title="Academia.edu">
+    <meta content="width=device-width, initial-scale=1" name="viewport">
+    <meta name="google-site-verification" content="bKJMBZA7E43xhDOopFZkssMMkBRjvYERV-NaN4R6mrs">
+
+    <meta name="csrf-param" content="authenticity_token" />
+<meta name="csrf-token" content="l_VyEUbB1IBFzbdhyFkd_asZ7gTk_d8NI3zAxQp2w8K9V23yW-RXjYD8aLrI-YyWkiYj0ocHzKNUda2I0r4iqg" />
+    <meta name="citation_title" content="API Testing Using Postman Tool" />
+<meta name="citation_publication_date" content="2022/12/14" />
+<meta name="citation_journal_title" content="International Journal for Research in Applied Science &amp; Engineering Technology (IJRASET)" />
+<meta name="citation_author" content="IJRASET Publication" />
+<meta name="citation_doi" content="10.22214/IJRASET.2022.48030" />
+<meta name="twitter:card" content="summary" />
+<meta name="twitter:url" content="https://www.academia.edu/92861694/API_Testing_Using_Postman_Tool" />
+<meta name="twitter:title" content="API Testing Using Postman Tool" />
+<meta name="twitter:description" content="Postman is one of the greatest API automation and documentation tools available today. Postman began as a simple Chrome browser plugin and has now grown to be a full API testing solution used by 5 million developers and over 100,000 enterprises all" />
+<meta name="twitter:image" content="https://0.academia-photos.com/6079060/2549300/33111525/s200_ijraset.publication.jpg" />
+<meta property="fb:app_id" content="2369844204" />
+<meta property="og:type" content="article" />
+<meta property="og:url" content="https://www.academia.edu/92861694/API_Testing_Using_Postman_Tool" />
+<meta property="og:title" content="API Testing Using Postman Tool" />
+<meta property="og:image" content="http://a.academia-assets.com/images/open-graph-icons/fb-paper.gif" />
+<meta property="og:description" content="Postman is one of the greatest API automation and documentation tools available today. Postman began as a simple Chrome browser plugin and has now grown to be a full API testing solution used by 5 million developers and over 100,000 enterprises all" />
+<meta property="article:author" content="https://independent.academia.edu/IJRASETPublication" />
+<meta name="description" content="Postman is one of the greatest API automation and documentation tools available today. Postman began as a simple Chrome browser plugin and has now grown to be a full API testing solution used by 5 million developers and over 100,000 enterprises all" />
+
+
+    <title>(PDF) API Testing Using Postman Tool</title>
+
+      <link rel="canonical" href="https://www.academia.edu/92861694/API_Testing_Using_Postman_Tool" />
+
+
+    <script>(function(h,o,u,n,d) {
+  h=h[d]=h[d]||{q:[],onReady:function(c){h.q.push(c)}}
+  d=o.createElement(u);d.async=1;d.src=n
+  n=o.getElementsByTagName(u)[0];n.parentNode.insertBefore(d,n)
+})(window,document,'script','https://www.datadoghq-browser-agent.com/us1/v6/datadog-rum.js','DD_RUM')
+window.DD_RUM.onReady(function() {
+  window.DD_RUM.init({
+    clientToken: 'pub43e59e1301d0f24a9e70902ee6fff7b5',
+    applicationId: 'a5eb4f00-1461-43a4-b9ae-ed159a4e2fd4',
+    site: 'datadoghq.com',
+    service: 'academia-app',
+    env: 'production',
+    version: 'e37a0f586a945c40113ae5b285fac9bfc38bab4b',
+    tracingSampleRate: 1,
+    sessionSampleRate: 1,
+    sessionReplaySampleRate: 20, // % of session sample rate
+    defaultPrivacyLevel: 'mask-user-input',
+    allowedTracingUrls: [
+      'https://academia.edu',
+      'https://www.academia.edu',
+      'https://a.academia-assets.com',
+    ]
+  });
+})</script>
+
+
+    
+
+    
+<script>
+  var $controller_name = 'single_work';
+  var $action_name = "show";
+  var $rails_env = 'production';
+  var $app_rev = 'e37a0f586a945c40113ae5b285fac9bfc38bab4b';
+  var $domain = 'academia.edu';
+  var $app_host = "academia.edu";
+  var $asset_host = "academia-assets.com";
+  var $start_time = new Date().getTime();
+  var $recaptcha_key = "6LdxlRMTAAAAADnu_zyLhLg0YF9uACwz78shpjJB";
+  var $recaptcha_invisible_key = "6Lf3KHUUAAAAACggoMpmGJdQDtiyrjVlvGJ6BbAj";
+  var $disableClientRecordHit = false;
+
+</script>
+
+
+    <script>
+      window.Aedu = window.Aedu || {};
+      window.Aedu.hit_data = null;
+      window.Aedu.serverRenderTime = new Date(1755363802000);
+      window.Aedu.timeDifference = new Date().getTime() - 1755363802000;
+    </script>
+
+      <link rel="stylesheet" href="//a.academia-assets.com/assets/simpler/logged_out_header-d1ed30cf29ad848dee03329828747c49563b910446d3d53b3e9cd31aba138166.css" media="all" />
+        <script async src="https://www.googletagmanager.com/gtag/js?id=G-5VKX33P2DS"></script>
+<script>
+  window.dataLayer = window.dataLayer || [];
+  function gtag(){dataLayer.push(arguments);}
+  gtag('js', new Date());
+  gtag('config', 'G-5VKX33P2DS', {
+    cookie_domain: 'academia.edu',
+    send_page_view: false,
+  });
+  gtag('event', 'page_view', {
+    'controller': "single_work",
+    'action': "show",
+    'controller_action': 'single_work#show',
+    'logged_in': 'false',
+    'edge': 'unknown',
+    // Send nil if there is no A/B test bucket, in case some records get logged
+    // with missing data - that way we can distinguish between the two cases.
+    // ab_test_bucket should be of the form <ab_test_name>:<bucket>
+    'ab_test_bucket': null,
+  })
+</script>
+
+
+    <script>
+      window.$feature_flags = {}
+    </script>
+
+
+    <script>
+      window.Aedu.SiteStats = {"premium_universities_count":13720,"monthly_visitors":"31 million","monthly_visitor_count":31300000,"monthly_visitor_count_in_millions":31,"user_count":293375161,"paper_count":55203019,"paper_count_in_millions":55,"page_count":432000000,"page_count_in_millions":432,"pdf_count":16500000,"pdf_count_in_millions":16}
+    </script>
+
+
+    <script type="application/ld+json">{"@context":"https://schema.org","@type":"ScholarlyArticle","abstract":"Postman is one of the greatest API automation and documentation tools available today. Postman began as a simple Chrome browser plugin and has now grown to be a full API testing solution used by 5 million developers and over 100,000 enterprises all over the world. With a $2 billion value, it\u0026amp;#39;s a unicorn in its own right, and it\u0026amp;#39;s become the go-to platform for creating enterprise APIs. As the API economy continues to growing, more challenges are created for developers. The old methods of manually creating and testing APIs no longtime scale as today\u0026amp;#39;s software and services can interface with hundreds of APIs within a single application. Development, testing, and delivery teams must work together to make sure that applications work barrier with APIs to provide a business advantage, rather than cause a business obstacle. Collaboration and operational efficiency are the keys to sharing modern API-powered applications. And this is the space that Postman plays in. In one of our GlobalLogic projects related to a Banking as well as Financial Services Customer Communications Management platform that is CCMP, we need to use Postman and its CI/CD add-on Newman to create, customize and automate Web API tests. This white paper and technical report narrate our passage direct this automation and showcases some learnings and best practices realized along the way. This is our view from the trenches on the capacity and possibilities of the Postman platform for API testing.","author":[{"@context":"https://schema.org","@type":"Person","name":"IJRASET Publication","url":"https://independent.academia.edu/IJRASETPublication","image":"https://0.academia-photos.com/6079060/2549300/33111525/s200_ijraset.publication.jpg","sameAs":["http://www.ijraset.com/"]}],"contributor":[],"dateCreated":"2022-12-14","dateModified":"2022-12-14","datePublished":"2022-12-14","headline":"API Testing Using Postman Tool","identifier":{"@type":"PropertyValue","propertyID":"DOI","value":"10.22214/IJRASET.2022.48030"},"image":"https://attachments.academia-assets.com/95758948/thumbnails/1.jpg","inLanguage":"en","keywords":["Collaboration","Operational Risk","Efficiency","Advantages"],"publication":"International Journal for Research in Applied Science \u0026 Engineering Technology (IJRASET)","publisher":{"@context":"https://schema.org","@type":"Organization","name":null},"sameAs":"https://doi.org/10.22214/IJRASET.2022.48030","sourceOrganization":[{"@context":"https://schema.org","@type":"EducationalOrganization","name":null}],"thumbnailUrl":"https://attachments.academia-assets.com/95758948/thumbnails/1.jpg","url":"https://www.academia.edu/92861694/API_Testing_Using_Postman_Tool"}</script><style>@media(max-width: 567px){:root{--token-mode: Rebrand;--dropshadow: 0 2px 4px 0 #22223340;--primary-brand: #0645b1;--error-dark: #b60000;--success-dark: #05b01c;--inactive-fill: #ebebee;--hover: #0c3b8d;--pressed: #082f75;--button-primary-fill-inactive: #ebebee;--button-primary-fill: #0645b1;--button-primary-text: #ffffff;--button-primary-fill-hover: #0c3b8d;--button-primary-fill-press: #082f75;--button-primary-icon: #ffffff;--button-primary-fill-inverse: #ffffff;--button-primary-text-inverse: #082f75;--button-primary-icon-inverse: #0645b1;--button-primary-fill-inverse-hover: #cddaef;--button-primary-stroke-inverse-pressed: #0645b1;--button-secondary-stroke-inactive: #b1b1ba;--button-secondary-fill: #eef2f9;--button-secondary-text: #082f75;--button-secondary-fill-press: #cddaef;--button-secondary-fill-inactive: #ebebee;--button-secondary-stroke: #cddaef;--button-secondary-stroke-hover: #386ac1;--button-secondary-stroke-press: #0645b1;--button-secondary-text-inactive: #b1b1ba;--button-secondary-icon: #082f75;--button-secondary-fill-hover: #e6ecf7;--button-secondary-stroke-inverse: #ffffff;--button-secondary-fill-inverse: rgba(255, 255, 255, 0);--button-secondary-icon-inverse: #ffffff;--button-secondary-icon-hover: #082f75;--button-secondary-icon-press: #082f75;--button-secondary-text-inverse: #ffffff;--button-secondary-text-hover: #082f75;--button-secondary-text-press: #082f75;--button-secondary-fill-inverse-hover: #043059;--button-xs-stroke: #141413;--button-xs-stroke-hover: #0c3b8d;--button-xs-stroke-press: #082f75;--button-xs-stroke-inactive: #ebebee;--button-xs-text: #141413;--button-xs-text-hover: #0c3b8d;--button-xs-text-press: #082f75;--button-xs-text-inactive: #91919e;--button-xs-icon: #141413;--button-xs-icon-hover: #0c3b8d;--button-xs-icon-press: #082f75;--button-xs-icon-inactive: #91919e;--button-xs-fill: #ffffff;--button-xs-fill-hover: #f4f7fc;--button-xs-fill-press: #eef2f9;--buttons-button-text-inactive: #91919e;--buttons-button-focus: #0645b1;--buttons-button-icon-inactive: #91919e;--buttons-small-buttons-corner-radius: 16px;--buttons-small-buttons-l-r-padding: 20px;--buttons-small-buttons-height: 48px;--buttons-small-buttons-gap: 8px;--buttons-small-buttons-icon-only-width: 48px;--buttons-small-buttons-icon-size: 20px;--buttons-small-buttons-stroke-default: 1px;--buttons-small-buttons-stroke-thick: 2px;--buttons-large-buttons-l-r-padding: 32px;--buttons-large-buttons-height: 64px;--buttons-large-buttons-icon-only-width: 64px;--buttons-large-buttons-icon-size: 20px;--buttons-large-buttons-gap: 8px;--buttons-large-buttons-corner-radius: 16px;--buttons-large-buttons-stroke-default: 1px;--buttons-large-buttons-stroke-thick: 2px;--buttons-extra-small-buttons-l-r-padding: 8px;--buttons-extra-small-buttons-height: 32px;--buttons-extra-small-buttons-icon-size: 16px;--buttons-extra-small-buttons-gap: 4px;--buttons-extra-small-buttons-corner-radius: 8px;--buttons-stroke-default: 1px;--buttons-stroke-thick: 2px;--background-beige: #f9f7f4;--error-light: #fff2f2;--text-placeholder: #6d6d7d;--stroke-dark: #141413;--stroke-light: #dddde2;--stroke-medium: #535366;--accent-green: #ccffd4;--accent-turquoise: #ccf7ff;--accent-yellow: #f7ffcc;--accent-peach: #ffd4cc;--accent-violet: #f7ccff;--accent-purple: #f4f7fc;--text-primary: #141413;--secondary-brand: #141413;--text-hover: #0c3b8d;--text-white: #ffffff;--text-link: #0645b1;--text-press: #082f75;--success-light: #f0f8f1;--background-light-blue: #f4f7fc;--background-white: #ffffff;--premium-dark: #877440;--premium-light: #f9f6ed;--stroke-white: #ffffff;--inactive-content: #b1b1ba;--annotate-light: #a35dff;--annotate-dark: #824acc;--grid: #eef2f9;--inactive-stroke: #ebebee;--shadow: rgba(34, 34, 51, 0.25);--text-inactive: #6d6d7d;--text-error: #b60000;--stroke-error: #b60000;--background-error: #fff2f2;--background-black: #141413;--icon-default: #141413;--icon-blue: #0645b1;--background-grey: #dddde2;--icon-grey: #b1b1ba;--text-focus: #082f75;--brand-colors-neutral-black: #141413;--brand-colors-neutral-900: #535366;--brand-colors-neutral-800: #6d6d7d;--brand-colors-neutral-700: #91919e;--brand-colors-neutral-600: #b1b1ba;--brand-colors-neutral-500: #c8c8cf;--brand-colors-neutral-400: #dddde2;--brand-colors-neutral-300: #ebebee;--brand-colors-neutral-200: #f8f8fb;--brand-colors-neutral-100: #fafafa;--brand-colors-neutral-white: #ffffff;--brand-colors-blue-900: #043059;--brand-colors-blue-800: #082f75;--brand-colors-blue-700: #0c3b8d;--brand-colors-blue-600: #0645b1;--brand-colors-blue-500: #386ac1;--brand-colors-blue-400: #cddaef;--brand-colors-blue-300: #e6ecf7;--brand-colors-blue-200: #eef2f9;--brand-colors-blue-100: #f4f7fc;--brand-colors-gold-500: #877440;--brand-colors-gold-400: #e9e3d4;--brand-colors-gold-300: #f2efe8;--brand-colors-gold-200: #f9f6ed;--brand-colors-gold-100: #f9f7f4;--brand-colors-error-900: #920000;--brand-colors-error-500: #b60000;--brand-colors-success-900: #035c0f;--brand-colors-green: #ccffd4;--brand-colors-turquoise: #ccf7ff;--brand-colors-yellow: #f7ffcc;--brand-colors-peach: #ffd4cc;--brand-colors-violet: #f7ccff;--brand-colors-error-100: #fff2f2;--brand-colors-success-500: #05b01c;--brand-colors-success-100: #f0f8f1;--text-secondary: #535366;--icon-white: #ffffff;--background-beige-darker: #f2efe8;--icon-dark-grey: #535366;--type-font-family-sans-serif: DM Sans;--type-font-family-serif: Gupter;--type-font-family-mono: IBM Plex Mono;--type-weights-300: 300;--type-weights-400: 400;--type-weights-500: 500;--type-weights-700: 700;--type-sizes-12: 12px;--type-sizes-14: 14px;--type-sizes-16: 16px;--type-sizes-18: 18px;--type-sizes-20: 20px;--type-sizes-22: 22px;--type-sizes-24: 24px;--type-sizes-28: 28px;--type-sizes-30: 30px;--type-sizes-32: 32px;--type-sizes-40: 40px;--type-sizes-42: 42px;--type-sizes-48-2: 48px;--type-line-heights-16: 16px;--type-line-heights-20: 20px;--type-line-heights-23: 23px;--type-line-heights-24: 24px;--type-line-heights-25: 25px;--type-line-heights-26: 26px;--type-line-heights-29: 29px;--type-line-heights-30: 30px;--type-line-heights-32: 32px;--type-line-heights-34: 34px;--type-line-heights-35: 35px;--type-line-heights-36: 36px;--type-line-heights-38: 38px;--type-line-heights-40: 40px;--type-line-heights-46: 46px;--type-line-heights-48: 48px;--type-line-heights-52: 52px;--type-line-heights-58: 58px;--type-line-heights-68: 68px;--type-line-heights-74: 74px;--type-line-heights-82: 82px;--type-paragraph-spacings-0: 0px;--type-paragraph-spacings-4: 4px;--type-paragraph-spacings-8: 8px;--type-paragraph-spacings-16: 16px;--type-sans-serif-xl-font-weight: 400;--type-sans-serif-xl-size: 32px;--type-sans-serif-xl-line-height: 46px;--type-sans-serif-xl-paragraph-spacing: 16px;--type-sans-serif-lg-font-weight: 400;--type-sans-serif-lg-size: 30px;--type-sans-serif-lg-line-height: 36px;--type-sans-serif-lg-paragraph-spacing: 16px;--type-sans-serif-md-font-weight: 400;--type-sans-serif-md-line-height: 30px;--type-sans-serif-md-paragraph-spacing: 16px;--type-sans-serif-md-size: 24px;--type-sans-serif-xs-font-weight: 700;--type-sans-serif-xs-line-height: 24px;--type-sans-serif-xs-paragraph-spacing: 0px;--type-sans-serif-xs-size: 18px;--type-sans-serif-sm-font-weight: 400;--type-sans-serif-sm-line-height: 32px;--type-sans-serif-sm-paragraph-spacing: 16px;--type-sans-serif-sm-size: 20px;--type-body-xl-font-weight: 400;--type-body-xl-size: 24px;--type-body-xl-line-height: 36px;--type-body-xl-paragraph-spacing: 0px;--type-body-sm-font-weight: 400;--type-body-sm-size: 14px;--type-body-sm-line-height: 20px;--type-body-sm-paragraph-spacing: 8px;--type-body-xs-font-weight: 400;--type-body-xs-size: 12px;--type-body-xs-line-height: 16px;--type-body-xs-paragraph-spacing: 0px;--type-body-md-font-weight: 400;--type-body-md-size: 16px;--type-body-md-line-height: 20px;--type-body-md-paragraph-spacing: 4px;--type-body-lg-font-weight: 400;--type-body-lg-size: 20px;--type-body-lg-line-height: 26px;--type-body-lg-paragraph-spacing: 16px;--type-body-lg-medium-font-weight: 500;--type-body-lg-medium-size: 20px;--type-body-lg-medium-line-height: 32px;--type-body-lg-medium-paragraph-spacing: 16px;--type-body-md-medium-font-weight: 500;--type-body-md-medium-size: 16px;--type-body-md-medium-line-height: 20px;--type-body-md-medium-paragraph-spacing: 4px;--type-body-sm-bold-font-weight: 700;--type-body-sm-bold-size: 14px;--type-body-sm-bold-line-height: 20px;--type-body-sm-bold-paragraph-spacing: 8px;--type-body-sm-medium-font-weight: 500;--type-body-sm-medium-size: 14px;--type-body-sm-medium-line-height: 20px;--type-body-sm-medium-paragraph-spacing: 8px;--type-serif-md-font-weight: 400;--type-serif-md-size: 32px;--type-serif-md-paragraph-spacing: 0px;--type-serif-md-line-height: 40px;--type-serif-sm-font-weight: 400;--type-serif-sm-size: 24px;--type-serif-sm-paragraph-spacing: 0px;--type-serif-sm-line-height: 26px;--type-serif-lg-font-weight: 400;--type-serif-lg-size: 48px;--type-serif-lg-paragraph-spacing: 0px;--type-serif-lg-line-height: 52px;--type-serif-xs-font-weight: 400;--type-serif-xs-size: 18px;--type-serif-xs-line-height: 24px;--type-serif-xs-paragraph-spacing: 0px;--type-serif-xl-font-weight: 400;--type-serif-xl-size: 48px;--type-serif-xl-paragraph-spacing: 0px;--type-serif-xl-line-height: 58px;--type-mono-md-font-weight: 400;--type-mono-md-size: 22px;--type-mono-md-line-height: 24px;--type-mono-md-paragraph-spacing: 0px;--type-mono-lg-font-weight: 400;--type-mono-lg-size: 40px;--type-mono-lg-line-height: 40px;--type-mono-lg-paragraph-spacing: 0px;--type-mono-sm-font-weight: 400;--type-mono-sm-size: 14px;--type-mono-sm-line-height: 24px;--type-mono-sm-paragraph-spacing: 0px;--spacing-xs-4: 4px;--spacing-xs-8: 8px;--spacing-xs-16: 16px;--spacing-sm-24: 24px;--spacing-sm-32: 32px;--spacing-md-40: 40px;--spacing-md-48: 48px;--spacing-lg-64: 64px;--spacing-lg-80: 80px;--spacing-xlg-104: 104px;--spacing-xlg-152: 152px;--spacing-xs-12: 12px;--spacing-page-section: 80px;--spacing-card-list-spacing: 48px;--spacing-text-section-spacing: 64px;--spacing-md-xs-headings: 40px;--corner-radius-radius-lg: 16px;--corner-radius-radius-sm: 4px;--corner-radius-radius-md: 8px;--corner-radius-radius-round: 104px}}@media(min-width: 568px)and (max-width: 1279px){:root{--token-mode: Rebrand;--dropshadow: 0 2px 4px 0 #22223340;--primary-brand: #0645b1;--error-dark: #b60000;--success-dark: #05b01c;--inactive-fill: #ebebee;--hover: #0c3b8d;--pressed: #082f75;--button-primary-fill-inactive: #ebebee;--button-primary-fill: #0645b1;--button-primary-text: #ffffff;--button-primary-fill-hover: #0c3b8d;--button-primary-fill-press: #082f75;--button-primary-icon: #ffffff;--button-primary-fill-inverse: #ffffff;--button-primary-text-inverse: #082f75;--button-primary-icon-inverse: #0645b1;--button-primary-fill-inverse-hover: #cddaef;--button-primary-stroke-inverse-pressed: #0645b1;--button-secondary-stroke-inactive: #b1b1ba;--button-secondary-fill: #eef2f9;--button-secondary-text: #082f75;--button-secondary-fill-press: #cddaef;--button-secondary-fill-inactive: #ebebee;--button-secondary-stroke: #cddaef;--button-secondary-stroke-hover: #386ac1;--button-secondary-stroke-press: #0645b1;--button-secondary-text-inactive: #b1b1ba;--button-secondary-icon: #082f75;--button-secondary-fill-hover: #e6ecf7;--button-secondary-stroke-inverse: #ffffff;--button-secondary-fill-inverse: rgba(255, 255, 255, 0);--button-secondary-icon-inverse: #ffffff;--button-secondary-icon-hover: #082f75;--button-secondary-icon-press: #082f75;--button-secondary-text-inverse: #ffffff;--button-secondary-text-hover: #082f75;--button-secondary-text-press: #082f75;--button-secondary-fill-inverse-hover: #043059;--button-xs-stroke: #141413;--button-xs-stroke-hover: #0c3b8d;--button-xs-stroke-press: #082f75;--button-xs-stroke-inactive: #ebebee;--button-xs-text: #141413;--button-xs-text-hover: #0c3b8d;--button-xs-text-press: #082f75;--button-xs-text-inactive: #91919e;--button-xs-icon: #141413;--button-xs-icon-hover: #0c3b8d;--button-xs-icon-press: #082f75;--button-xs-icon-inactive: #91919e;--button-xs-fill: #ffffff;--button-xs-fill-hover: #f4f7fc;--button-xs-fill-press: #eef2f9;--buttons-button-text-inactive: #91919e;--buttons-button-focus: #0645b1;--buttons-button-icon-inactive: #91919e;--buttons-small-buttons-corner-radius: 16px;--buttons-small-buttons-l-r-padding: 20px;--buttons-small-buttons-height: 48px;--buttons-small-buttons-gap: 8px;--buttons-small-buttons-icon-only-width: 48px;--buttons-small-buttons-icon-size: 20px;--buttons-small-buttons-stroke-default: 1px;--buttons-small-buttons-stroke-thick: 2px;--buttons-large-buttons-l-r-padding: 32px;--buttons-large-buttons-height: 64px;--buttons-large-buttons-icon-only-width: 64px;--buttons-large-buttons-icon-size: 20px;--buttons-large-buttons-gap: 8px;--buttons-large-buttons-corner-radius: 16px;--buttons-large-buttons-stroke-default: 1px;--buttons-large-buttons-stroke-thick: 2px;--buttons-extra-small-buttons-l-r-padding: 8px;--buttons-extra-small-buttons-height: 32px;--buttons-extra-small-buttons-icon-size: 16px;--buttons-extra-small-buttons-gap: 4px;--buttons-extra-small-buttons-corner-radius: 8px;--buttons-stroke-default: 1px;--buttons-stroke-thick: 2px;--background-beige: #f9f7f4;--error-light: #fff2f2;--text-placeholder: #6d6d7d;--stroke-dark: #141413;--stroke-light: #dddde2;--stroke-medium: #535366;--accent-green: #ccffd4;--accent-turquoise: #ccf7ff;--accent-yellow: #f7ffcc;--accent-peach: #ffd4cc;--accent-violet: #f7ccff;--accent-purple: #f4f7fc;--text-primary: #141413;--secondary-brand: #141413;--text-hover: #0c3b8d;--text-white: #ffffff;--text-link: #0645b1;--text-press: #082f75;--success-light: #f0f8f1;--background-light-blue: #f4f7fc;--background-white: #ffffff;--premium-dark: #877440;--premium-light: #f9f6ed;--stroke-white: #ffffff;--inactive-content: #b1b1ba;--annotate-light: #a35dff;--annotate-dark: #824acc;--grid: #eef2f9;--inactive-stroke: #ebebee;--shadow: rgba(34, 34, 51, 0.25);--text-inactive: #6d6d7d;--text-error: #b60000;--stroke-error: #b60000;--background-error: #fff2f2;--background-black: #141413;--icon-default: #141413;--icon-blue: #0645b1;--background-grey: #dddde2;--icon-grey: #b1b1ba;--text-focus: #082f75;--brand-colors-neutral-black: #141413;--brand-colors-neutral-900: #535366;--brand-colors-neutral-800: #6d6d7d;--brand-colors-neutral-700: #91919e;--brand-colors-neutral-600: #b1b1ba;--brand-colors-neutral-500: #c8c8cf;--brand-colors-neutral-400: #dddde2;--brand-colors-neutral-300: #ebebee;--brand-colors-neutral-200: #f8f8fb;--brand-colors-neutral-100: #fafafa;--brand-colors-neutral-white: #ffffff;--brand-colors-blue-900: #043059;--brand-colors-blue-800: #082f75;--brand-colors-blue-700: #0c3b8d;--brand-colors-blue-600: #0645b1;--brand-colors-blue-500: #386ac1;--brand-colors-blue-400: #cddaef;--brand-colors-blue-300: #e6ecf7;--brand-colors-blue-200: #eef2f9;--brand-colors-blue-100: #f4f7fc;--brand-colors-gold-500: #877440;--brand-colors-gold-400: #e9e3d4;--brand-colors-gold-300: #f2efe8;--brand-colors-gold-200: #f9f6ed;--brand-colors-gold-100: #f9f7f4;--brand-colors-error-900: #920000;--brand-colors-error-500: #b60000;--brand-colors-success-900: #035c0f;--brand-colors-green: #ccffd4;--brand-colors-turquoise: #ccf7ff;--brand-colors-yellow: #f7ffcc;--brand-colors-peach: #ffd4cc;--brand-colors-violet: #f7ccff;--brand-colors-error-100: #fff2f2;--brand-colors-success-500: #05b01c;--brand-colors-success-100: #f0f8f1;--text-secondary: #535366;--icon-white: #ffffff;--background-beige-darker: #f2efe8;--icon-dark-grey: #535366;--type-font-family-sans-serif: DM Sans;--type-font-family-serif: Gupter;--type-font-family-mono: IBM Plex Mono;--type-weights-300: 300;--type-weights-400: 400;--type-weights-500: 500;--type-weights-700: 700;--type-sizes-12: 12px;--type-sizes-14: 14px;--type-sizes-16: 16px;--type-sizes-18: 18px;--type-sizes-20: 20px;--type-sizes-22: 22px;--type-sizes-24: 24px;--type-sizes-28: 28px;--type-sizes-30: 30px;--type-sizes-32: 32px;--type-sizes-40: 40px;--type-sizes-42: 42px;--type-sizes-48-2: 48px;--type-line-heights-16: 16px;--type-line-heights-20: 20px;--type-line-heights-23: 23px;--type-line-heights-24: 24px;--type-line-heights-25: 25px;--type-line-heights-26: 26px;--type-line-heights-29: 29px;--type-line-heights-30: 30px;--type-line-heights-32: 32px;--type-line-heights-34: 34px;--type-line-heights-35: 35px;--type-line-heights-36: 36px;--type-line-heights-38: 38px;--type-line-heights-40: 40px;--type-line-heights-46: 46px;--type-line-heights-48: 48px;--type-line-heights-52: 52px;--type-line-heights-58: 58px;--type-line-heights-68: 68px;--type-line-heights-74: 74px;--type-line-heights-82: 82px;--type-paragraph-spacings-0: 0px;--type-paragraph-spacings-4: 4px;--type-paragraph-spacings-8: 8px;--type-paragraph-spacings-16: 16px;--type-sans-serif-xl-font-weight: 400;--type-sans-serif-xl-size: 42px;--type-sans-serif-xl-line-height: 46px;--type-sans-serif-xl-paragraph-spacing: 16px;--type-sans-serif-lg-font-weight: 400;--type-sans-serif-lg-size: 32px;--type-sans-serif-lg-line-height: 36px;--type-sans-serif-lg-paragraph-spacing: 16px;--type-sans-serif-md-font-weight: 400;--type-sans-serif-md-line-height: 34px;--type-sans-serif-md-paragraph-spacing: 16px;--type-sans-serif-md-size: 28px;--type-sans-serif-xs-font-weight: 700;--type-sans-serif-xs-line-height: 25px;--type-sans-serif-xs-paragraph-spacing: 0px;--type-sans-serif-xs-size: 20px;--type-sans-serif-sm-font-weight: 400;--type-sans-serif-sm-line-height: 30px;--type-sans-serif-sm-paragraph-spacing: 16px;--type-sans-serif-sm-size: 24px;--type-body-xl-font-weight: 400;--type-body-xl-size: 24px;--type-body-xl-line-height: 36px;--type-body-xl-paragraph-spacing: 0px;--type-body-sm-font-weight: 400;--type-body-sm-size: 14px;--type-body-sm-line-height: 20px;--type-body-sm-paragraph-spacing: 8px;--type-body-xs-font-weight: 400;--type-body-xs-size: 12px;--type-body-xs-line-height: 16px;--type-body-xs-paragraph-spacing: 0px;--type-body-md-font-weight: 400;--type-body-md-size: 16px;--type-body-md-line-height: 20px;--type-body-md-paragraph-spacing: 4px;--type-body-lg-font-weight: 400;--type-body-lg-size: 20px;--type-body-lg-line-height: 26px;--type-body-lg-paragraph-spacing: 16px;--type-body-lg-medium-font-weight: 500;--type-body-lg-medium-size: 20px;--type-body-lg-medium-line-height: 32px;--type-body-lg-medium-paragraph-spacing: 16px;--type-body-md-medium-font-weight: 500;--type-body-md-medium-size: 16px;--type-body-md-medium-line-height: 20px;--type-body-md-medium-paragraph-spacing: 4px;--type-body-sm-bold-font-weight: 700;--type-body-sm-bold-size: 14px;--type-body-sm-bold-line-height: 20px;--type-body-sm-bold-paragraph-spacing: 8px;--type-body-sm-medium-font-weight: 500;--type-body-sm-medium-size: 14px;--type-body-sm-medium-line-height: 20px;--type-body-sm-medium-paragraph-spacing: 8px;--type-serif-md-font-weight: 400;--type-serif-md-size: 40px;--type-serif-md-paragraph-spacing: 0px;--type-serif-md-line-height: 48px;--type-serif-sm-font-weight: 400;--type-serif-sm-size: 28px;--type-serif-sm-paragraph-spacing: 0px;--type-serif-sm-line-height: 32px;--type-serif-lg-font-weight: 400;--type-serif-lg-size: 58px;--type-serif-lg-paragraph-spacing: 0px;--type-serif-lg-line-height: 68px;--type-serif-xs-font-weight: 400;--type-serif-xs-size: 18px;--type-serif-xs-line-height: 24px;--type-serif-xs-paragraph-spacing: 0px;--type-serif-xl-font-weight: 400;--type-serif-xl-size: 74px;--type-serif-xl-paragraph-spacing: 0px;--type-serif-xl-line-height: 82px;--type-mono-md-font-weight: 400;--type-mono-md-size: 22px;--type-mono-md-line-height: 24px;--type-mono-md-paragraph-spacing: 0px;--type-mono-lg-font-weight: 400;--type-mono-lg-size: 40px;--type-mono-lg-line-height: 40px;--type-mono-lg-paragraph-spacing: 0px;--type-mono-sm-font-weight: 400;--type-mono-sm-size: 14px;--type-mono-sm-line-height: 24px;--type-mono-sm-paragraph-spacing: 0px;--spacing-xs-4: 4px;--spacing-xs-8: 8px;--spacing-xs-16: 16px;--spacing-sm-24: 24px;--spacing-sm-32: 32px;--spacing-md-40: 40px;--spacing-md-48: 48px;--spacing-lg-64: 64px;--spacing-lg-80: 80px;--spacing-xlg-104: 104px;--spacing-xlg-152: 152px;--spacing-xs-12: 12px;--spacing-page-section: 104px;--spacing-card-list-spacing: 48px;--spacing-text-section-spacing: 80px;--spacing-md-xs-headings: 40px;--corner-radius-radius-lg: 16px;--corner-radius-radius-sm: 4px;--corner-radius-radius-md: 8px;--corner-radius-radius-round: 104px}}@media(min-width: 1280px){:root{--token-mode: Rebrand;--dropshadow: 0 2px 4px 0 #22223340;--primary-brand: #0645b1;--error-dark: #b60000;--success-dark: #05b01c;--inactive-fill: #ebebee;--hover: #0c3b8d;--pressed: #082f75;--button-primary-fill-inactive: #ebebee;--button-primary-fill: #0645b1;--button-primary-text: #ffffff;--button-primary-fill-hover: #0c3b8d;--button-primary-fill-press: #082f75;--button-primary-icon: #ffffff;--button-primary-fill-inverse: #ffffff;--button-primary-text-inverse: #082f75;--button-primary-icon-inverse: #0645b1;--button-primary-fill-inverse-hover: #cddaef;--button-primary-stroke-inverse-pressed: #0645b1;--button-secondary-stroke-inactive: #b1b1ba;--button-secondary-fill: #eef2f9;--button-secondary-text: #082f75;--button-secondary-fill-press: #cddaef;--button-secondary-fill-inactive: #ebebee;--button-secondary-stroke: #cddaef;--button-secondary-stroke-hover: #386ac1;--button-secondary-stroke-press: #0645b1;--button-secondary-text-inactive: #b1b1ba;--button-secondary-icon: #082f75;--button-secondary-fill-hover: #e6ecf7;--button-secondary-stroke-inverse: #ffffff;--button-secondary-fill-inverse: rgba(255, 255, 255, 0);--button-secondary-icon-inverse: #ffffff;--button-secondary-icon-hover: #082f75;--button-secondary-icon-press: #082f75;--button-secondary-text-inverse: #ffffff;--button-secondary-text-hover: #082f75;--button-secondary-text-press: #082f75;--button-secondary-fill-inverse-hover: #043059;--button-xs-stroke: #141413;--button-xs-stroke-hover: #0c3b8d;--button-xs-stroke-press: #082f75;--button-xs-stroke-inactive: #ebebee;--button-xs-text: #141413;--button-xs-text-hover: #0c3b8d;--button-xs-text-press: #082f75;--button-xs-text-inactive: #91919e;--button-xs-icon: #141413;--button-xs-icon-hover: #0c3b8d;--button-xs-icon-press: #082f75;--button-xs-icon-inactive: #91919e;--button-xs-fill: #ffffff;--button-xs-fill-hover: #f4f7fc;--button-xs-fill-press: #eef2f9;--buttons-button-text-inactive: #91919e;--buttons-button-focus: #0645b1;--buttons-button-icon-inactive: #91919e;--buttons-small-buttons-corner-radius: 16px;--buttons-small-buttons-l-r-padding: 20px;--buttons-small-buttons-height: 48px;--buttons-small-buttons-gap: 8px;--buttons-small-buttons-icon-only-width: 48px;--buttons-small-buttons-icon-size: 20px;--buttons-small-buttons-stroke-default: 1px;--buttons-small-buttons-stroke-thick: 2px;--buttons-large-buttons-l-r-padding: 32px;--buttons-large-buttons-height: 64px;--buttons-large-buttons-icon-only-width: 64px;--buttons-large-buttons-icon-size: 20px;--buttons-large-buttons-gap: 8px;--buttons-large-buttons-corner-radius: 16px;--buttons-large-buttons-stroke-default: 1px;--buttons-large-buttons-stroke-thick: 2px;--buttons-extra-small-buttons-l-r-padding: 8px;--buttons-extra-small-buttons-height: 32px;--buttons-extra-small-buttons-icon-size: 16px;--buttons-extra-small-buttons-gap: 4px;--buttons-extra-small-buttons-corner-radius: 8px;--buttons-stroke-default: 1px;--buttons-stroke-thick: 2px;--background-beige: #f9f7f4;--error-light: #fff2f2;--text-placeholder: #6d6d7d;--stroke-dark: #141413;--stroke-light: #dddde2;--stroke-medium: #535366;--accent-green: #ccffd4;--accent-turquoise: #ccf7ff;--accent-yellow: #f7ffcc;--accent-peach: #ffd4cc;--accent-violet: #f7ccff;--accent-purple: #f4f7fc;--text-primary: #141413;--secondary-brand: #141413;--text-hover: #0c3b8d;--text-white: #ffffff;--text-link: #0645b1;--text-press: #082f75;--success-light: #f0f8f1;--background-light-blue: #f4f7fc;--background-white: #ffffff;--premium-dark: #877440;--premium-light: #f9f6ed;--stroke-white: #ffffff;--inactive-content: #b1b1ba;--annotate-light: #a35dff;--annotate-dark: #824acc;--grid: #eef2f9;--inactive-stroke: #ebebee;--shadow: rgba(34, 34, 51, 0.25);--text-inactive: #6d6d7d;--text-error: #b60000;--stroke-error: #b60000;--background-error: #fff2f2;--background-black: #141413;--icon-default: #141413;--icon-blue: #0645b1;--background-grey: #dddde2;--icon-grey: #b1b1ba;--text-focus: #082f75;--brand-colors-neutral-black: #141413;--brand-colors-neutral-900: #535366;--brand-colors-neutral-800: #6d6d7d;--brand-colors-neutral-700: #91919e;--brand-colors-neutral-600: #b1b1ba;--brand-colors-neutral-500: #c8c8cf;--brand-colors-neutral-400: #dddde2;--brand-colors-neutral-300: #ebebee;--brand-colors-neutral-200: #f8f8fb;--brand-colors-neutral-100: #fafafa;--brand-colors-neutral-white: #ffffff;--brand-colors-blue-900: #043059;--brand-colors-blue-800: #082f75;--brand-colors-blue-700: #0c3b8d;--brand-colors-blue-600: #0645b1;--brand-colors-blue-500: #386ac1;--brand-colors-blue-400: #cddaef;--brand-colors-blue-300: #e6ecf7;--brand-colors-blue-200: #eef2f9;--brand-colors-blue-100: #f4f7fc;--brand-colors-gold-500: #877440;--brand-colors-gold-400: #e9e3d4;--brand-colors-gold-300: #f2efe8;--brand-colors-gold-200: #f9f6ed;--brand-colors-gold-100: #f9f7f4;--brand-colors-error-900: #920000;--brand-colors-error-500: #b60000;--brand-colors-success-900: #035c0f;--brand-colors-green: #ccffd4;--brand-colors-turquoise: #ccf7ff;--brand-colors-yellow: #f7ffcc;--brand-colors-peach: #ffd4cc;--brand-colors-violet: #f7ccff;--brand-colors-error-100: #fff2f2;--brand-colors-success-500: #05b01c;--brand-colors-success-100: #f0f8f1;--text-secondary: #535366;--icon-white: #ffffff;--background-beige-darker: #f2efe8;--icon-dark-grey: #535366;--type-font-family-sans-serif: DM Sans;--type-font-family-serif: Gupter;--type-font-family-mono: IBM Plex Mono;--type-weights-300: 300;--type-weights-400: 400;--type-weights-500: 500;--type-weights-700: 700;--type-sizes-12: 12px;--type-sizes-14: 14px;--type-sizes-16: 16px;--type-sizes-18: 18px;--type-sizes-20: 20px;--type-sizes-22: 22px;--type-sizes-24: 24px;--type-sizes-28: 28px;--type-sizes-30: 30px;--type-sizes-32: 32px;--type-sizes-40: 40px;--type-sizes-42: 42px;--type-sizes-48-2: 48px;--type-line-heights-16: 16px;--type-line-heights-20: 20px;--type-line-heights-23: 23px;--type-line-heights-24: 24px;--type-line-heights-25: 25px;--type-line-heights-26: 26px;--type-line-heights-29: 29px;--type-line-heights-30: 30px;--type-line-heights-32: 32px;--type-line-heights-34: 34px;--type-line-heights-35: 35px;--type-line-heights-36: 36px;--type-line-heights-38: 38px;--type-line-heights-40: 40px;--type-line-heights-46: 46px;--type-line-heights-48: 48px;--type-line-heights-52: 52px;--type-line-heights-58: 58px;--type-line-heights-68: 68px;--type-line-heights-74: 74px;--type-line-heights-82: 82px;--type-paragraph-spacings-0: 0px;--type-paragraph-spacings-4: 4px;--type-paragraph-spacings-8: 8px;--type-paragraph-spacings-16: 16px;--type-sans-serif-xl-font-weight: 400;--type-sans-serif-xl-size: 42px;--type-sans-serif-xl-line-height: 46px;--type-sans-serif-xl-paragraph-spacing: 16px;--type-sans-serif-lg-font-weight: 400;--type-sans-serif-lg-size: 32px;--type-sans-serif-lg-line-height: 38px;--type-sans-serif-lg-paragraph-spacing: 16px;--type-sans-serif-md-font-weight: 400;--type-sans-serif-md-line-height: 34px;--type-sans-serif-md-paragraph-spacing: 16px;--type-sans-serif-md-size: 28px;--type-sans-serif-xs-font-weight: 700;--type-sans-serif-xs-line-height: 25px;--type-sans-serif-xs-paragraph-spacing: 0px;--type-sans-serif-xs-size: 20px;--type-sans-serif-sm-font-weight: 400;--type-sans-serif-sm-line-height: 30px;--type-sans-serif-sm-paragraph-spacing: 16px;--type-sans-serif-sm-size: 24px;--type-body-xl-font-weight: 400;--type-body-xl-size: 24px;--type-body-xl-line-height: 36px;--type-body-xl-paragraph-spacing: 0px;--type-body-sm-font-weight: 400;--type-body-sm-size: 14px;--type-body-sm-line-height: 20px;--type-body-sm-paragraph-spacing: 8px;--type-body-xs-font-weight: 400;--type-body-xs-size: 12px;--type-body-xs-line-height: 16px;--type-body-xs-paragraph-spacing: 0px;--type-body-md-font-weight: 400;--type-body-md-size: 16px;--type-body-md-line-height: 20px;--type-body-md-paragraph-spacing: 4px;--type-body-lg-font-weight: 400;--type-body-lg-size: 20px;--type-body-lg-line-height: 26px;--type-body-lg-paragraph-spacing: 16px;--type-body-lg-medium-font-weight: 500;--type-body-lg-medium-size: 20px;--type-body-lg-medium-line-height: 32px;--type-body-lg-medium-paragraph-spacing: 16px;--type-body-md-medium-font-weight: 500;--type-body-md-medium-size: 16px;--type-body-md-medium-line-height: 20px;--type-body-md-medium-paragraph-spacing: 4px;--type-body-sm-bold-font-weight: 700;--type-body-sm-bold-size: 14px;--type-body-sm-bold-line-height: 20px;--type-body-sm-bold-paragraph-spacing: 8px;--type-body-sm-medium-font-weight: 500;--type-body-sm-medium-size: 14px;--type-body-sm-medium-line-height: 20px;--type-body-sm-medium-paragraph-spacing: 8px;--type-serif-md-font-weight: 400;--type-serif-md-size: 40px;--type-serif-md-paragraph-spacing: 0px;--type-serif-md-line-height: 48px;--type-serif-sm-font-weight: 400;--type-serif-sm-size: 28px;--type-serif-sm-paragraph-spacing: 0px;--type-serif-sm-line-height: 32px;--type-serif-lg-font-weight: 400;--type-serif-lg-size: 58px;--type-serif-lg-paragraph-spacing: 0px;--type-serif-lg-line-height: 68px;--type-serif-xs-font-weight: 400;--type-serif-xs-size: 18px;--type-serif-xs-line-height: 24px;--type-serif-xs-paragraph-spacing: 0px;--type-serif-xl-font-weight: 400;--type-serif-xl-size: 74px;--type-serif-xl-paragraph-spacing: 0px;--type-serif-xl-line-height: 82px;--type-mono-md-font-weight: 400;--type-mono-md-size: 22px;--type-mono-md-line-height: 24px;--type-mono-md-paragraph-spacing: 0px;--type-mono-lg-font-weight: 400;--type-mono-lg-size: 40px;--type-mono-lg-line-height: 40px;--type-mono-lg-paragraph-spacing: 0px;--type-mono-sm-font-weight: 400;--type-mono-sm-size: 14px;--type-mono-sm-line-height: 24px;--type-mono-sm-paragraph-spacing: 0px;--spacing-xs-4: 4px;--spacing-xs-8: 8px;--spacing-xs-16: 16px;--spacing-sm-24: 24px;--spacing-sm-32: 32px;--spacing-md-40: 40px;--spacing-md-48: 48px;--spacing-lg-64: 64px;--spacing-lg-80: 80px;--spacing-xlg-104: 104px;--spacing-xlg-152: 152px;--spacing-xs-12: 12px;--spacing-page-section: 152px;--spacing-card-list-spacing: 48px;--spacing-text-section-spacing: 80px;--spacing-md-xs-headings: 40px;--corner-radius-radius-lg: 16px;--corner-radius-radius-sm: 4px;--corner-radius-radius-md: 8px;--corner-radius-radius-round: 104px}}</style><link rel="stylesheet" href="//a.academia-assets.com/assets/single_work_page/loswp_redesigns/outline_variant-b5f899f4ac239d914d04c9babc001d20602fa1525b7f7d8a04fa5418503b767f.css" media="all" /><link rel="stylesheet" href="//a.academia-assets.com/assets/single_work_page/outline-81167b90d0109620221d366e55ca8f498a621752df59ae26b6678cf0870d7f37.css" media="all" /><link rel="stylesheet" href="//a.academia-assets.com/assets/design_system/body-c50f5ab98832f511df8842993148351135752147645352dc0b07c369bcb29ab7.css" media="all" /><link rel="stylesheet" href="//a.academia-assets.com/assets/design_system/button-71718c8dba3ea0db0a554a601dbc5855a002afaefa44dbf4215a94ca1560cb81.css" media="all" /><link rel="stylesheet" href="//a.academia-assets.com/assets/design_system/heading-95367dc03b794f6737f30123738a886cf53b7a65cdef98a922a98591d60063e3.css" media="all" /><link rel="stylesheet" href="//a.academia-assets.com/assets/design_system/text_button-d1941ab08e91e29ee143084c4749da4aaffa350a2ac6eec2306b1d7a352d911a.css" media="all" /><link rel="stylesheet" href="//a.academia-assets.com/assets/single_work_page/ordered_list-9123030494f589694fc98dd7b689a70398eb527516b541b1c648dce5ab690c12.css" media="all" /><link rel="stylesheet" href="//a.academia-assets.com/assets/design_system/pill_button-415e0369ec1a9d16d4ee620aec8867d6e8e5e31496b0c56fb8fea35907265a1b.css" media="all" /><link rel="stylesheet" href="//a.academia-assets.com/assets/about_hiring/footer-4b1d1471325a90ac5ba51422db929bc292e3d4469d0fabb80d93ab2310ff2719.css" media="all" /><link rel="preload" href="//a.academia-assets.com/fonts/design_system/DM-Sans_100-1000_normal_latin.woff2" as="font" type="font/woff2" crossorigin="anonymous"><link rel="preload" href="//a.academia-assets.com/fonts/design_system/Gupter_400_normal_latin.woff2" as="font" type="font/woff2" crossorigin="anonymous"><link rel="preload" href="//a.academia-assets.com/fonts/design_system/Material-Symbols-Outlined.woff2" as="font" type="font/woff2" crossorigin="anonymous"><link rel="preload" href="//a.academia-assets.com/fonts/design_system/Roboto_100-900_normal_latin.woff2" as="font" type="font/woff2" crossorigin="anonymous"><link rel="stylesheet" href="//a.academia-assets.com/assets/design_system/font-faces-efad2d03062f07fc8ad9218be9cffc066b9dcb4118790653009961988e50304c.css" media="all" /><link rel="stylesheet" href="//a.academia-assets.com/assets/design_system/common-3c00d3ae0a9cc0bf1476231d85efc602ef73468a39e42dc5dd2bb62d223c4005.css" media="all" />
+  </head>
+
+  <body>
+    <div id='react-modal'></div>
+
+
+
+
+    <div class="js-upgrade-ie-banner" style="display: none; text-align: center; padding: 8px 0; background-color: #ebe480;"><p style="color: #000; font-size: 12px; margin: 0 0 4px;">Academia.edu no longer supports Internet Explorer.</p><p style="color: #000; font-size: 12px; margin: 0;">To browse Academia.edu and the wider internet faster and more securely, please take a few seconds to&nbsp;<a href="https://www.academia.edu/upgrade-browser">upgrade your browser</a>.</p></div><script>// Show this banner for all versions of IE
+if (!!window.MSInputMethodContext || /(MSIE)/.test(navigator.userAgent)) {
+  document.querySelector('.js-upgrade-ie-banner').style.display = 'block';
+}</script>
+
+      <div id="fb-root"></div><script>window.fbAsyncInit = function() {
+  FB.init({
+    appId: "2369844204",
+    version: "v8.0",
+    status: true,
+    cookie: true,
+    xfbml: true
+  });
+
+  // Additional initialization code.
+  if (window.InitFacebook) {
+    // facebook.ts already loaded, set it up.
+    window.InitFacebook();
+  } else {
+    // Set a flag for facebook.ts to find when it loads.
+    window.academiaAuthReadyFacebook = true;
+  }
+};</script>
+      <div id="google-root"></div><script>window.loadGoogle = function() {
+  if (window.InitGoogle) {
+    // google.ts already loaded, set it up.
+    window.InitGoogle("331998490334-rsn3chp12mbkiqhl6e7lu2q0mlbu0f1b");
+  } else {
+    // Set a flag for google.ts to use when it loads.
+    window.GoogleClientID = "331998490334-rsn3chp12mbkiqhl6e7lu2q0mlbu0f1b";
+  }
+};</script>
+
+      <div class="header--container" id="main-header-container"><div class="header--inner-container header--inner-container-ds2"><div class="header-ds2--left-wrapper"><div class="header-ds2--left-wrapper-inner"><a data-main-header-link-target="logo_home" href="https://www.academia.edu/"><img class="hide-on-desktop-redesign" style="height: 24px; width: 24px;" alt="Academia.edu" src="//a.academia-assets.com/images/academia-logo-redesign-2015-A.svg" width="24" height="24" /><img width="145.2" height="18" class="hide-on-mobile-redesign" style="height: 24px;" alt="Academia.edu" src="//a.academia-assets.com/images/academia-logo-redesign-2015.svg" /></a><div class="header--search-container header--search-container-ds2"><form class="js-SiteSearch-form select2-no-default-pills" action="https://www.academia.edu/search" accept-charset="UTF-8" method="get"><svg style="width: 14px; height: 14px;" aria-hidden="true" focusable="false" data-prefix="fas" data-icon="search" class="header--search-icon svg-inline--fa fa-search fa-w-16" role="img" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 512 512"><path fill="currentColor" d="M505 442.7L405.3 343c-4.5-4.5-10.6-7-17-7H372c27.6-35.3 44-79.7 44-128C416 93.1 322.9 0 208 0S0 93.1 0 208s93.1 208 208 208c48.3 0 92.7-16.4 128-44v16.3c0 6.4 2.5 12.5 7 17l99.7 99.7c9.4 9.4 24.6 9.4 33.9 0l28.3-28.3c9.4-9.4 9.4-24.6.1-34zM208 336c-70.7 0-128-57.2-128-128 0-70.7 57.2-128 128-128 70.7 0 128 57.2 128 128 0 70.7-57.2 128-128 128z"></path></svg><input class="header--search-input header--search-input-ds2 js-SiteSearch-form-input" data-main-header-click-target="search_input" name="q" placeholder="Search" type="text" /></form></div></div></div><nav class="header--nav-buttons header--nav-buttons-ds2 js-main-nav"><button class="ds2-5-button ds2-5-button--secondary js-header-login-url header-button-ds2 header-login-ds2 hide-on-mobile-redesign react-login-modal-opener" data-signup-modal="{&quot;location&quot;:&quot;login-button--header&quot;}" rel="nofollow">Log In</button><button class="ds2-5-button ds2-5-button--secondary header-button-ds2 hide-on-mobile-redesign react-login-modal-opener" data-signup-modal="{&quot;location&quot;:&quot;signup-button--header&quot;}" rel="nofollow">Sign Up</button><button class="header--hamburger-button header--hamburger-button-ds2 hide-on-desktop-redesign js-header-hamburger-button"><div class="icon-bar"></div><div class="icon-bar" style="margin-top: 4px;"></div><div class="icon-bar" style="margin-top: 4px;"></div></button></nav></div><ul class="header--dropdown-container js-header-dropdown"><li class="header--dropdown-row"><a class="header--dropdown-link" href="https://www.academia.edu/login" rel="nofollow">Log In</a></li><li class="header--dropdown-row"><a class="header--dropdown-link" href="https://www.academia.edu/signup" rel="nofollow">Sign Up</a></li><li class="header--dropdown-row js-header-dropdown-expand-button"><button class="header--dropdown-button">more<svg aria-hidden="true" focusable="false" data-prefix="fas" data-icon="caret-down" class="header--dropdown-button-icon svg-inline--fa fa-caret-down fa-w-10" role="img" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 320 512"><path fill="currentColor" d="M31.3 192h257.3c17.8 0 26.7 21.5 14.1 34.1L174.1 354.8c-7.8 7.8-20.5 7.8-28.3 0L17.2 226.1C4.6 213.5 13.5 192 31.3 192z"></path></svg></button></li><li><ul class="header--expanded-dropdown-container"><li class="header--dropdown-row"><a class="header--dropdown-link" href="https://www.academia.edu/about">About</a></li><li class="header--dropdown-row"><a class="header--dropdown-link" href="https://www.academia.edu/press">Press</a></li><li class="header--dropdown-row"><a class="header--dropdown-link" href="https://www.academia.edu/documents">Papers</a></li><li class="header--dropdown-row"><a class="header--dropdown-link" href="https://www.academia.edu/terms">Terms</a></li><li class="header--dropdown-row"><a class="header--dropdown-link" href="https://www.academia.edu/privacy">Privacy</a></li><li class="header--dropdown-row"><a class="header--dropdown-link" href="https://www.academia.edu/copyright">Copyright</a></li><li class="header--dropdown-row"><a class="header--dropdown-link" href="https://www.academia.edu/hiring"><svg aria-hidden="true" focusable="false" data-prefix="fas" data-icon="briefcase" class="header--dropdown-row-icon svg-inline--fa fa-briefcase fa-w-16" role="img" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 512 512"><path fill="currentColor" d="M320 336c0 8.84-7.16 16-16 16h-96c-8.84 0-16-7.16-16-16v-48H0v144c0 25.6 22.4 48 48 48h416c25.6 0 48-22.4 48-48V288H320v48zm144-208h-80V80c0-25.6-22.4-48-48-48H176c-25.6 0-48 22.4-48 48v48H48c-25.6 0-48 22.4-48 48v80h512v-80c0-25.6-22.4-48-48-48zm-144 0H192V96h128v32z"></path></svg>We&#39;re Hiring!</a></li><li class="header--dropdown-row"><a class="header--dropdown-link" href="https://support.academia.edu/hc/en-us"><svg aria-hidden="true" focusable="false" data-prefix="fas" data-icon="question-circle" class="header--dropdown-row-icon svg-inline--fa fa-question-circle fa-w-16" role="img" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 512 512"><path fill="currentColor" d="M504 256c0 136.997-111.043 248-248 248S8 392.997 8 256C8 119.083 119.043 8 256 8s248 111.083 248 248zM262.655 90c-54.497 0-89.255 22.957-116.549 63.758-3.536 5.286-2.353 12.415 2.715 16.258l34.699 26.31c5.205 3.947 12.621 3.008 16.665-2.122 17.864-22.658 30.113-35.797 57.303-35.797 20.429 0 45.698 13.148 45.698 32.958 0 14.976-12.363 22.667-32.534 33.976C247.128 238.528 216 254.941 216 296v4c0 6.627 5.373 12 12 12h56c6.627 0 12-5.373 12-12v-1.333c0-28.462 83.186-29.647 83.186-106.667 0-58.002-60.165-102-116.531-102zM256 338c-25.365 0-46 20.635-46 46 0 25.364 20.635 46 46 46s46-20.636 46-46c0-25.365-20.635-46-46-46z"></path></svg>Help Center</a></li><li class="header--dropdown-row js-header-dropdown-collapse-button"><button class="header--dropdown-button">less<svg aria-hidden="true" focusable="false" data-prefix="fas" data-icon="caret-up" class="header--dropdown-button-icon svg-inline--fa fa-caret-up fa-w-10" role="img" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 320 512"><path fill="currentColor" d="M288.662 352H31.338c-17.818 0-26.741-21.543-14.142-34.142l128.662-128.662c7.81-7.81 20.474-7.81 28.284 0l128.662 128.662c12.6 12.599 3.676 34.142-14.142 34.142z"></path></svg></button></li></ul></li></ul></div>
+
+    
+
+    <script>window.pageData = {
+  real_authors: [],
+  license: "",
+  attribution: ""
+}</script><script src="//a.academia-assets.com/assets/webpack_bundles/runtime-modern-bundle-5a0793c38c53136ba6311f20acbafb2f543ccae5a8cace90557fca4ec9a6458d.js" defer="defer"></script>
+<script src="//a.academia-assets.com/assets/webpack_bundles/vendor-react-bundle-e04232e750586a09d402fd1a4aa8b8c7d0f1000e1d7f0cfdb9007bf2370d0e9a.js" defer="defer"></script>
+<script src="//a.academia-assets.com/assets/webpack_bundles/fast_loswp-bundle-c6234a6d6cea589ae15b5914e0f9f146dfc95683655c92405ee4a8c1dd81954c.js" defer="defer"></script><script>window.loswp = {};
+window.loswp.shouldDetectTimezone = true;
+window.loswp.work = {"work":{"id":92861694,"created_at":"2022-12-14T03:51:15.456-08:00","from_world_paper_id":null,"updated_at":"2025-08-10T15:34:02.347-07:00","_data":{"doi":"10.22214/ijraset.2022.48030","issue":"XII","volume":"10","abstract":"Postman is one of the greatest API automation and documentation tools available today. Postman began as a simple Chrome browser plugin and has now grown to be a full API testing solution used by 5 million developers and over 100,000 enterprises all over the world. With a $2 billion value, it's a unicorn in its own right, and it's become the go-to platform for creating enterprise APIs. As the API economy continues to growing, more challenges are created for developers. The old methods of manually creating and testing APIs no longtime scale as today's software and services can interface with hundreds of APIs within a single application. Development, testing, and delivery teams must work together to make sure that applications work barrier with APIs to provide a business advantage, rather than cause a business obstacle. Collaboration and operational efficiency are the keys to sharing modern API-powered applications. And this is the space that Postman plays in. In one of our GlobalLogic projects related to a Banking as well as Financial Services Customer Communications Management platform that is CCMP, we need to use Postman and its CI/CD add-on Newman to create, customize and automate Web API tests. This white paper and technical report narrate our passage direct this automation and showcases some learnings and best practices realized along the way. This is our view from the trenches on the capacity and possibilities of the Postman platform for API testing.","page_numbers":"841-843 ","publication_date":"2022,,","publication_name":"International Journal for Research in Applied Science \u0026 Engineering Technology (IJRASET)"},"document_type":"paper","pre_hit_view_count_baseline":null,"quality":"low","language":"en","title":"API Testing Using Postman Tool","broadcastable":false,"draft":false,"has_indexable_attachment":true,"indexable":true,"seo_quality":10}}["work"];
+window.loswp.previewableAttachments = [{"id":95758948,"identifier":"Attachment_95758948","shouldShowBulkDownload":false}];
+window.loswp.hasViewableAttachments = true;
+window.loswp.cwvAbTestBucket = "";
+window.loswp.designVariant = "outline";
+window.loswp.useOptimizedScribd4genScript = false;
+
+window.loginModal = {};
+window.loginModal.appleClientId = 'edu.academia.applesignon';
+window.userInChina = "false";</script><script defer="" src="https://accounts.google.com/gsi/client"></script><div class="safe-loswp--grid-container"><div class="left-rail--container"><div class="outline--wrapper  outline-variant--outline"><div class="outline--heading"><p class="ds2-5-body-md-bold">Outline</p><button aria-controls="outline" aria-expanded="false" aria-label="Expand outline" class="ds2-5-button ds2-5-button--inverse js-tc-loswp--outline-toggle outline--toggle js-outline-toggle"><span class="material-symbols-outlined" style="font-size: 20px" translate="no">keyboard_arrow_down</span></button><script>document.addEventListener('DOMContentLoaded', () => {
+  const csrfToken = document.querySelector("[name='csrf-token']").content;
+  const options = {"source":"loswp--outline-toggle"};
+  const button = document.querySelector('.js-tc-loswp--outline-toggle');
+  button.addEventListener('click', () => {
+    fetch('/v0/clicks?subdomain_param=api', {
+      method: 'POST',
+      headers: {
+        'Content-Type': 'application/json',
+        'X-CSRF-Token': csrfToken,
+      },
+      keepalive: true,
+      mode: 'same-origin',
+      body: JSON.stringify({
+        ...options,
+        occurred_at: new Date(),
+        hit_id: window.Aedu?.hit_data?.id,
+      }),
+    });
+  });
+});</script></div><div class="outline--container js-outline-container" id="outline"><div class="outline--progress-container"><div class="outline--progress-line js-outline-progress-line"></div></div><div class="outline--elements-container"><div class="outline--element js-outline-element-title primary" data-target-id="title"><div class="outline--progress-dot"></div><a class="outline--element-label js-tc-loswp--outline-navigation" href="#title">Title</a></div><div class="outline--element js-outline-element-abstract " data-target-id="abstract"><div class="outline--progress-dot"></div><a class="outline--element-label js-tc-loswp--outline-navigation" href="#abstract">Abstract</a></div><div class="outline--element js-outline-element-outer_page_2 " data-target-id="outer_page_2"><div class="outline--progress-dot"></div><a class="outline--element-label js-tc-loswp--outline-navigation" href="#outer_page_2">Introduction</a></div><div class="outline--element js-outline-element-outer_page_3 " data-target-id="outer_page_3"><div class="outline--progress-dot"></div><a class="outline--element-label js-tc-loswp--outline-navigation" href="#outer_page_3">Rest Request A. Method Type</a></div><div class="outline--element js-outline-element-references " data-target-id="references"><div class="outline--progress-dot"></div><a class="outline--element-label js-tc-loswp--outline-navigation" href="#references">References</a></div></div></div></div><script>document.addEventListener('DOMContentLoaded', () => {
+  const csrfToken = document.querySelector("[name='csrf-token']").content;
+  const outlineElements = {"Title":"title","Abstract":"abstract","Introduction":"outer_page_2","Rest Request A. Method Type":"outer_page_3","References":"references"};
+  Object.entries(outlineElements).forEach(([elementName, elementId]) => {
+    const button = document.querySelector(`.js-outline-element-${elementId} .js-tc-loswp--outline-navigation`);
+    if (!button) return;
+    button.addEventListener('click', () => {
+      fetch('/v0/clicks?subdomain_param=api', {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json',
+          'X-CSRF-Token': csrfToken,
+        },
+        keepalive: true,
+        mode: 'same-origin',
+        body: JSON.stringify({
+          source: 'loswp--outline-navigation',
+          extra: { element_name: elementName },
+          occurred_at: new Date(),
+          hit_id: window.Aedu?.hit_data?.id,
+        }),
+      });
+    });
+  });
+});</script></div><div class="main-content--container"><div class="safe-work-card--container js-loswp-work-card" id="loswp-work-card"><div class="breadcrumb-wrapper"><div class="topic-breadcrumb"><div class="topic-breadcrumb__item"><div class="topic-breadcrumb__link"><a class="js-tc-loswp-topic-breadcrumb" data-topic-id="all_topics" href="https://www.academia.edu/topics">All Topics</a></div></div><div class="topic-breadcrumb__item"><div class="topic-breadcrumb__link"><a class="js-tc-loswp-topic-breadcrumb" data-topic-id="73149" href="https://www.academia.edu/Documents/in/Business_and_Management">Business and Management</a></div></div><div class="topic-breadcrumb__item"><div class="topic-breadcrumb__link"><a class="js-tc-loswp-topic-breadcrumb" data-topic-id="601819" href="https://www.academia.edu/Documents/in/Risk_Analysis_and_Management">Risk Analysis and Management</a></div></div></div><script>document.addEventListener('DOMContentLoaded', () => {
+  const csrfToken = document.querySelector("[name='csrf-token']").content;
+  const options = {"source":"loswp-topic-breadcrumb","entity_id":92861694};
+  const links = document.querySelectorAll('.js-tc-loswp-topic-breadcrumb');
+  links.forEach(link => {
+    link.addEventListener('click', () => {
+      const clickedTopicId = link.getAttribute('data-topic-id');
+      fetch('/v0/clicks?subdomain_param=api', {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json',
+          'X-CSRF-Token': csrfToken,
+        },
+        keepalive: true,
+        mode: 'same-origin',
+        body: JSON.stringify({
+          ...options,
+          occurred_at: new Date(),
+          hit_id: window.Aedu?.hit_data?.id,
+          extra: {
+            ...options.extra,
+            clicked_topic_id: clickedTopicId,
+          },
+        }),
+      });
+    });
+  });
+});</script></div><div class="safe-work-card--cover"><div class="ds-work-cover--wrapper"><div class="ds-work-cover--container"><style>.login-ghost-button {
+  background: none;
+  border: none;
+  padding: 0;
+  width: 100%;
+
+  display: block;
+  cursor: pointer;
+  position: relative;
+}</style><button class="js-login-button--da73ce2f login-ghost-button ds-work-cover--clickable"><img alt="First page of “API Testing Using Postman Tool”" class="ds-work-cover--cover-thumbnail" src="https://0.academia-photos.com/attachment_thumbnails/95758948/mini_magick20221215-1-1rof33c.png?1671134646" /><img alt="PDF Icon" class="ds-work-cover--file-icon" src="//a.academia-assets.com/images/single_work_splash/adobe_icon.svg" /><div class="ds-work-cover--hover-container"><span class="material-symbols-outlined" style="font-size: 20px" translate="no">download</span><p>Download Free PDF</p></div><div class="ds-work-cover--ribbon-container">Download Free PDF</div><div class="ds-work-cover--ribbon-triangle"></div></button><script>document.addEventListener('DOMContentLoaded', () => { const loginButton = document.querySelector('.js-login-button--da73ce2f'); if (!loginButton) { throw new Error('Login button not found'); } const options = { detail: {"postLoginRedirectUrl":"https://www.academia.edu/92861694/API_Testing_Using_Postman_Tool","clickTrackingContext":{"source":"loswp--swp-splash-paper-cover","bucket":"outline","entity_id":92861694,"extra":{"source_work_id":92861694}},"configuredText":{"buttonsPage":{"header":"Read your PDF for free"},"emailEntryPage":{"subheader":"Sign up or log in to continue reading."},"emailLoginPage":{"subheader":"Log in to continue reading."},"emailRegistrationPage":{"subheader":"Sign up to continue reading."}},"registrationParams":{"user_source":"download","doc_id":95758948}} }; loginButton.addEventListener('click', () => { document.dispatchEvent(new CustomEvent('open-login-modal', options)); }); });</script></div></div></div><div class="safe-work-card--work-information"><h1 class="ds-work-card--work-title ds2-5-heading-sans-serif-lg" id="title">API Testing Using Postman Tool</h1><div class="ds-work-card--work-authors ds-work-card--detail"><a class="ds-work-card--author js-wsj-grid-card-author ds2-5-body-md ds2-5-body-link" data-author-id="6079060" href="https://independent.academia.edu/IJRASETPublication"><img alt="Profile image of IJRASET Publication" class="ds-work-card--author-avatar" src="https://0.academia-photos.com/6079060/2549300/33111525/s65_ijraset.publication.jpg" />IJRASET Publication</a></div><a class="ds-work-card--detail js-loswp-work-card-doi-link ds2-5-body-sm ds2-5-body-link" href="https://doi.org/10.22214/IJRASET.2022.48030" rel="nofollow">https://doi.org/10.22214/IJRASET.2022.48030</a><div class="ds-work-card--detail"><div class="work-publishing-metadata"><strong>Uploaded&nbsp;</strong>(2022)&nbsp;|&nbsp;<strong>Journal:&nbsp;</strong>International Journal for Research in Applied Science &amp; Engineering Technology (IJRASET)</div></div><div class="ds-work-card--work-metadata"><div class="ds-work-card--work-metadata__stat"><span class="material-symbols-outlined" style="font-size: 20px" translate="no">visibility</span><p class="ds2-5-body-sm" id="work-metadata-view-count">…</p></div><div class="ds-work-card--work-metadata__stat"><span class="material-symbols-outlined" style="font-size: 20px" translate="no">description</span><p class="ds2-5-body-sm">5 pages</p></div><div class="ds-work-card--work-metadata__stat"><span class="material-symbols-outlined" style="font-size: 20px" translate="no">link</span><p class="ds2-5-body-sm">1 file</p></div></div><script>(async () => {
+  const workId = 92861694;
+  const worksViewsPath = "/v0/works/views?subdomain_param=api&amp;work_ids%5B%5D=92861694";
+
+  const getWorkViews = async (workId) => {
+    const response = await fetch(worksViewsPath);
+
+    if (!response.ok) {
+      throw new Error('Failed to load work views');
+    }
+
+    const data = await response.json();
+
+    return data.views[workId];
+  };
+  // Get the view count for the work - we send this immediately rather than waiting for
+  // the DOM to load, so it can be available as soon as possible (but without holding up
+  // the backend or other resource requests, because it's a bit expensive and not critical).
+  const viewCount = await getWorkViews(workId);
+
+  const updateViewCount = (viewCount) => {
+    try {
+      const viewCountNumber = parseInt(viewCount, 10);
+      if (viewCountNumber === 0) {
+        // Remove the whole views element if there are zero views.
+        document.getElementById('work-metadata-view-count')?.parentNode?.remove();
+        return;
+      }
+
+      const commaizedViewCount = viewCountNumber.toLocaleString();
+
+      const viewCountBody = document.getElementById('work-metadata-view-count');
+
+      if (!viewCountBody) {
+        throw new Error('Failed to find work views element');
+      }
+
+      viewCountBody.textContent = `${commaizedViewCount} views`;
+    } catch (error) {
+      // Remove the whole views element if there was some issue parsing.
+      document.getElementById('work-metadata-view-count')?.parentNode?.remove();
+      throw new Error(`Failed to parse view count: ${viewCount}`, error);
+    }
+  };
+
+  // If the DOM is still loading, wait for it to be ready before updating the view count.
+  if (document.readyState === "loading") {
+    document.addEventListener('DOMContentLoaded', () => {
+      updateViewCount(viewCount);
+    });
+  // Otherwise, just update it immediately.
+  } else {
+    updateViewCount(viewCount);
+  }
+})();</script><div class="ds-work-card--button-container"><div class="primary-buttons"><button class="ds2-5-button js-tc-loswp--continue-reading-button--work-card js-login-button--b451fe8f"><span class="material-symbols-outlined" style="font-size: 20px" translate="no">description</span>See full PDF</button><script>document.addEventListener('DOMContentLoaded', () => {
+  const csrfToken = document.querySelector("[name='csrf-token']").content;
+  const options = {"source":"loswp--continue-reading-button--work-card","bucket":"outline","entity_id":92861694,"extra":{"source_work_id":92861694}};
+  const button = document.querySelector('.js-tc-loswp--continue-reading-button--work-card');
+  button.addEventListener('click', () => {
+    fetch('/v0/clicks?subdomain_param=api', {
+      method: 'POST',
+      headers: {
+        'Content-Type': 'application/json',
+        'X-CSRF-Token': csrfToken,
+      },
+      keepalive: true,
+      mode: 'same-origin',
+      body: JSON.stringify({
+        ...options,
+        occurred_at: new Date(),
+        hit_id: window.Aedu?.hit_data?.id,
+      }),
+    });
+  });
+});</script><script>document.addEventListener('DOMContentLoaded', () => { const loginButton = document.querySelector('.js-login-button--b451fe8f'); if (!loginButton) { throw new Error('Login button not found'); } const options = { detail: {"postLoginRedirectUrl":"https://www.academia.edu/92861694/API_Testing_Using_Postman_Tool","clickTrackingContext":{"source":"loswp--continue-reading-button--work-card","bucket":"outline","entity_id":92861694,"extra":{"source_work_id":92861694}},"configuredText":{"buttonsPage":{"header":"Read your PDF for free"},"emailEntryPage":{"subheader":"Sign up or log in to continue reading."},"emailLoginPage":{"subheader":"Log in to continue reading."},"emailRegistrationPage":{"subheader":"Sign up to continue reading."}},"registrationParams":{"user_source":"download","doc_id":95758948}} }; loginButton.addEventListener('click', () => { document.dispatchEvent(new CustomEvent('open-login-modal', options)); }); });</script><button class="ds2-5-button ds2-5-button--secondary js-tc-loswp--download-pdf-button--work-card js-login-button--a916f11e"><span class="material-symbols-outlined" style="font-size: 20px" translate="no">download</span>Download PDF</button><script>document.addEventListener('DOMContentLoaded', () => {
+  const csrfToken = document.querySelector("[name='csrf-token']").content;
+  const options = {"source":"loswp--download-pdf-button--work-card","bucket":"outline","entity_id":92861694,"extra":{"source_work_id":92861694}};
+  const button = document.querySelector('.js-tc-loswp--download-pdf-button--work-card');
+  button.addEventListener('click', () => {
+    fetch('/v0/clicks?subdomain_param=api', {
+      method: 'POST',
+      headers: {
+        'Content-Type': 'application/json',
+        'X-CSRF-Token': csrfToken,
+      },
+      keepalive: true,
+      mode: 'same-origin',
+      body: JSON.stringify({
+        ...options,
+        occurred_at: new Date(),
+        hit_id: window.Aedu?.hit_data?.id,
+      }),
+    });
+  });
+});</script><script>document.addEventListener('DOMContentLoaded', () => { const loginButton = document.querySelector('.js-login-button--a916f11e'); if (!loginButton) { throw new Error('Login button not found'); } const options = { detail: {"postLoginRedirectUrl":"https://www.academia.edu/92861694/API_Testing_Using_Postman_Tool?auto=download","clickTrackingContext":{"source":"loswp--download-pdf-button--work-card","bucket":"outline","entity_id":92861694,"extra":{"source_work_id":92861694}},"configuredText":{"buttonsPage":{"header":"Download your PDF for free"},"emailEntryPage":{"subheader":"Sign up or log in to continue with your free download."},"emailLoginPage":{"subheader":"Log in to continue with your free download."},"emailRegistrationPage":{"subheader":"Sign up to continue with your free download.","submit":"Start Download"}},"registrationParams":{"user_source":"download","doc_id":95758948,"auto":"download"}} }; loginButton.addEventListener('click', () => { document.dispatchEvent(new CustomEvent('open-login-modal', options)); }); });</script><div id="js-react-on-rails-context" style="display:none" data-rails-context="{&quot;inMailer&quot;:false,&quot;i18nLocale&quot;:&quot;en&quot;,&quot;i18nDefaultLocale&quot;:&quot;en&quot;,&quot;href&quot;:&quot;https://www.academia.edu/92861694/API_Testing_Using_Postman_Tool&quot;,&quot;location&quot;:&quot;/92861694/API_Testing_Using_Postman_Tool&quot;,&quot;scheme&quot;:&quot;https&quot;,&quot;host&quot;:&quot;www.academia.edu&quot;,&quot;port&quot;:null,&quot;pathname&quot;:&quot;/92861694/API_Testing_Using_Postman_Tool&quot;,&quot;search&quot;:null,&quot;httpAcceptLanguage&quot;:null,&quot;serverSide&quot;:false}"></div>
+<div class="js-react-on-rails-component" style="display:none" data-component-name="CitationButton" data-props="{&quot;workId&quot;:92861694,&quot;source&quot;:&quot;swp_citation_modal&quot;,&quot;buttonClassName&quot;:&quot;ds-work-card--citation-button&quot;}" data-trace="false" data-dom-id="CitationButton-react-component-f99e330a-d303-46e6-b20c-c495c84c8483"></div>
+    <div id="CitationButton-react-component-f99e330a-d303-46e6-b20c-c495c84c8483"></div>
+    
+</div><div class="share-and-save-buttons"><button class="ds2-5-text-link ds2-5-text-link--inline js-tc-loswp--bookmark-button--work-card js-login-button--c3547ab7"><span class="material-symbols-outlined" style="font-size: 18px" translate="no">bookmark</span><span class="ds2-5-text-link__content">Save to Library</span></button><script>document.addEventListener('DOMContentLoaded', () => {
+  const csrfToken = document.querySelector("[name='csrf-token']").content;
+  const options = {"source":"loswp--bookmark-button--work-card","bucket":"outline","entity_id":92861694,"extra":{"source_work_id":92861694}};
+  const button = document.querySelector('.js-tc-loswp--bookmark-button--work-card');
+  button.addEventListener('click', () => {
+    fetch('/v0/clicks?subdomain_param=api', {
+      method: 'POST',
+      headers: {
+        'Content-Type': 'application/json',
+        'X-CSRF-Token': csrfToken,
+      },
+      keepalive: true,
+      mode: 'same-origin',
+      body: JSON.stringify({
+        ...options,
+        occurred_at: new Date(),
+        hit_id: window.Aedu?.hit_data?.id,
+      }),
+    });
+  });
+});</script><script>document.addEventListener('DOMContentLoaded', () => { const loginButton = document.querySelector('.js-login-button--c3547ab7'); if (!loginButton) { throw new Error('Login button not found'); } const options = { detail: {"postLoginRedirectUrl":"https://www.academia.edu/92861694/API_Testing_Using_Postman_Tool","clickTrackingContext":{"source":"loswp--bookmark-button--work-card","bucket":"outline","entity_id":92861694,"extra":{"source_work_id":92861694}},"configuredText":{"buttonsPage":{"header":"Read your PDF for free"},"emailEntryPage":{"subheader":"Sign up or log in to continue reading."},"emailLoginPage":{"subheader":"Log in to continue reading."},"emailRegistrationPage":{"subheader":"Sign up to continue reading."}},"registrationParams":{"user_source":"download","doc_id":95758948}} }; loginButton.addEventListener('click', () => { document.dispatchEvent(new CustomEvent('open-login-modal', options)); }); });</script><button class="ds2-5-text-link ds2-5-text-link--inline js-tc-loswp--share-button--work-card js-login-button--6224b009"><span class="material-symbols-outlined" style="font-size: 18px" translate="no">share</span><span class="ds2-5-text-link__content">Share</span></button><script>document.addEventListener('DOMContentLoaded', () => {
+  const csrfToken = document.querySelector("[name='csrf-token']").content;
+  const options = {"source":"loswp--share-button--work-card","bucket":"outline","entity_id":92861694,"extra":{"source_work_id":92861694}};
+  const button = document.querySelector('.js-tc-loswp--share-button--work-card');
+  button.addEventListener('click', () => {
+    fetch('/v0/clicks?subdomain_param=api', {
+      method: 'POST',
+      headers: {
+        'Content-Type': 'application/json',
+        'X-CSRF-Token': csrfToken,
+      },
+      keepalive: true,
+      mode: 'same-origin',
+      body: JSON.stringify({
+        ...options,
+        occurred_at: new Date(),
+        hit_id: window.Aedu?.hit_data?.id,
+      }),
+    });
+  });
+});</script><script>document.addEventListener('DOMContentLoaded', () => { const loginButton = document.querySelector('.js-login-button--6224b009'); if (!loginButton) { throw new Error('Login button not found'); } const options = { detail: {"postLoginRedirectUrl":"https://www.academia.edu/92861694/API_Testing_Using_Postman_Tool","clickTrackingContext":{"source":"loswp--share-button--work-card","bucket":"outline","entity_id":92861694,"extra":{"source_work_id":92861694}},"configuredText":{"buttonsPage":{"header":"Read your PDF for free"},"emailEntryPage":{"subheader":"Sign up or log in to continue reading."},"emailLoginPage":{"subheader":"Log in to continue reading."},"emailRegistrationPage":{"subheader":"Sign up to continue reading."}},"registrationParams":{"user_source":"download","doc_id":95758948}} }; loginButton.addEventListener('click', () => { document.dispatchEvent(new CustomEvent('open-login-modal', options)); }); });</script></div></div><div class="ds-signup-banner-trigger-container"><div class="ds-signup-banner-trigger ds-signup-banner-trigger-control"></div></div><div class="ds-signup-banner ds-signup-banner-control"><div id="ds-signup-banner-close-button"><button class="ds2-5-button ds2-5-button--secondary ds2-5-button--inverse"><span class="material-symbols-outlined" style="font-size: 20px" translate="no">close</span></button></div><div class="ds-signup-banner-ctas" data-impression-entity-id="92861694" data-impression-entity-type="2" data-impression-source="signup-banner"><img src="//a.academia-assets.com/images/academia-logo-capital-white.svg" /><h4 class="ds2-5-heading-serif-sm">Sign up for access to the world's latest research</h4><button class="ds2-5-button ds2-5-button--inverse ds2-5-button--full-width js-tc-loswp--signup-banner js-login-button--a8a2ccf9">Sign up for free<span class="material-symbols-outlined" style="font-size: 20px" translate="no">arrow_forward</span></button><script>document.addEventListener('DOMContentLoaded', () => {
+  const csrfToken = document.querySelector("[name='csrf-token']").content;
+  const options = {"source":"loswp--signup-banner","bucket":"outline","entity_id":92861694,"extra":{"source_work_id":92861694}};
+  const button = document.querySelector('.js-tc-loswp--signup-banner');
+  button.addEventListener('click', () => {
+    fetch('/v0/clicks?subdomain_param=api', {
+      method: 'POST',
+      headers: {
+        'Content-Type': 'application/json',
+        'X-CSRF-Token': csrfToken,
+      },
+      keepalive: true,
+      mode: 'same-origin',
+      body: JSON.stringify({
+        ...options,
+        occurred_at: new Date(),
+        hit_id: window.Aedu?.hit_data?.id,
+      }),
+    });
+  });
+});</script><script>document.addEventListener('DOMContentLoaded', () => { const loginButton = document.querySelector('.js-login-button--a8a2ccf9'); if (!loginButton) { throw new Error('Login button not found'); } const options = { detail: {"postLoginRedirectUrl":"https://www.academia.edu/92861694/API_Testing_Using_Postman_Tool","clickTrackingContext":{"source":"loswp--signup-banner","bucket":"outline","entity_id":92861694,"extra":{"source_work_id":92861694}},"configuredText":{"buttonsPage":{"header":"Read your PDF for free"},"emailEntryPage":{"subheader":"Sign up or log in to continue reading."},"emailLoginPage":{"subheader":"Log in to continue reading."},"emailRegistrationPage":{"subheader":"Sign up to continue reading."}},"registrationParams":{"user_source":"download","doc_id":95758948}} }; loginButton.addEventListener('click', () => { document.dispatchEvent(new CustomEvent('open-login-modal', options)); }); });</script></div><div class="ds-signup-banner-divider"></div><div class="ds-signup-banner-reasons"><div class="ds-signup-banner-reasons-item"><span class="material-symbols-outlined" style="font-size: 24px" translate="no">check</span><span>Get notified about relevant papers</span></div><div class="ds-signup-banner-reasons-item"><span class="material-symbols-outlined" style="font-size: 24px" translate="no">check</span><span>Save papers to use in your research</span></div><div class="ds-signup-banner-reasons-item"><span class="material-symbols-outlined" style="font-size: 24px" translate="no">check</span><span>Join the discussion with peers</span></div><div class="ds-signup-banner-reasons-item"><span class="material-symbols-outlined" style="font-size: 24px" translate="no">check</span><span>Track your impact</span></div></div></div><script>(() => {
+  // Set up signup banner show/hide behavior:
+  // 1. If the signup banner trigger (a 242px-high* invisible div underneath the 'See Full PDF' / 'Download PDF' buttons)
+  //    is already fully scrolled above the viewport, show the banner by default
+  // 2. If the signup banner trigger is fully visible, show the banner
+  // 3. If the signup banner trigger has even a few pixels scrolled below the viewport, hide the banner
+  //
+  // * 242px is the empirically determined height of the signup banner. It's better to be a bit taller than
+  //   necessary than too short, so it's fine that the mobile (small breakpoint) banner is shorter.
+
+  // First check session storage for the signup banner's visibility state
+  const signupBannerHidden = sessionStorage.getItem('ds-signup-banner-hidden');
+  if (signupBannerHidden === 'true') {
+    return;
+  }
+
+  const signupBanner = document.querySelector('.ds-signup-banner');
+  const signupBannerTrigger = document.querySelector('.ds-signup-banner-trigger');
+
+  let footerShown = false;
+
+  window.addEventListener('load', () => {
+    const rect = signupBannerTrigger.getBoundingClientRect();
+    // If page loaded up already scrolled below the trigger (via scroll restoration), show the banner by default
+    if (rect.bottom < 0) {
+      footerShown = true;
+      signupBanner.classList.add('ds-signup-banner-visible');
+    }
+  });
+
+  // Wait for trigger to fully enter viewport before showing banner (ensures PDF CTAs are never covered by banner)
+  const observer = new IntersectionObserver((entries) => {
+    entries.forEach(entry => {
+      if (entry.isIntersecting && !footerShown) {
+        footerShown = true;
+        signupBanner.classList.add('ds-signup-banner-visible');
+      } else if (!entry.isIntersecting && footerShown) {
+        if (signupBannerTrigger.getBoundingClientRect().bottom > 0) {
+          footerShown = false;
+          signupBanner.classList.remove('ds-signup-banner-visible');
+        }
+      }
+    });
+  });
+  observer.observe(signupBannerTrigger);
+
+  // Set up signup banner close button event handler:
+  const signupBannerCloseButton = document.querySelector('#ds-signup-banner-close-button');
+  signupBannerCloseButton.addEventListener('click', () => {
+    signupBanner.classList.remove('ds-signup-banner-visible');
+    observer.unobserve(signupBannerTrigger);
+
+    // Store the signup banner's visibility state in session storage
+    sessionStorage.setItem('ds-signup-banner-hidden', 'true');
+  });
+})();</script></div></div><style>@media screen and (min-width: 568px) and (max-width: 621px) {  .ds-work-card--button-container .primary-buttons .ds2-5-button, .ds-work-card--citation-button {    font-size: var(--font-size-small);    line-height: var(--line-height-small);    padding: 0 var(--buttons-small-buttons-l-r-padding, 12px);    height: var(--buttons-small-buttons-height, 44px);    gap: var(--buttons-small-buttons-gap, 8px);    border-radius: var(--buttons-small-buttons-corner-radius, 8px);  }}@media screen and (min-width: 1280px) and (max-width: 1515px) {  .ds-work-card--button-container .primary-buttons .ds2-5-button, .ds-work-card--citation-button {    font-size: var(--font-size-small);    line-height: var(--line-height-small);    padding: 0 var(--buttons-small-buttons-l-r-padding, 12px);    height: var(--buttons-small-buttons-height, 44px);    gap: var(--buttons-small-buttons-gap, 8px);    border-radius: var(--buttons-small-buttons-corner-radius, 8px);  } .ds-work-card--button-container {   flex-direction: column !important; } .ds-work-card--button-container .share-and-save-buttons {   align-self: start; }}</style><div data-auto_select="false" data-client_id="331998490334-rsn3chp12mbkiqhl6e7lu2q0mlbu0f1b" data-doc_id="95758948" data-landing_url="https://www.academia.edu/92861694/API_Testing_Using_Postman_Tool" data-login_uri="https://www.academia.edu/registrations/google_one_tap" data-use_fedcm_for_prompt="true" id="g_id_onload"></div><div class="safe-abstract--container"><h2 class="safe-abstract--heading ds2-5-heading-sans-serif-lg" id="abstract">Abstract</h2><div class="safe-abstract--body"><style>.truncate-component {
+  position: relative;
+
+  overflow: hidden;
+  display: -webkit-box;
+  line-clamp: 16;
+  -webkit-line-clamp: 16;
+  -webkit-box-orient: vertical;
+}
+
+.toggle-truncation-button {
+  display: none;
+  position: absolute;
+  bottom: 0;
+  right: 0;
+}</style><div class="truncate-component js-truncate-component--abstract"><p class="ds2-5-body-md">Postman is one of the greatest API automation and documentation tools available today. Postman began as a simple Chrome browser plugin and has now grown to be a full API testing solution used by 5 million developers and over 100,000 enterprises all over the world. With a $2 billion value, it&#39;s a unicorn in its own right, and it&#39;s become the go-to platform for creating enterprise APIs. As the API economy continues to growing, more challenges are created for developers. The old methods of manually creating and testing APIs no longtime scale as today&#39;s software and services can interface with hundreds of APIs within a single application. Development, testing, and delivery teams must work together to make sure that applications work barrier with APIs to provide a business advantage, rather than cause a business obstacle. Collaboration and operational efficiency are the keys to sharing modern API-powered applications. And this is the space that Postman plays in. In one of our GlobalLogic projects related to a Banking as well as Financial Services Customer Communications Management platform that is CCMP, we need to use Postman and its CI/CD add-on Newman to create, customize and automate Web API tests. This white paper and technical report narrate our passage direct this automation and showcases some learnings and best practices realized along the way. This is our view from the trenches on the capacity and possibilities of the Postman platform for API testing.</p><div class="toggle-truncation-button js-toggle-truncation-button--abstract"><button class="safe-abstract--toggle-truncation-button"><span>... </span><span class="safe-abstract--toggle-truncation-button-text">Read more</span></button></div></div></div></div><div class="safe-below-fold--related-works"><h2 class="safe-related-content--heading">Related papers</h2><div class="safe-related-content--container" data-nosnippet=""><div class="ds-related-work--container js-wsj-grid-card js-safe-related-work-wsj " data-collection-position="0" data-entity-id="102563040" data-sort-order="default"><a class="ds-related-work--title js-wsj-grid-card-title ds2-5-body-md ds2-5-body-link" href="https://www.academia.edu/102563040/Black_Box_and_White_Box_Test_Case_Generation_for_RESTful_APIs_Enemies_or_Allies">Black-Box and White-Box Test Case Generation for RESTful APIs: Enemies or Allies?</a><div class="ds-related-work--metadata"><a class="js-wsj-grid-card-author ds2-5-body-sm ds2-5-body-link" data-author-id="271745483" href="https://independent.academia.edu/SergioSegura75">Sergio Segura</a></div><p class="ds-related-work--metadata ds2-5-body-xs">2021 IEEE 32nd International Symposium on Software Reliability Engineering (ISSRE), 2021</p><p class="ds2-5-body-sm ds-related-work--abstract ">Automated test case generation for RESTful APIs is a thriving research topic due to their critical role in software integration. Testing approaches can be divided into black-box and white-box. Black-box approaches exploit the API specification for the generation of test cases, while white-box approaches can also leverage the source code. Both strategies have shown great promise, but they have not been fully compared yet, hindering the selection of the right tool for the job. In this paper, we report on our experience comparing black-box and white-box test case generation for RESTful APIs using the stateof-the-art tools RESTest (black-box) and EvoMaster (white-box). Also, we propose integrating both approaches by using blackbox test cases as the seed for white-box search-based test case generation. Evaluation results on four RESTful APIs involving over 40 million API calls show that there is no one-size-fits-all strategy. More importantly, the combination of black-box and white-box yielded the best results in most case studies in terms of code coverage and fault finding, paving the way for better tools integrating the best of both perspectives. As a result of our work, we provide lessons learned and open challenges for guiding the use and further development of current tool support.</p><div class="ds-related-work--ctas"><a class="ds2-5-text-link ds2-5-text-link--inline js-tc-loswp--wsj-grid-card-download-pdf-modal js-login-button--94a674bc"><span class="material-symbols-outlined" style="font-size: 18px" translate="no">download</span><span class="ds2-5-text-link__content">Download free PDF</span></a><script>document.addEventListener('DOMContentLoaded', () => {
+  const csrfToken = document.querySelector("[name='csrf-token']").content;
+  const options = {"source":"loswp--wsj-grid-card-download-pdf-modal","bucket":"outline","entity_id":102563040,"extra":{"source_work_id":102563040}};
+  const button = document.querySelector('.js-tc-loswp--wsj-grid-card-download-pdf-modal');
+  button.addEventListener('click', () => {
+    fetch('/v0/clicks?subdomain_param=api', {
+      method: 'POST',
+      headers: {
+        'Content-Type': 'application/json',
+        'X-CSRF-Token': csrfToken,
+      },
+      keepalive: true,
+      mode: 'same-origin',
+      body: JSON.stringify({
+        ...options,
+        occurred_at: new Date(),
+        hit_id: window.Aedu?.hit_data?.id,
+      }),
+    });
+  });
+});</script><script>document.addEventListener('DOMContentLoaded', () => { const loginButton = document.querySelector('.js-login-button--94a674bc'); if (!loginButton) { throw new Error('Login button not found'); } const options = { detail: {"postLoginRedirectUrl":"https://www.academia.edu/102563040/Black_Box_and_White_Box_Test_Case_Generation_for_RESTful_APIs_Enemies_or_Allies","clickTrackingContext":{"source":"loswp--wsj-grid-card-download-pdf-modal","bucket":"outline","entity_id":102563040,"extra":{"source_work_id":102563040}},"configuredText":{"buttonsPage":{"header":"Read your PDF for free"},"emailEntryPage":{"subheader":"Sign up or log in to continue reading."},"emailLoginPage":{"subheader":"Log in to continue reading."},"emailRegistrationPage":{"subheader":"Sign up to continue reading."}},"registrationParams":{"user_source":"download","doc_id":102801288}} }; loginButton.addEventListener('click', () => { document.dispatchEvent(new CustomEvent('open-login-modal', options)); }); });</script><a class="ds2-5-text-link ds2-5-text-link--inline js-wsj-grid-card-view-pdf" href="https://www.academia.edu/102563040/Black_Box_and_White_Box_Test_Case_Generation_for_RESTful_APIs_Enemies_or_Allies"><span class="ds2-5-text-link__content">View PDF</span><span class="material-symbols-outlined" style="font-size: 18px" translate="no">chevron_right</span></a></div></div><div class="ds-related-work--container js-wsj-grid-card js-safe-related-work-wsj " data-collection-position="1" data-entity-id="111060860" data-sort-order="default"><a class="ds-related-work--title js-wsj-grid-card-title ds2-5-body-md ds2-5-body-link" href="https://www.academia.edu/111060860/REST_API_Composition_for_Effective_Testing_the_Cloud">REST API Composition for Effective Testing the Cloud</a><div class="ds-related-work--metadata"><a class="js-wsj-grid-card-author ds2-5-body-sm ds2-5-body-link" data-author-id="18163650" href="https://independent.academia.edu/BehailuGetachew">Behailu Getachew</a></div><p class="ds-related-work--metadata ds2-5-body-xs">Journal of Applied Research and Technology, 2021</p><p class="ds2-5-body-sm ds-related-work--abstract ">Cloud offers many ready-made REST services for the end users. This offer realizes the service composition through implementation somewhere on internet based on Service Level Agreement (SLA). For ensuring this SLA, a software testing is a useful means for attesting a non-functional requirement that guarantees quality assurance from end user&amp;#39;s perspective. However, test engineer experiences only what goes in and out through an interface that contains a high level behaviors separated from its underlying details. Testing with these behaviors become an issue for classical testing procedures. So, REST API through composition is an alternative new promising approach for modeling behaviors with parameters against the cloud. This new approach helps to devise test effectiveness in terms of REST based behavior-driven implementation. It aims to understand functional behaviors through API methods based on input domain modeling (IDM) on the standard keyboard pattern. By making an effective RE...</p><div class="ds-related-work--ctas"><a class="ds2-5-text-link ds2-5-text-link--inline js-tc-loswp--wsj-grid-card-download-pdf-modal js-login-button--b7e5db6a"><span class="material-symbols-outlined" style="font-size: 18px" translate="no">download</span><span class="ds2-5-text-link__content">Download free PDF</span></a><script>document.addEventListener('DOMContentLoaded', () => {
+  const csrfToken = document.querySelector("[name='csrf-token']").content;
+  const options = {"source":"loswp--wsj-grid-card-download-pdf-modal","bucket":"outline","entity_id":111060860,"extra":{"source_work_id":111060860}};
+  const button = document.querySelector('.js-tc-loswp--wsj-grid-card-download-pdf-modal');
+  button.addEventListener('click', () => {
+    fetch('/v0/clicks?subdomain_param=api', {
+      method: 'POST',
+      headers: {
+        'Content-Type': 'application/json',
+        'X-CSRF-Token': csrfToken,
+      },
+      keepalive: true,
+      mode: 'same-origin',
+      body: JSON.stringify({
+        ...options,
+        occurred_at: new Date(),
+        hit_id: window.Aedu?.hit_data?.id,
+      }),
+    });
+  });
+});</script><script>document.addEventListener('DOMContentLoaded', () => { const loginButton = document.querySelector('.js-login-button--b7e5db6a'); if (!loginButton) { throw new Error('Login button not found'); } const options = { detail: {"postLoginRedirectUrl":"https://www.academia.edu/111060860/REST_API_Composition_for_Effective_Testing_the_Cloud","clickTrackingContext":{"source":"loswp--wsj-grid-card-download-pdf-modal","bucket":"outline","entity_id":111060860,"extra":{"source_work_id":111060860}},"configuredText":{"buttonsPage":{"header":"Read your PDF for free"},"emailEntryPage":{"subheader":"Sign up or log in to continue reading."},"emailLoginPage":{"subheader":"Log in to continue reading."},"emailRegistrationPage":{"subheader":"Sign up to continue reading."}},"registrationParams":{"user_source":"download","doc_id":108683955}} }; loginButton.addEventListener('click', () => { document.dispatchEvent(new CustomEvent('open-login-modal', options)); }); });</script><a class="ds2-5-text-link ds2-5-text-link--inline js-wsj-grid-card-view-pdf" href="https://www.academia.edu/111060860/REST_API_Composition_for_Effective_Testing_the_Cloud"><span class="ds2-5-text-link__content">View PDF</span><span class="material-symbols-outlined" style="font-size: 18px" translate="no">chevron_right</span></a></div></div><div class="ds-related-work--container js-wsj-grid-card js-safe-related-work-wsj " data-collection-position="2" data-entity-id="88184545" data-sort-order="default"><a class="ds-related-work--title js-wsj-grid-card-title ds2-5-body-md ds2-5-body-link" href="https://www.academia.edu/88184545/RESTful_API_Testing_Methodologies_Rationale_Challenges_and_Solution_Directions">RESTful API Testing Methodologies: Rationale, Challenges, and Solution Directions</a><div class="ds-related-work--metadata"><a class="js-wsj-grid-card-author ds2-5-body-sm ds2-5-body-link" data-author-id="211487943" href="https://independent.academia.edu/MOFADev">MOFA Dev</a></div><p class="ds-related-work--metadata ds2-5-body-xs">Applied sciences, 2022</p><p class="ds2-5-body-sm ds-related-work--abstract ">This article is an open access article distributed under the terms and conditions of the Creative Commons Attribution (CC BY</p><div class="ds-related-work--ctas"><a class="ds2-5-text-link ds2-5-text-link--inline js-tc-loswp--wsj-grid-card-download-pdf-modal js-login-button--903429f5"><span class="material-symbols-outlined" style="font-size: 18px" translate="no">download</span><span class="ds2-5-text-link__content">Download free PDF</span></a><script>document.addEventListener('DOMContentLoaded', () => {
+  const csrfToken = document.querySelector("[name='csrf-token']").content;
+  const options = {"source":"loswp--wsj-grid-card-download-pdf-modal","bucket":"outline","entity_id":88184545,"extra":{"source_work_id":88184545}};
+  const button = document.querySelector('.js-tc-loswp--wsj-grid-card-download-pdf-modal');
+  button.addEventListener('click', () => {
+    fetch('/v0/clicks?subdomain_param=api', {
+      method: 'POST',
+      headers: {
+        'Content-Type': 'application/json',
+        'X-CSRF-Token': csrfToken,
+      },
+      keepalive: true,
+      mode: 'same-origin',
+      body: JSON.stringify({
+        ...options,
+        occurred_at: new Date(),
+        hit_id: window.Aedu?.hit_data?.id,
+      }),
+    });
+  });
+});</script><script>document.addEventListener('DOMContentLoaded', () => { const loginButton = document.querySelector('.js-login-button--903429f5'); if (!loginButton) { throw new Error('Login button not found'); } const options = { detail: {"postLoginRedirectUrl":"https://www.academia.edu/88184545/RESTful_API_Testing_Methodologies_Rationale_Challenges_and_Solution_Directions","clickTrackingContext":{"source":"loswp--wsj-grid-card-download-pdf-modal","bucket":"outline","entity_id":88184545,"extra":{"source_work_id":88184545}},"configuredText":{"buttonsPage":{"header":"Read your PDF for free"},"emailEntryPage":{"subheader":"Sign up or log in to continue reading."},"emailLoginPage":{"subheader":"Log in to continue reading."},"emailRegistrationPage":{"subheader":"Sign up to continue reading."}},"registrationParams":{"user_source":"download","doc_id":92206788}} }; loginButton.addEventListener('click', () => { document.dispatchEvent(new CustomEvent('open-login-modal', options)); }); });</script><a class="ds2-5-text-link ds2-5-text-link--inline js-wsj-grid-card-view-pdf" href="https://www.academia.edu/88184545/RESTful_API_Testing_Methodologies_Rationale_Challenges_and_Solution_Directions"><span class="ds2-5-text-link__content">View PDF</span><span class="material-symbols-outlined" style="font-size: 18px" translate="no">chevron_right</span></a></div></div><div class="ds-related-work--container js-wsj-grid-card js-safe-related-work-wsj " data-collection-position="3" data-entity-id="112999115" data-sort-order="default"><a class="ds-related-work--title js-wsj-grid-card-title ds2-5-body-md ds2-5-body-link" href="https://www.academia.edu/112999115/AN_INTELLIGENT_APITESTING_UNLEASHING_THE_POWER_OF_AI">AN INTELLIGENT APITESTING: UNLEASHING THE POWER OF AI</a><div class="ds-related-work--metadata"><a class="js-wsj-grid-card-author ds2-5-body-sm ds2-5-body-link" data-author-id="88410027" href="https://independent.academia.edu/Rohitkhankhoje">Rohit khankhoje</a></div><p class="ds-related-work--metadata ds2-5-body-xs">The International Journal of Software Engineering &amp; Applications (IJSEA), 2024</p><p class="ds2-5-body-sm ds-related-work--abstract ">In the continually evolving domain of software development, guaranteeing the dependability and functionality of Application Programming Interfaces (APIs) is of utmost importance. Traditional approaches to API testing frequently encounter difficulties in keeping up with the dynamic nature of APIs, resulting in inefficiencies and overlooked defects. This research paper investigates the transformative potential of Artificial Intelligence (AI) in API testing, ushering in a new era of intelligent testing. Intelligent API testing harnesses the capabilities of AI to enhance the efficiency, precision, and adaptability of the testing process. API driven techniques enable the production of diverse and realistic test data, ensuring comprehensive test coverage. Furthermore, AI-powered algorithms can anticipate potential issues, identify anomalies, and optimize test case selection, all while adapting to evolving API schemas. This research paper delves into the various aspects of intelligent API testing, encompassing data generation, tools and technologies, benefits and impact, challenges, and real-world use cases. We illustrate how AI empowers testers to discover subtle defects, streamline testing endeavors, and enhance the overall quality of APIdriven applications. As we navigate the era of digital transformation, intelligent API testing emerges as an essential tool in the software development toolkit, enabling organizations to deliver robust and resilient APIs that fulfill the demands of contemporary applications. Embracing AI in API testing not only holds the promise of expediting the development lifecycle but also ensures that APIs remain agile and reliable in an ever-changing digital landscape.</p><div class="ds-related-work--ctas"><a class="ds2-5-text-link ds2-5-text-link--inline js-tc-loswp--wsj-grid-card-download-pdf-modal js-login-button--88fd8a9f"><span class="material-symbols-outlined" style="font-size: 18px" translate="no">download</span><span class="ds2-5-text-link__content">Download free PDF</span></a><script>document.addEventListener('DOMContentLoaded', () => {
+  const csrfToken = document.querySelector("[name='csrf-token']").content;
+  const options = {"source":"loswp--wsj-grid-card-download-pdf-modal","bucket":"outline","entity_id":112999115,"extra":{"source_work_id":112999115}};
+  const button = document.querySelector('.js-tc-loswp--wsj-grid-card-download-pdf-modal');
+  button.addEventListener('click', () => {
+    fetch('/v0/clicks?subdomain_param=api', {
+      method: 'POST',
+      headers: {
+        'Content-Type': 'application/json',
+        'X-CSRF-Token': csrfToken,
+      },
+      keepalive: true,
+      mode: 'same-origin',
+      body: JSON.stringify({
+        ...options,
+        occurred_at: new Date(),
+        hit_id: window.Aedu?.hit_data?.id,
+      }),
+    });
+  });
+});</script><script>document.addEventListener('DOMContentLoaded', () => { const loginButton = document.querySelector('.js-login-button--88fd8a9f'); if (!loginButton) { throw new Error('Login button not found'); } const options = { detail: {"postLoginRedirectUrl":"https://www.academia.edu/112999115/AN_INTELLIGENT_APITESTING_UNLEASHING_THE_POWER_OF_AI","clickTrackingContext":{"source":"loswp--wsj-grid-card-download-pdf-modal","bucket":"outline","entity_id":112999115,"extra":{"source_work_id":112999115}},"configuredText":{"buttonsPage":{"header":"Read your PDF for free"},"emailEntryPage":{"subheader":"Sign up or log in to continue reading."},"emailLoginPage":{"subheader":"Log in to continue reading."},"emailRegistrationPage":{"subheader":"Sign up to continue reading."}},"registrationParams":{"user_source":"download","doc_id":110078231}} }; loginButton.addEventListener('click', () => { document.dispatchEvent(new CustomEvent('open-login-modal', options)); }); });</script><a class="ds2-5-text-link ds2-5-text-link--inline js-wsj-grid-card-view-pdf" href="https://www.academia.edu/112999115/AN_INTELLIGENT_APITESTING_UNLEASHING_THE_POWER_OF_AI"><span class="ds2-5-text-link__content">View PDF</span><span class="material-symbols-outlined" style="font-size: 18px" translate="no">chevron_right</span></a></div></div><div class="ds-related-work--container js-wsj-grid-card js-safe-related-work-wsj " data-collection-position="4" data-entity-id="90433658" data-sort-order="default"><a class="ds-related-work--title js-wsj-grid-card-title ds2-5-body-md ds2-5-body-link" href="https://www.academia.edu/90433658/Automated_generation_of_realistic_test_inputs_for_web_APIs">Automated generation of realistic test inputs for web APIs</a><div class="ds-related-work--metadata"><a class="js-wsj-grid-card-author ds2-5-body-sm ds2-5-body-link" data-author-id="100713211" href="https://independent.academia.edu/JuanCarlosAlonsoValenzuela">Juan Carlos Alonso Valenzuela</a></div><p class="ds-related-work--metadata ds2-5-body-xs">Proceedings of the 29th ACM Joint Meeting on European Software Engineering Conference and Symposium on the Foundations of Software Engineering, 2021</p><p class="ds2-5-body-sm ds-related-work--abstract ">Testing web APIs automatically requires generating input data values such as addressess, coordinates or country codes. Generating meaningful values for these types of parameters randomly is rarely feasible, which means a major obstacle for current test case generation approaches. In this paper, we present ARTE, the first semantic-based approach for the Automated generation of Realistic TEst inputs for web APIs. Specifically, ARTE leverages the specification of the API under test to search for meaningful test inputs for the API parameters in knowledge bases like DBpedia. Our approach has been integrated into RESTest, a state-of-the-art tool for API testing, achieving an unprecedented level of automation which allows to generate up to 100% more valid API calls than existing fuzzing techniques, 30% on average. Evaluation results on a set of 26 real-world APIs show that ARTE can generate realistic inputs for 7 out of every 10 parameters, outperforming related approaches. CCS CONCEPTS • Software and its engineering → Software testing and debugging; • Information systems → RESTful web services.</p><div class="ds-related-work--ctas"><a class="ds2-5-text-link ds2-5-text-link--inline js-tc-loswp--wsj-grid-card-download-pdf-modal js-login-button--cfa5cb00"><span class="material-symbols-outlined" style="font-size: 18px" translate="no">download</span><span class="ds2-5-text-link__content">Download free PDF</span></a><script>document.addEventListener('DOMContentLoaded', () => {
+  const csrfToken = document.querySelector("[name='csrf-token']").content;
+  const options = {"source":"loswp--wsj-grid-card-download-pdf-modal","bucket":"outline","entity_id":90433658,"extra":{"source_work_id":90433658}};
+  const button = document.querySelector('.js-tc-loswp--wsj-grid-card-download-pdf-modal');
+  button.addEventListener('click', () => {
+    fetch('/v0/clicks?subdomain_param=api', {
+      method: 'POST',
+      headers: {
+        'Content-Type': 'application/json',
+        'X-CSRF-Token': csrfToken,
+      },
+      keepalive: true,
+      mode: 'same-origin',
+      body: JSON.stringify({
+        ...options,
+        occurred_at: new Date(),
+        hit_id: window.Aedu?.hit_data?.id,
+      }),
+    });
+  });
+});</script><script>document.addEventListener('DOMContentLoaded', () => { const loginButton = document.querySelector('.js-login-button--cfa5cb00'); if (!loginButton) { throw new Error('Login button not found'); } const options = { detail: {"postLoginRedirectUrl":"https://www.academia.edu/90433658/Automated_generation_of_realistic_test_inputs_for_web_APIs","clickTrackingContext":{"source":"loswp--wsj-grid-card-download-pdf-modal","bucket":"outline","entity_id":90433658,"extra":{"source_work_id":90433658}},"configuredText":{"buttonsPage":{"header":"Read your PDF for free"},"emailEntryPage":{"subheader":"Sign up or log in to continue reading."},"emailLoginPage":{"subheader":"Log in to continue reading."},"emailRegistrationPage":{"subheader":"Sign up to continue reading."}},"registrationParams":{"user_source":"download","doc_id":93998564}} }; loginButton.addEventListener('click', () => { document.dispatchEvent(new CustomEvent('open-login-modal', options)); }); });</script><a class="ds2-5-text-link ds2-5-text-link--inline js-wsj-grid-card-view-pdf" href="https://www.academia.edu/90433658/Automated_generation_of_realistic_test_inputs_for_web_APIs"><span class="ds2-5-text-link__content">View PDF</span><span class="material-symbols-outlined" style="font-size: 18px" translate="no">chevron_right</span></a></div></div><div class="ds-related-work--container js-wsj-grid-card js-safe-related-work-wsj " data-collection-position="5" data-entity-id="78289416" data-sort-order="default"><a class="ds-related-work--title js-wsj-grid-card-title ds2-5-body-md ds2-5-body-link" href="https://www.academia.edu/78289416/Empirical_Comparison_of_Black_box_Test_Case_Generation_Tools_for_RESTful_APIs">Empirical Comparison of Black-box Test Case Generation Tools for RESTful APIs</a><div class="ds-related-work--metadata"><a class="js-wsj-grid-card-author ds2-5-body-sm ds2-5-body-link" data-author-id="33423764" href="https://univr.academia.edu/marianoceccato">mariano ceccato</a></div><p class="ds-related-work--metadata ds2-5-body-xs">2021</p><p class="ds2-5-body-sm ds-related-work--abstract ">The present document is the preliminary version of the work prior to peer-review. The final version can be found on the publisher website.</p><div class="ds-related-work--ctas"><a class="ds2-5-text-link ds2-5-text-link--inline js-tc-loswp--wsj-grid-card-download-pdf-modal js-login-button--dc819eac"><span class="material-symbols-outlined" style="font-size: 18px" translate="no">download</span><span class="ds2-5-text-link__content">Download free PDF</span></a><script>document.addEventListener('DOMContentLoaded', () => {
+  const csrfToken = document.querySelector("[name='csrf-token']").content;
+  const options = {"source":"loswp--wsj-grid-card-download-pdf-modal","bucket":"outline","entity_id":78289416,"extra":{"source_work_id":78289416}};
+  const button = document.querySelector('.js-tc-loswp--wsj-grid-card-download-pdf-modal');
+  button.addEventListener('click', () => {
+    fetch('/v0/clicks?subdomain_param=api', {
+      method: 'POST',
+      headers: {
+        'Content-Type': 'application/json',
+        'X-CSRF-Token': csrfToken,
+      },
+      keepalive: true,
+      mode: 'same-origin',
+      body: JSON.stringify({
+        ...options,
+        occurred_at: new Date(),
+        hit_id: window.Aedu?.hit_data?.id,
+      }),
+    });
+  });
+});</script><script>document.addEventListener('DOMContentLoaded', () => { const loginButton = document.querySelector('.js-login-button--dc819eac'); if (!loginButton) { throw new Error('Login button not found'); } const options = { detail: {"postLoginRedirectUrl":"https://www.academia.edu/78289416/Empirical_Comparison_of_Black_box_Test_Case_Generation_Tools_for_RESTful_APIs","clickTrackingContext":{"source":"loswp--wsj-grid-card-download-pdf-modal","bucket":"outline","entity_id":78289416,"extra":{"source_work_id":78289416}},"configuredText":{"buttonsPage":{"header":"Read your PDF for free"},"emailEntryPage":{"subheader":"Sign up or log in to continue reading."},"emailLoginPage":{"subheader":"Log in to continue reading."},"emailRegistrationPage":{"subheader":"Sign up to continue reading."}},"registrationParams":{"user_source":"download","doc_id":85389002}} }; loginButton.addEventListener('click', () => { document.dispatchEvent(new CustomEvent('open-login-modal', options)); }); });</script><a class="ds2-5-text-link ds2-5-text-link--inline js-wsj-grid-card-view-pdf" href="https://www.academia.edu/78289416/Empirical_Comparison_of_Black_box_Test_Case_Generation_Tools_for_RESTful_APIs"><span class="ds2-5-text-link__content">View PDF</span><span class="material-symbols-outlined" style="font-size: 18px" translate="no">chevron_right</span></a></div></div><div class="ds-related-work--container js-wsj-grid-card js-safe-related-work-wsj " data-collection-position="6" data-entity-id="101548218" data-sort-order="default"><a class="ds-related-work--title js-wsj-grid-card-title ds2-5-body-md ds2-5-body-link" href="https://www.academia.edu/101548218/Morest_Model_based_RESTful_API_Testing_with_Execution_Feedback">Morest: Model-based RESTful API Testing with Execution Feedback</a><div class="ds-related-work--metadata"><a class="js-wsj-grid-card-author ds2-5-body-sm ds2-5-body-link" data-author-id="269095966" href="https://independent.academia.edu/GeleiDeng">Gelei Deng</a></div><p class="ds-related-work--metadata ds2-5-body-xs">arXiv (Cornell University), 2022</p><p class="ds2-5-body-sm ds-related-work--abstract ">RESTful APIs are arguably the most popular endpoints for accessing Web services. Blackbox testing is one of the emerging techniques for ensuring the reliability of RESTful APIs. The major challenge in testing RESTful APIs is the need for correct sequences of API operation calls for in-depth testing. To build meaningful operation call sequences, researchers have proposed techniques to learn and utilize the API dependencies based on OpenAPI specifications. However, these techniques either lack the overall awareness of how all the APIs are connected or the flexibility of adaptively fixing the learned knowledge. In this paper, we propose Morest, a model-based RESTful API testing technique that builds and maintains a dynamically updating RESTful-service Property Graph (RPG) to model the behaviors of RESTful-services and guide the call sequence generation. We empirically evaluated Morest and the results demonstrate that Morest can successfully request an average of 152.66%-232.45% more API operations, cover 26.16%-103.24% more lines of code, and detect 40.64%-215.94% more bugs than state-of-the-art techniques. In total, we applied Morest to 6 real-world projects and found 44 bugs (13 of them cannot be detected by existing approaches). Specifically, 2 of the confirmed bugs are from Bitbucket, a famous code management service with more than 6 million users.</p><div class="ds-related-work--ctas"><a class="ds2-5-text-link ds2-5-text-link--inline js-tc-loswp--wsj-grid-card-download-pdf-modal js-login-button--d86e6a15"><span class="material-symbols-outlined" style="font-size: 18px" translate="no">download</span><span class="ds2-5-text-link__content">Download free PDF</span></a><script>document.addEventListener('DOMContentLoaded', () => {
+  const csrfToken = document.querySelector("[name='csrf-token']").content;
+  const options = {"source":"loswp--wsj-grid-card-download-pdf-modal","bucket":"outline","entity_id":101548218,"extra":{"source_work_id":101548218}};
+  const button = document.querySelector('.js-tc-loswp--wsj-grid-card-download-pdf-modal');
+  button.addEventListener('click', () => {
+    fetch('/v0/clicks?subdomain_param=api', {
+      method: 'POST',
+      headers: {
+        'Content-Type': 'application/json',
+        'X-CSRF-Token': csrfToken,
+      },
+      keepalive: true,
+      mode: 'same-origin',
+      body: JSON.stringify({
+        ...options,
+        occurred_at: new Date(),
+        hit_id: window.Aedu?.hit_data?.id,
+      }),
+    });
+  });
+});</script><script>document.addEventListener('DOMContentLoaded', () => { const loginButton = document.querySelector('.js-login-button--d86e6a15'); if (!loginButton) { throw new Error('Login button not found'); } const options = { detail: {"postLoginRedirectUrl":"https://www.academia.edu/101548218/Morest_Model_based_RESTful_API_Testing_with_Execution_Feedback","clickTrackingContext":{"source":"loswp--wsj-grid-card-download-pdf-modal","bucket":"outline","entity_id":101548218,"extra":{"source_work_id":101548218}},"configuredText":{"buttonsPage":{"header":"Read your PDF for free"},"emailEntryPage":{"subheader":"Sign up or log in to continue reading."},"emailLoginPage":{"subheader":"Log in to continue reading."},"emailRegistrationPage":{"subheader":"Sign up to continue reading."}},"registrationParams":{"user_source":"download","doc_id":102060027}} }; loginButton.addEventListener('click', () => { document.dispatchEvent(new CustomEvent('open-login-modal', options)); }); });</script><a class="ds2-5-text-link ds2-5-text-link--inline js-wsj-grid-card-view-pdf" href="https://www.academia.edu/101548218/Morest_Model_based_RESTful_API_Testing_with_Execution_Feedback"><span class="ds2-5-text-link__content">View PDF</span><span class="material-symbols-outlined" style="font-size: 18px" translate="no">chevron_right</span></a></div></div><div class="ds-related-work--container js-wsj-grid-card js-safe-related-work-wsj " data-collection-position="7" data-entity-id="82628923" data-sort-order="default"><a class="ds-related-work--title js-wsj-grid-card-title ds2-5-body-md ds2-5-body-link" href="https://www.academia.edu/82628923/Research_on_Functional_Test_Automation_Tools_for_API_Web_and_Mobile_application">Research on Functional Test Automation Tools for API, Web and Mobile application</a><div class="ds-related-work--metadata"><a class="js-wsj-grid-card-author ds2-5-body-sm ds2-5-body-link" data-author-id="144378375" href="https://rvce.academia.edu/BKSRINIVAS">Srinivas B K Haritsa</a></div><p class="ds-related-work--metadata ds2-5-body-xs">International Journal of Advance Research, Ideas and Innovations in Technology, 2021</p><p class="ds2-5-body-sm ds-related-work--abstract ">Industry 4.0 is reshaping every aspect of production. This modern industry necessitates a faster-than-ever evolution of all aspects of the networks. In this case, validation and verification occur as critical phases in the life cycle of software projects. A software failure could have devastating effects, so it is critical that all applications function correctly in development. Without automation, testing cannot be effective in today&#39;s world. We need automation to minimize repetitive work and to ensure that the time from development to production is shortened while maintaining high quality. As a result, automated testing is critical in the software testing phase. This study aims at exploring and comparison of few popular tools in the realm of Web UI automation, API automation, mobile app test automation.</p><div class="ds-related-work--ctas"><a class="ds2-5-text-link ds2-5-text-link--inline js-tc-loswp--wsj-grid-card-download-pdf-modal js-login-button--acefcdcd"><span class="material-symbols-outlined" style="font-size: 18px" translate="no">download</span><span class="ds2-5-text-link__content">Download free PDF</span></a><script>document.addEventListener('DOMContentLoaded', () => {
+  const csrfToken = document.querySelector("[name='csrf-token']").content;
+  const options = {"source":"loswp--wsj-grid-card-download-pdf-modal","bucket":"outline","entity_id":82628923,"extra":{"source_work_id":82628923}};
+  const button = document.querySelector('.js-tc-loswp--wsj-grid-card-download-pdf-modal');
+  button.addEventListener('click', () => {
+    fetch('/v0/clicks?subdomain_param=api', {
+      method: 'POST',
+      headers: {
+        'Content-Type': 'application/json',
+        'X-CSRF-Token': csrfToken,
+      },
+      keepalive: true,
+      mode: 'same-origin',
+      body: JSON.stringify({
+        ...options,
+        occurred_at: new Date(),
+        hit_id: window.Aedu?.hit_data?.id,
+      }),
+    });
+  });
+});</script><script>document.addEventListener('DOMContentLoaded', () => { const loginButton = document.querySelector('.js-login-button--acefcdcd'); if (!loginButton) { throw new Error('Login button not found'); } const options = { detail: {"postLoginRedirectUrl":"https://www.academia.edu/82628923/Research_on_Functional_Test_Automation_Tools_for_API_Web_and_Mobile_application","clickTrackingContext":{"source":"loswp--wsj-grid-card-download-pdf-modal","bucket":"outline","entity_id":82628923,"extra":{"source_work_id":82628923}},"configuredText":{"buttonsPage":{"header":"Read your PDF for free"},"emailEntryPage":{"subheader":"Sign up or log in to continue reading."},"emailLoginPage":{"subheader":"Log in to continue reading."},"emailRegistrationPage":{"subheader":"Sign up to continue reading."}},"registrationParams":{"user_source":"download","doc_id":88273127}} }; loginButton.addEventListener('click', () => { document.dispatchEvent(new CustomEvent('open-login-modal', options)); }); });</script><a class="ds2-5-text-link ds2-5-text-link--inline js-wsj-grid-card-view-pdf" href="https://www.academia.edu/82628923/Research_on_Functional_Test_Automation_Tools_for_API_Web_and_Mobile_application"><span class="ds2-5-text-link__content">View PDF</span><span class="material-symbols-outlined" style="font-size: 18px" translate="no">chevron_right</span></a></div></div><div class="ds-related-work--container js-wsj-grid-card js-safe-related-work-wsj " data-collection-position="8" data-entity-id="98748858" data-sort-order="default"><a class="ds-related-work--title js-wsj-grid-card-title ds2-5-body-md ds2-5-body-link" href="https://www.academia.edu/98748858/Ant_Bee_Colony_for_Automated_black_box_testing_of_RESTful_API">Ant Bee Colony for Automated black-box testing of RESTful API</a><div class="ds-related-work--metadata"><a class="js-wsj-grid-card-author ds2-5-body-sm ds2-5-body-link" data-author-id="18135907" href="https://bue.academia.edu/AHamdy">Abeer Hamdy</a></div><p class="ds-related-work--metadata ds2-5-body-xs">Engineering World</p><p class="ds2-5-body-sm ds-related-work--abstract ">Recently, RESTful APIs are widely utilized in a variety of web applications; developers utilize Restful APIs as a blacked-out component in micro-services. Black box testing for Restful APIs is essential as neither of the API’s source code nor its compiled binary is always available for public access. A handful number of research studies were conducted for the automatic generation of test suite for RESTful APIs based on black box testing. However, to our knowledge, none of them considered the test coverage criteria or the test suite optimization. This paper proposed adapting the Artificial Bee Colony (ABC) swarm intelligence algorithm for the automatic generation of test suites for Restful APIs based on Open API Specification (OAS); whilst also maximizing the API test coverage (path, operation, parameter, input value and status code). Experiments were conducted on six APIs that differ from each other in the number of routes, operation types, input values, and how well the API is docu...</p><div class="ds-related-work--ctas"><a class="ds2-5-text-link ds2-5-text-link--inline js-tc-loswp--wsj-grid-card-download-pdf-modal js-login-button--01c460c8"><span class="material-symbols-outlined" style="font-size: 18px" translate="no">download</span><span class="ds2-5-text-link__content">Download free PDF</span></a><script>document.addEventListener('DOMContentLoaded', () => {
+  const csrfToken = document.querySelector("[name='csrf-token']").content;
+  const options = {"source":"loswp--wsj-grid-card-download-pdf-modal","bucket":"outline","entity_id":98748858,"extra":{"source_work_id":98748858}};
+  const button = document.querySelector('.js-tc-loswp--wsj-grid-card-download-pdf-modal');
+  button.addEventListener('click', () => {
+    fetch('/v0/clicks?subdomain_param=api', {
+      method: 'POST',
+      headers: {
+        'Content-Type': 'application/json',
+        'X-CSRF-Token': csrfToken,
+      },
+      keepalive: true,
+      mode: 'same-origin',
+      body: JSON.stringify({
+        ...options,
+        occurred_at: new Date(),
+        hit_id: window.Aedu?.hit_data?.id,
+      }),
+    });
+  });
+});</script><script>document.addEventListener('DOMContentLoaded', () => { const loginButton = document.querySelector('.js-login-button--01c460c8'); if (!loginButton) { throw new Error('Login button not found'); } const options = { detail: {"postLoginRedirectUrl":"https://www.academia.edu/98748858/Ant_Bee_Colony_for_Automated_black_box_testing_of_RESTful_API","clickTrackingContext":{"source":"loswp--wsj-grid-card-download-pdf-modal","bucket":"outline","entity_id":98748858,"extra":{"source_work_id":98748858}},"configuredText":{"buttonsPage":{"header":"Read your PDF for free"},"emailEntryPage":{"subheader":"Sign up or log in to continue reading."},"emailLoginPage":{"subheader":"Log in to continue reading."},"emailRegistrationPage":{"subheader":"Sign up to continue reading."}},"registrationParams":{"user_source":"download","doc_id":100016120}} }; loginButton.addEventListener('click', () => { document.dispatchEvent(new CustomEvent('open-login-modal', options)); }); });</script><a class="ds2-5-text-link ds2-5-text-link--inline js-wsj-grid-card-view-pdf" href="https://www.academia.edu/98748858/Ant_Bee_Colony_for_Automated_black_box_testing_of_RESTful_API"><span class="ds2-5-text-link__content">View PDF</span><span class="material-symbols-outlined" style="font-size: 18px" translate="no">chevron_right</span></a></div></div><div class="ds-related-work--container js-wsj-grid-card js-safe-related-work-wsj " data-collection-position="9" data-entity-id="7668203" data-sort-order="default"><a class="ds-related-work--title js-wsj-grid-card-title ds2-5-body-md ds2-5-body-link" href="https://www.academia.edu/7668203/WS_TAXI_A_WSDL_based_Testing_Tool_for_Web_Services">WS-TAXI: A WSDL-based Testing Tool for Web Services</a><div class="ds-related-work--metadata"><a class="js-wsj-grid-card-author ds2-5-body-sm ds2-5-body-link" data-author-id="13927152" href="https://uni-lu.academia.edu/CesareBartolini">Cesare Bartolini</a></div><p class="ds-related-work--metadata ds2-5-body-xs">2009</p><p class="ds2-5-body-sm ds-related-work--abstract ">Web Services (WSs) are the W3C-endorsed realization of the Service-Oriented Architecture (SOA). Since they are supposed to be implementation-neutral, WSs are typically tested black-box at their interface. Such an interface is generally specied in an XML-based notation called the WS Description Language (WSDL). Conceptually, these WSDL documents are eligible for fully automated WS test generation using syntax-based testing approaches. Towards such goal, we introduce the WS-TAXI framework, in which we combine the coverage of WS operations with data-driven test generation. In this paper we present an early-stage implementation of WS-TAXI, obtained by the integration of two existing softwares: soapUI, a popular tool for WS testing, and TAXI, an application we have previously developed for the automated derivation of XML instances from a XML schema. WS-TAXI delivers a complete suite of test messages ready for execution. Test generation is driven by basic coverage criteria and by the application of some heuristics. The application of WS-TAXI to a real case study gave encouraging results.</p><div class="ds-related-work--ctas"><a class="ds2-5-text-link ds2-5-text-link--inline js-tc-loswp--wsj-grid-card-download-pdf-modal js-login-button--0f6662a3"><span class="material-symbols-outlined" style="font-size: 18px" translate="no">download</span><span class="ds2-5-text-link__content">Download free PDF</span></a><script>document.addEventListener('DOMContentLoaded', () => {
+  const csrfToken = document.querySelector("[name='csrf-token']").content;
+  const options = {"source":"loswp--wsj-grid-card-download-pdf-modal","bucket":"outline","entity_id":7668203,"extra":{"source_work_id":7668203}};
+  const button = document.querySelector('.js-tc-loswp--wsj-grid-card-download-pdf-modal');
+  button.addEventListener('click', () => {
+    fetch('/v0/clicks?subdomain_param=api', {
+      method: 'POST',
+      headers: {
+        'Content-Type': 'application/json',
+        'X-CSRF-Token': csrfToken,
+      },
+      keepalive: true,
+      mode: 'same-origin',
+      body: JSON.stringify({
+        ...options,
+        occurred_at: new Date(),
+        hit_id: window.Aedu?.hit_data?.id,
+      }),
+    });
+  });
+});</script><script>document.addEventListener('DOMContentLoaded', () => { const loginButton = document.querySelector('.js-login-button--0f6662a3'); if (!loginButton) { throw new Error('Login button not found'); } const options = { detail: {"postLoginRedirectUrl":"https://www.academia.edu/7668203/WS_TAXI_A_WSDL_based_Testing_Tool_for_Web_Services","clickTrackingContext":{"source":"loswp--wsj-grid-card-download-pdf-modal","bucket":"outline","entity_id":7668203,"extra":{"source_work_id":7668203}},"configuredText":{"buttonsPage":{"header":"Read your PDF for free"},"emailEntryPage":{"subheader":"Sign up or log in to continue reading."},"emailLoginPage":{"subheader":"Log in to continue reading."},"emailRegistrationPage":{"subheader":"Sign up to continue reading."}},"registrationParams":{"user_source":"download","doc_id":48377528}} }; loginButton.addEventListener('click', () => { document.dispatchEvent(new CustomEvent('open-login-modal', options)); }); });</script><a class="ds2-5-text-link ds2-5-text-link--inline js-wsj-grid-card-view-pdf" href="https://www.academia.edu/7668203/WS_TAXI_A_WSDL_based_Testing_Tool_for_Web_Services"><span class="ds2-5-text-link__content">View PDF</span><span class="material-symbols-outlined" style="font-size: 18px" translate="no">chevron_right</span></a></div></div></div></div><div class="safe-sticky-ctas--container js-loswp-sticky-ctas hidden"><button class="ds2-5-button js-tc-loswp--continue-reading-button--sticky-ctas js-login-button--97162a8e">See full PDF</button><script>document.addEventListener('DOMContentLoaded', () => {
+  const csrfToken = document.querySelector("[name='csrf-token']").content;
+  const options = {"source":"loswp--continue-reading-button--sticky-ctas","bucket":"outline","entity_id":92861694,"extra":{"source_work_id":92861694}};
+  const button = document.querySelector('.js-tc-loswp--continue-reading-button--sticky-ctas');
+  button.addEventListener('click', () => {
+    fetch('/v0/clicks?subdomain_param=api', {
+      method: 'POST',
+      headers: {
+        'Content-Type': 'application/json',
+        'X-CSRF-Token': csrfToken,
+      },
+      keepalive: true,
+      mode: 'same-origin',
+      body: JSON.stringify({
+        ...options,
+        occurred_at: new Date(),
+        hit_id: window.Aedu?.hit_data?.id,
+      }),
+    });
+  });
+});</script><script>document.addEventListener('DOMContentLoaded', () => { const loginButton = document.querySelector('.js-login-button--97162a8e'); if (!loginButton) { throw new Error('Login button not found'); } const options = { detail: {"postLoginRedirectUrl":"https://www.academia.edu/92861694/API_Testing_Using_Postman_Tool","clickTrackingContext":{"source":"loswp--continue-reading-button--sticky-ctas","bucket":"outline","entity_id":92861694,"extra":{"source_work_id":92861694}},"configuredText":{"buttonsPage":{"header":"Read your PDF for free"},"emailEntryPage":{"subheader":"Sign up or log in to continue reading."},"emailLoginPage":{"subheader":"Log in to continue reading."},"emailRegistrationPage":{"subheader":"Sign up to continue reading."}},"registrationParams":{"user_source":"download","doc_id":95758948}} }; loginButton.addEventListener('click', () => { document.dispatchEvent(new CustomEvent('open-login-modal', options)); }); });</script><button class="ds2-5-button ds2-5-button--secondary js-tc-loswp--download-pdf-button--sticky-ctas js-login-button--16cf4b21"><span class="material-symbols-outlined" style="font-size: 20px" translate="no">download</span>Download PDF</button><script>document.addEventListener('DOMContentLoaded', () => {
+  const csrfToken = document.querySelector("[name='csrf-token']").content;
+  const options = {"source":"loswp--download-pdf-button--sticky-ctas","bucket":"outline","entity_id":92861694,"extra":{"source_work_id":92861694}};
+  const button = document.querySelector('.js-tc-loswp--download-pdf-button--sticky-ctas');
+  button.addEventListener('click', () => {
+    fetch('/v0/clicks?subdomain_param=api', {
+      method: 'POST',
+      headers: {
+        'Content-Type': 'application/json',
+        'X-CSRF-Token': csrfToken,
+      },
+      keepalive: true,
+      mode: 'same-origin',
+      body: JSON.stringify({
+        ...options,
+        occurred_at: new Date(),
+        hit_id: window.Aedu?.hit_data?.id,
+      }),
+    });
+  });
+});</script><script>document.addEventListener('DOMContentLoaded', () => { const loginButton = document.querySelector('.js-login-button--16cf4b21'); if (!loginButton) { throw new Error('Login button not found'); } const options = { detail: {"postLoginRedirectUrl":"https://www.academia.edu/92861694/API_Testing_Using_Postman_Tool?auto=download","clickTrackingContext":{"source":"loswp--download-pdf-button--sticky-ctas","bucket":"outline","entity_id":92861694,"extra":{"source_work_id":92861694}},"configuredText":{"buttonsPage":{"header":"Download your PDF for free"},"emailEntryPage":{"subheader":"Sign up or log in to continue with your free download."},"emailLoginPage":{"subheader":"Log in to continue with your free download."},"emailRegistrationPage":{"subheader":"Sign up to continue with your free download.","submit":"Start Download"}},"registrationParams":{"user_source":"download","doc_id":95758948,"auto":"download"}} }; loginButton.addEventListener('click', () => { document.dispatchEvent(new CustomEvent('open-login-modal', options)); }); });</script></div><div class="ds-work--container js-loswp-embedded-document" id="loswp-embedded-document"><div class="attachment_preview" data-attachment="Attachment_95758948" style="display: none"><div class="js-scribd-document-container"><div class="scribd--document-loading js-scribd-document-loader" style="display: block;"><img alt="Loading..." src="//a.academia-assets.com/images/loaders/paper-load.gif" /><p>Loading Preview</p></div></div><div style="text-align: center;"><div class="scribd--no-preview-alert js-preview-unavailable"><p>Sorry, preview is currently unavailable. You can download the paper by clicking the button above.</p></div></div></div></div><div class="references--container"><h2 class="references--heading" id="references">References (6)</h2><ol class="ordered-list"><li class="ordered-list--item ds2-5-body-md">Dheeraj Chhillar, &quot;A Proposed T-Model to Cover 4S Quality Metrics Based on Empirical Study of Software Failures,&quot; International Journal of Electrical and Computer Engineering (IJECE), Vol. 9, No. 2, April 2019.</li><li class="ordered-list--item ds2-5-body-md">&quot;SofTReL Software Testing Guide Book Part1,&quot; by Ajitha and Amrit Shah.</li><li class="ordered-list--item ds2-5-body-md">S. L. Bangare, A. R. Khare, and P. S. Bangare, &quot;Quality measurement of modularized object-oriented software using metrics,&quot; ACM International Conference ICWET-2011 at Mumbai, ISBN: 978-1-4503-0449-8.</li><li class="ordered-list--item ds2-5-body-md">&quot;Web Services Protocol: SOAP versus REST,&quot; by Vibha. Volume 4 Issue 5 of the International Journal of Advanced Research in Computer Engineering and Technology (IJARCET) was published in May 2015.</li><li class="ordered-list--item ds2-5-body-md">Authorization (https://learning.getpostman.com/docs/po stman/send ingapi requests/authorization/), Postman Learning Centre</li><li class="ordered-list--item ds2-5-body-md">P.P. Ray (n.d.) (n.d.) (n.d.) Computer and Information Sciences Journal of King Saud University (2018) 30, 291-319</li></ol></div></div><div class="right-rail--container"><div class="safe-right-rail--related-works"><h2 class="safe-related-content--heading">Related papers</h2><div class="safe-related-content--container" data-nosnippet=""><div class="ds-related-work--container js-related-work-sidebar-card js-safe-related-work-related-work " data-collection-position="0" data-entity-id="102563043" data-sort-order="default"><a class="ds-related-work--title js-related-work-grid-card-title ds2-5-body-md ds2-5-body-link" href="https://www.academia.edu/102563043/Online_testing_of_RESTful_APIs_promises_and_challenges">Online testing of RESTful APIs: promises and challenges</a><div class="ds-related-work--metadata"><a class="js-related-work-grid-card-author ds2-5-body-sm ds2-5-body-link" data-author-id="271745483" href="https://independent.academia.edu/SergioSegura75">Sergio Segura</a></div><p class="ds-related-work--metadata ds2-5-body-xs">Proceedings of the 30th ACM Joint European Software Engineering Conference and Symposium on the Foundations of Software Engineering</p><p class="ds2-5-body-sm ds-related-work--abstract hide-on-large">Online testing of web APIsÐtesting APIs in productionÐis gaining traction in industry. Platforms such as RapidAPI and Sauce Labs provide online testing and monitoring services of web APIs 24/7, typically by re-executing manually designed test cases on the target APIs on a regular basis. In parallel, research on the automated generation of test cases for RESTful APIs has seen significant advances in recent years. However, despite their promising results in the lab, it is unclear whether research tools would scale to industrialsize settings and, more importantly, how they would perform in an online testing setup, increasingly common in practice. In this paper, we report the results of an empirical study on the use of automated test case generation methods for online testing of RESTful APIs. Specifically, we used the RESTest framework to automatically generate and execute test cases in 13 industrial APIs for 15 days non-stop, resulting in over one million test cases. To scale at this level, we had to transition from a monolithic tool approach to a multi-bot architecture with over 200 bots working cooperatively in tasks like test generation and reporting. As a result, we uncovered about 390K failures, which we conservatively triaged into 254 bugs, 65 of which have been acknowledged or fixed by developers to date. Among others, we identified confirmed faults in the APIs of Amadeus, Foursquare, Yelp, and YouTube, accessed by millions of applications worldwide. More importantly, our reports have guided developers on improving their APIs, including bug fixes and documentation updates in the APIs of Amadeus and YouTube. Our results show the potential of online testing of RESTful APIs as the next must-have feature in industry, but also some of the key challenges to overcome for its full adoption in practice. CCS CONCEPTS • Information systems → RESTful web services; • Software and its engineering → Software testing and debugging.</p><div class="ds-related-work--ctas"><a class="ds2-5-text-link ds2-5-text-link--inline js-tc-loswp--wsj-grid-card-download-pdf-modal js-login-button--7680d596"><span class="material-symbols-outlined" style="font-size: 18px" translate="no">download</span><span class="ds2-5-text-link__content">Download free PDF</span></a><script>document.addEventListener('DOMContentLoaded', () => {
+  const csrfToken = document.querySelector("[name='csrf-token']").content;
+  const options = {"source":"loswp--wsj-grid-card-download-pdf-modal","bucket":"outline","entity_id":102563043,"extra":{"source_work_id":102563043}};
+  const button = document.querySelector('.js-tc-loswp--wsj-grid-card-download-pdf-modal');
+  button.addEventListener('click', () => {
+    fetch('/v0/clicks?subdomain_param=api', {
+      method: 'POST',
+      headers: {
+        'Content-Type': 'application/json',
+        'X-CSRF-Token': csrfToken,
+      },
+      keepalive: true,
+      mode: 'same-origin',
+      body: JSON.stringify({
+        ...options,
+        occurred_at: new Date(),
+        hit_id: window.Aedu?.hit_data?.id,
+      }),
+    });
+  });
+});</script><script>document.addEventListener('DOMContentLoaded', () => { const loginButton = document.querySelector('.js-login-button--7680d596'); if (!loginButton) { throw new Error('Login button not found'); } const options = { detail: {"postLoginRedirectUrl":"https://www.academia.edu/102563043/Online_testing_of_RESTful_APIs_promises_and_challenges","clickTrackingContext":{"source":"loswp--wsj-grid-card-download-pdf-modal","bucket":"outline","entity_id":102563043,"extra":{"source_work_id":102563043}},"configuredText":{"buttonsPage":{"header":"Read your PDF for free"},"emailEntryPage":{"subheader":"Sign up or log in to continue reading."},"emailLoginPage":{"subheader":"Log in to continue reading."},"emailRegistrationPage":{"subheader":"Sign up to continue reading."}},"registrationParams":{"user_source":"download","doc_id":102801263}} }; loginButton.addEventListener('click', () => { document.dispatchEvent(new CustomEvent('open-login-modal', options)); }); });</script><a class="ds2-5-text-link ds2-5-text-link--inline js-related-work-grid-card-view-pdf" href="https://www.academia.edu/102563043/Online_testing_of_RESTful_APIs_promises_and_challenges"><span class="ds2-5-text-link__content">View PDF</span><span class="material-symbols-outlined" style="font-size: 18px" translate="no">chevron_right</span></a></div></div><div class="ds-related-work--container js-related-work-sidebar-card js-safe-related-work-related-work " data-collection-position="1" data-entity-id="44193940" data-sort-order="default"><a class="ds-related-work--title js-related-work-grid-card-title ds2-5-body-md ds2-5-body-link" href="https://www.academia.edu/44193940/IRJET_Automated_Framework_for_API_Testing">IRJET- Automated Framework for API Testing</a><div class="ds-related-work--metadata"><a class="js-related-work-grid-card-author ds2-5-body-sm ds2-5-body-link" data-author-id="31493941" href="https://irjet.academia.edu/IRJET">IRJET  Journal</a></div><p class="ds-related-work--metadata ds2-5-body-xs">IRJET, 2020</p><p class="ds2-5-body-sm ds-related-work--abstract hide-on-large">This study aims to find out a more effective way of performing API testing. Automation is the need of the hour and it can help in reducing manual testing efforts by tenfold. The automation will consider any number of test scenarios and can run the same without human intervention. This must be done to check whether the application has been developed based on the requirements. This is very important as we must stick to the SRS while developing any application. By integrating many tools, we can achieve higher efficiency in the testing process. In this study we can see how to use Rest Assured for the process of automation and how we can validate the API calls without manual intervention. It gives us a faster and smarter approach of validating our Application in this case Xcellerate Risk Review Application.</p><div class="ds-related-work--ctas"><a class="ds2-5-text-link ds2-5-text-link--inline js-tc-loswp--wsj-grid-card-download-pdf-modal js-login-button--68182ee0"><span class="material-symbols-outlined" style="font-size: 18px" translate="no">download</span><span class="ds2-5-text-link__content">Download free PDF</span></a><script>document.addEventListener('DOMContentLoaded', () => {
+  const csrfToken = document.querySelector("[name='csrf-token']").content;
+  const options = {"source":"loswp--wsj-grid-card-download-pdf-modal","bucket":"outline","entity_id":44193940,"extra":{"source_work_id":44193940}};
+  const button = document.querySelector('.js-tc-loswp--wsj-grid-card-download-pdf-modal');
+  button.addEventListener('click', () => {
+    fetch('/v0/clicks?subdomain_param=api', {
+      method: 'POST',
+      headers: {
+        'Content-Type': 'application/json',
+        'X-CSRF-Token': csrfToken,
+      },
+      keepalive: true,
+      mode: 'same-origin',
+      body: JSON.stringify({
+        ...options,
+        occurred_at: new Date(),
+        hit_id: window.Aedu?.hit_data?.id,
+      }),
+    });
+  });
+});</script><script>document.addEventListener('DOMContentLoaded', () => { const loginButton = document.querySelector('.js-login-button--68182ee0'); if (!loginButton) { throw new Error('Login button not found'); } const options = { detail: {"postLoginRedirectUrl":"https://www.academia.edu/44193940/IRJET_Automated_Framework_for_API_Testing","clickTrackingContext":{"source":"loswp--wsj-grid-card-download-pdf-modal","bucket":"outline","entity_id":44193940,"extra":{"source_work_id":44193940}},"configuredText":{"buttonsPage":{"header":"Read your PDF for free"},"emailEntryPage":{"subheader":"Sign up or log in to continue reading."},"emailLoginPage":{"subheader":"Log in to continue reading."},"emailRegistrationPage":{"subheader":"Sign up to continue reading."}},"registrationParams":{"user_source":"download","doc_id":64555737}} }; loginButton.addEventListener('click', () => { document.dispatchEvent(new CustomEvent('open-login-modal', options)); }); });</script><a class="ds2-5-text-link ds2-5-text-link--inline js-related-work-grid-card-view-pdf" href="https://www.academia.edu/44193940/IRJET_Automated_Framework_for_API_Testing"><span class="ds2-5-text-link__content">View PDF</span><span class="material-symbols-outlined" style="font-size: 18px" translate="no">chevron_right</span></a></div></div><div class="ds-related-work--container js-related-work-sidebar-card js-safe-related-work-related-work " data-collection-position="2" data-entity-id="115618854" data-sort-order="default"><a class="ds-related-work--title js-related-work-grid-card-title ds2-5-body-md ds2-5-body-link" href="https://www.academia.edu/115618854/ARTE_Automated_Generation_of_Realistic_Test_Inputs_for_Web_APIs">ARTE: Automated Generation of Realistic Test Inputs for Web APIs</a><div class="ds-related-work--metadata"><a class="js-related-work-grid-card-author ds2-5-body-sm ds2-5-body-link" data-author-id="142846633" href="https://independent.academia.edu/alonsovalenzuela14">alonso valenzuela</a></div><p class="ds-related-work--metadata ds2-5-body-xs">IEEE Transactions on Software Engineering, 2022</p><p class="ds2-5-body-sm ds-related-work--abstract hide-on-large">Automated test case generation for web APIs is a thriving research topic, where test cases are frequently derived from the API specification. However, this process is only partially automated since testers are usually obliged to manually set meaningful valid test inputs for each input parameter. In this article, we present ARTE, an approach for the automated extraction of realistic test data for web APIs from knowledge bases like DBpedia. Specifically, ARTE leverages the specification of the API parameters to automatically search for realistic test inputs using natural language processing, search-based, and knowledge extraction techniques. ARTE has been integrated into RESTest, an open-source testing framework for RESTful APIs, fully automating the test case generation process. Evaluation results on 140 operations from 48 real-world web APIs show that ARTE can efficiently generate realistic test inputs for 64.9% of the target parameters, outperforming the state-of-the-art approach SAIGEN (31.8%). More importantly, ARTE supported the generation of over twice as many valid API calls (57.3%) as random generation (20%) and SAIGEN (26%), leading to a higher failure detection capability and uncovering several real-world bugs. These results show the potential of ARTE for enhancing existing web API testing tools, achieving an unprecedented level of automation. Index Terms-Test data generation, automated testing, web APIs, Web of Data ! 1 INTRODUCTION 1 W EB Application Programming Interfaces (APIs) allow 2 heterogeneous software systems to talk to each other 3 over the network [1], [2]. Modern web APIs typically adhere 4 to the REpresentational State Transfer (REST) architectural 5 style, being referred to as RESTful web APIs [3]. RESTful 6 web APIs typically allow applications to interact by ex-7 changing JSON messages sent over HTTP. In practice, this 8 allows, for example, checking the result of a football match 9 (BeSoccer API [4]), posting a tweet (Twitter API [5]), booking 10 a hotel room (Amadeus API [6]), translating a text (DeepL 11 API [7]), or finding a route between two locations (Open-12 route API [8]). RESTful APIs are commonly described using 13 languages such as the OpenAPI Specification (OAS) [9].</p><div class="ds-related-work--ctas"><a class="ds2-5-text-link ds2-5-text-link--inline js-tc-loswp--wsj-grid-card-download-pdf-modal js-login-button--89003e41"><span class="material-symbols-outlined" style="font-size: 18px" translate="no">download</span><span class="ds2-5-text-link__content">Download free PDF</span></a><script>document.addEventListener('DOMContentLoaded', () => {
+  const csrfToken = document.querySelector("[name='csrf-token']").content;
+  const options = {"source":"loswp--wsj-grid-card-download-pdf-modal","bucket":"outline","entity_id":115618854,"extra":{"source_work_id":115618854}};
+  const button = document.querySelector('.js-tc-loswp--wsj-grid-card-download-pdf-modal');
+  button.addEventListener('click', () => {
+    fetch('/v0/clicks?subdomain_param=api', {
+      method: 'POST',
+      headers: {
+        'Content-Type': 'application/json',
+        'X-CSRF-Token': csrfToken,
+      },
+      keepalive: true,
+      mode: 'same-origin',
+      body: JSON.stringify({
+        ...options,
+        occurred_at: new Date(),
+        hit_id: window.Aedu?.hit_data?.id,
+      }),
+    });
+  });
+});</script><script>document.addEventListener('DOMContentLoaded', () => { const loginButton = document.querySelector('.js-login-button--89003e41'); if (!loginButton) { throw new Error('Login button not found'); } const options = { detail: {"postLoginRedirectUrl":"https://www.academia.edu/115618854/ARTE_Automated_Generation_of_Realistic_Test_Inputs_for_Web_APIs","clickTrackingContext":{"source":"loswp--wsj-grid-card-download-pdf-modal","bucket":"outline","entity_id":115618854,"extra":{"source_work_id":115618854}},"configuredText":{"buttonsPage":{"header":"Read your PDF for free"},"emailEntryPage":{"subheader":"Sign up or log in to continue reading."},"emailLoginPage":{"subheader":"Log in to continue reading."},"emailRegistrationPage":{"subheader":"Sign up to continue reading."}},"registrationParams":{"user_source":"download","doc_id":111975636}} }; loginButton.addEventListener('click', () => { document.dispatchEvent(new CustomEvent('open-login-modal', options)); }); });</script><a class="ds2-5-text-link ds2-5-text-link--inline js-related-work-grid-card-view-pdf" href="https://www.academia.edu/115618854/ARTE_Automated_Generation_of_Realistic_Test_Inputs_for_Web_APIs"><span class="ds2-5-text-link__content">View PDF</span><span class="material-symbols-outlined" style="font-size: 18px" translate="no">chevron_right</span></a></div></div><div class="ds-related-work--container js-related-work-sidebar-card js-safe-related-work-related-work " data-collection-position="3" data-entity-id="118801157" data-sort-order="default"><a class="ds-related-work--title js-related-work-grid-card-title ds2-5-body-md ds2-5-body-link" href="https://www.academia.edu/118801157/Automated_Api_Testing_Approach">Automated Api Testing Approach</a><div class="ds-related-work--metadata"><a class="js-related-work-grid-card-author ds2-5-body-sm ds2-5-body-link" data-author-id="27737930" href="https://independent.academia.edu/pallavibangare">pallavi bangare</a></div><p class="ds-related-work--metadata ds2-5-body-xs">2012</p><p class="ds2-5-body-sm ds-related-work--abstract hide-on-large">Software testing is an investigation conducted to provide stakeholders with information about the quality of the product or service under test. With the help of software testing we can verify or validate the software product. Normally testing will be done after development of software but we can perform the software testing at the time of development process also. This paper will give you a brief introduction about Automated API Testing Tool. This tool of testing will reduce lots of headache after the whole development of software. It saves time as well as money. Such type of testing is helpful in the Industries &amp; Colleges also.</p><div class="ds-related-work--ctas"><a class="ds2-5-text-link ds2-5-text-link--inline js-tc-loswp--wsj-grid-card-download-pdf-modal js-login-button--83c7ad3d"><span class="material-symbols-outlined" style="font-size: 18px" translate="no">download</span><span class="ds2-5-text-link__content">Download free PDF</span></a><script>document.addEventListener('DOMContentLoaded', () => {
+  const csrfToken = document.querySelector("[name='csrf-token']").content;
+  const options = {"source":"loswp--wsj-grid-card-download-pdf-modal","bucket":"outline","entity_id":118801157,"extra":{"source_work_id":118801157}};
+  const button = document.querySelector('.js-tc-loswp--wsj-grid-card-download-pdf-modal');
+  button.addEventListener('click', () => {
+    fetch('/v0/clicks?subdomain_param=api', {
+      method: 'POST',
+      headers: {
+        'Content-Type': 'application/json',
+        'X-CSRF-Token': csrfToken,
+      },
+      keepalive: true,
+      mode: 'same-origin',
+      body: JSON.stringify({
+        ...options,
+        occurred_at: new Date(),
+        hit_id: window.Aedu?.hit_data?.id,
+      }),
+    });
+  });
+});</script><script>document.addEventListener('DOMContentLoaded', () => { const loginButton = document.querySelector('.js-login-button--83c7ad3d'); if (!loginButton) { throw new Error('Login button not found'); } const options = { detail: {"postLoginRedirectUrl":"https://www.academia.edu/118801157/Automated_Api_Testing_Approach","clickTrackingContext":{"source":"loswp--wsj-grid-card-download-pdf-modal","bucket":"outline","entity_id":118801157,"extra":{"source_work_id":118801157}},"configuredText":{"buttonsPage":{"header":"Read your PDF for free"},"emailEntryPage":{"subheader":"Sign up or log in to continue reading."},"emailLoginPage":{"subheader":"Log in to continue reading."},"emailRegistrationPage":{"subheader":"Sign up to continue reading."}},"registrationParams":{"user_source":"download","doc_id":114340985}} }; loginButton.addEventListener('click', () => { document.dispatchEvent(new CustomEvent('open-login-modal', options)); }); });</script><a class="ds2-5-text-link ds2-5-text-link--inline js-related-work-grid-card-view-pdf" href="https://www.academia.edu/118801157/Automated_Api_Testing_Approach"><span class="ds2-5-text-link__content">View PDF</span><span class="material-symbols-outlined" style="font-size: 18px" translate="no">chevron_right</span></a></div></div><div class="ds-related-work--container js-related-work-sidebar-card js-safe-related-work-related-work " data-collection-position="4" data-entity-id="78289415" data-sort-order="default"><a class="ds-related-work--title js-related-work-grid-card-title ds2-5-body-md ds2-5-body-link" href="https://www.academia.edu/78289415/Restats_A_Test_Coverage_Tool_for_RESTful_APIs">Restats: A Test Coverage Tool for RESTful APIs</a><div class="ds-related-work--metadata"><a class="js-related-work-grid-card-author ds2-5-body-sm ds2-5-body-link" data-author-id="33423764" href="https://univr.academia.edu/marianoceccato">mariano ceccato</a></div><p class="ds-related-work--metadata ds2-5-body-xs">2021</p><p class="ds2-5-body-sm ds-related-work--abstract hide-on-large">The present document is the preliminary version of the work prior to peer-review. The final version can be found on the publisher website.</p><div class="ds-related-work--ctas"><a class="ds2-5-text-link ds2-5-text-link--inline js-tc-loswp--wsj-grid-card-download-pdf-modal js-login-button--7f1cc5d4"><span class="material-symbols-outlined" style="font-size: 18px" translate="no">download</span><span class="ds2-5-text-link__content">Download free PDF</span></a><script>document.addEventListener('DOMContentLoaded', () => {
+  const csrfToken = document.querySelector("[name='csrf-token']").content;
+  const options = {"source":"loswp--wsj-grid-card-download-pdf-modal","bucket":"outline","entity_id":78289415,"extra":{"source_work_id":78289415}};
+  const button = document.querySelector('.js-tc-loswp--wsj-grid-card-download-pdf-modal');
+  button.addEventListener('click', () => {
+    fetch('/v0/clicks?subdomain_param=api', {
+      method: 'POST',
+      headers: {
+        'Content-Type': 'application/json',
+        'X-CSRF-Token': csrfToken,
+      },
+      keepalive: true,
+      mode: 'same-origin',
+      body: JSON.stringify({
+        ...options,
+        occurred_at: new Date(),
+        hit_id: window.Aedu?.hit_data?.id,
+      }),
+    });
+  });
+});</script><script>document.addEventListener('DOMContentLoaded', () => { const loginButton = document.querySelector('.js-login-button--7f1cc5d4'); if (!loginButton) { throw new Error('Login button not found'); } const options = { detail: {"postLoginRedirectUrl":"https://www.academia.edu/78289415/Restats_A_Test_Coverage_Tool_for_RESTful_APIs","clickTrackingContext":{"source":"loswp--wsj-grid-card-download-pdf-modal","bucket":"outline","entity_id":78289415,"extra":{"source_work_id":78289415}},"configuredText":{"buttonsPage":{"header":"Read your PDF for free"},"emailEntryPage":{"subheader":"Sign up or log in to continue reading."},"emailLoginPage":{"subheader":"Log in to continue reading."},"emailRegistrationPage":{"subheader":"Sign up to continue reading."}},"registrationParams":{"user_source":"download","doc_id":85389006}} }; loginButton.addEventListener('click', () => { document.dispatchEvent(new CustomEvent('open-login-modal', options)); }); });</script><a class="ds2-5-text-link ds2-5-text-link--inline js-related-work-grid-card-view-pdf" href="https://www.academia.edu/78289415/Restats_A_Test_Coverage_Tool_for_RESTful_APIs"><span class="ds2-5-text-link__content">View PDF</span><span class="material-symbols-outlined" style="font-size: 18px" translate="no">chevron_right</span></a></div></div><div class="ds-related-work--container js-related-work-sidebar-card js-safe-related-work-related-work hidden" data-collection-position="5" data-entity-id="65686833" data-sort-order="default"><a class="ds-related-work--title js-related-work-grid-card-title ds2-5-body-md ds2-5-body-link" href="https://www.academia.edu/65686833/Towards_API_Testing_Across_Cloud_and_Edge">Towards API Testing Across Cloud and Edge</a><div class="ds-related-work--metadata"><a class="js-related-work-grid-card-author ds2-5-body-sm ds2-5-body-link" data-author-id="38788125" href="https://ibm.academia.edu/NirmitDesai">Nirmit Desai</a></div><p class="ds-related-work--metadata ds2-5-body-xs">ArXiv, 2021</p><p class="ds2-5-body-sm ds-related-work--abstract hide-on-large">API economy is driving the digital transformation of business applications across the hybrid Cloud and edge environments. For such transformations to succeed, end-to-end testing of the application API composition is required. Testing of API compositions, even in centralized Cloud environments, is challenging as it requires coverage of functional as well as reliability requirements. The combinatorial space of scenarios is huge, e.g., API input parameters, order of API execution, and network faults. Hybrid Cloud and edge environments exacerbate the challenge of API testing due to the need to coordinate test execution across dynamic wide-area networks, possibly across network boundaries. To handle this challenge, we envision a test framework named Distributed Software Test Kit (DSTK). The DSTK leverages Combinatorial Test Design (CTD) to cover the functional requirements and then automatically covers the reliability requirements via under-the-hood closed loop between test execution fee...</p><div class="ds-related-work--ctas"><a class="ds2-5-text-link ds2-5-text-link--inline js-tc-loswp--wsj-grid-card-download-pdf-modal js-login-button--3452dc89"><span class="material-symbols-outlined" style="font-size: 18px" translate="no">download</span><span class="ds2-5-text-link__content">Download free PDF</span></a><script>document.addEventListener('DOMContentLoaded', () => {
+  const csrfToken = document.querySelector("[name='csrf-token']").content;
+  const options = {"source":"loswp--wsj-grid-card-download-pdf-modal","bucket":"outline","entity_id":65686833,"extra":{"source_work_id":65686833}};
+  const button = document.querySelector('.js-tc-loswp--wsj-grid-card-download-pdf-modal');
+  button.addEventListener('click', () => {
+    fetch('/v0/clicks?subdomain_param=api', {
+      method: 'POST',
+      headers: {
+        'Content-Type': 'application/json',
+        'X-CSRF-Token': csrfToken,
+      },
+      keepalive: true,
+      mode: 'same-origin',
+      body: JSON.stringify({
+        ...options,
+        occurred_at: new Date(),
+        hit_id: window.Aedu?.hit_data?.id,
+      }),
+    });
+  });
+});</script><script>document.addEventListener('DOMContentLoaded', () => { const loginButton = document.querySelector('.js-login-button--3452dc89'); if (!loginButton) { throw new Error('Login button not found'); } const options = { detail: {"postLoginRedirectUrl":"https://www.academia.edu/65686833/Towards_API_Testing_Across_Cloud_and_Edge","clickTrackingContext":{"source":"loswp--wsj-grid-card-download-pdf-modal","bucket":"outline","entity_id":65686833,"extra":{"source_work_id":65686833}},"configuredText":{"buttonsPage":{"header":"Read your PDF for free"},"emailEntryPage":{"subheader":"Sign up or log in to continue reading."},"emailLoginPage":{"subheader":"Log in to continue reading."},"emailRegistrationPage":{"subheader":"Sign up to continue reading."}},"registrationParams":{"user_source":"download","doc_id":77175969}} }; loginButton.addEventListener('click', () => { document.dispatchEvent(new CustomEvent('open-login-modal', options)); }); });</script><a class="ds2-5-text-link ds2-5-text-link--inline js-related-work-grid-card-view-pdf" href="https://www.academia.edu/65686833/Towards_API_Testing_Across_Cloud_and_Edge"><span class="ds2-5-text-link__content">View PDF</span><span class="material-symbols-outlined" style="font-size: 18px" translate="no">chevron_right</span></a></div></div><div class="ds-related-work--container js-related-work-sidebar-card js-safe-related-work-related-work hidden" data-collection-position="6" data-entity-id="88387376" data-sort-order="default"><a class="ds-related-work--title js-related-work-grid-card-title ds2-5-body-md ds2-5-body-link" href="https://www.academia.edu/88387376/Automation_of_End_to_End_Testing_and_Their_Importance">Automation of End-to-End Testing and Their Importance</a><div class="ds-related-work--metadata"><a class="js-related-work-grid-card-author ds2-5-body-sm ds2-5-body-link" data-author-id="6079060" href="https://independent.academia.edu/IJRASETPublication">IJRASET Publication</a></div><p class="ds-related-work--metadata ds2-5-body-xs">International Journal for Research in Applied Science &amp; Engineering Technology (IJRASET), 2022</p><p class="ds2-5-body-sm ds-related-work--abstract hide-on-large">End to end testing, to put it very simply, is a sort of software testing to ascertain whether software is behaving as planned. An End to end test is a way which tests every layer of the application, including the user interface, the browser (and compatibility with it), the network, the server, the APIs, the codebase, any third-party integrations, and any hardware-the whole kit. As there were a number of drawbacks in the manual testing, in order to overcome these drawbacks automation testing has been proposed. Keywords: E2E, API, JSON I. INTRODUCTION End to End testing(E2E) tests entail applying tests that track the application&#39;s flow and identify breaks in it. An interruption in the flow would reveal an error in the application. End to end testing is where the whole application needs to be tested from beginning to end. Testing is very important as it identifies the bugs in the product and guarantees the quality of the product. The typical procedure for E2E testing for the website involves testing the website of various functionalities and using the testing frameworks or platforms for the planning and creation of tests for various needs. Testing the websites is very important as it involves verification of the built architecture. Different types of testing that should be checked for the websites or any application can be unit testing, integration testing, system testing etc. But instead of performing all these manually or using any tool to perform the operations, it is better to perform automation testing using API&#39;s as we can easily verify the build architecture. Application programming interfaces(APIs), are a collection of guidelines that specify how devices and software can connect to and communicate with one another. An API that adheres to the representational state transfer, or REST, design principles is known as a REST API. REST APIs are sometimes referred to as RESTful APIs as a result. To put it in another way, REST APIs process requests for resources and respond with all pertinent information about the resource in a format such a way that clients can easily understand (this format is determined by the API receiving requests)</p><div class="ds-related-work--ctas"><a class="ds2-5-text-link ds2-5-text-link--inline js-tc-loswp--wsj-grid-card-download-pdf-modal js-login-button--b6e0b0dc"><span class="material-symbols-outlined" style="font-size: 18px" translate="no">download</span><span class="ds2-5-text-link__content">Download free PDF</span></a><script>document.addEventListener('DOMContentLoaded', () => {
+  const csrfToken = document.querySelector("[name='csrf-token']").content;
+  const options = {"source":"loswp--wsj-grid-card-download-pdf-modal","bucket":"outline","entity_id":88387376,"extra":{"source_work_id":88387376}};
+  const button = document.querySelector('.js-tc-loswp--wsj-grid-card-download-pdf-modal');
+  button.addEventListener('click', () => {
+    fetch('/v0/clicks?subdomain_param=api', {
+      method: 'POST',
+      headers: {
+        'Content-Type': 'application/json',
+        'X-CSRF-Token': csrfToken,
+      },
+      keepalive: true,
+      mode: 'same-origin',
+      body: JSON.stringify({
+        ...options,
+        occurred_at: new Date(),
+        hit_id: window.Aedu?.hit_data?.id,
+      }),
+    });
+  });
+});</script><script>document.addEventListener('DOMContentLoaded', () => { const loginButton = document.querySelector('.js-login-button--b6e0b0dc'); if (!loginButton) { throw new Error('Login button not found'); } const options = { detail: {"postLoginRedirectUrl":"https://www.academia.edu/88387376/Automation_of_End_to_End_Testing_and_Their_Importance","clickTrackingContext":{"source":"loswp--wsj-grid-card-download-pdf-modal","bucket":"outline","entity_id":88387376,"extra":{"source_work_id":88387376}},"configuredText":{"buttonsPage":{"header":"Read your PDF for free"},"emailEntryPage":{"subheader":"Sign up or log in to continue reading."},"emailLoginPage":{"subheader":"Log in to continue reading."},"emailRegistrationPage":{"subheader":"Sign up to continue reading."}},"registrationParams":{"user_source":"download","doc_id":92369862}} }; loginButton.addEventListener('click', () => { document.dispatchEvent(new CustomEvent('open-login-modal', options)); }); });</script><a class="ds2-5-text-link ds2-5-text-link--inline js-related-work-grid-card-view-pdf" href="https://www.academia.edu/88387376/Automation_of_End_to_End_Testing_and_Their_Importance"><span class="ds2-5-text-link__content">View PDF</span><span class="material-symbols-outlined" style="font-size: 18px" translate="no">chevron_right</span></a></div></div><div class="ds-related-work--container js-related-work-sidebar-card js-safe-related-work-related-work hidden" data-collection-position="7" data-entity-id="1536060" data-sort-order="default"><a class="ds-related-work--title js-related-work-grid-card-title ds2-5-body-md ds2-5-body-link" href="https://www.academia.edu/1536060/REST_A_tool_for_reducing_effort_in_script_based_testing">REST: A tool for reducing effort in script-based testing</a><div class="ds-related-work--metadata"><a class="js-related-work-grid-card-author ds2-5-body-sm ds2-5-body-link" data-author-id="1673470" href="https://uic.academia.edu/MarkGrechanik">Mark Grechanik</a></div><p class="ds-related-work--metadata ds2-5-body-xs">2008</p><p class="ds2-5-body-sm ds-related-work--abstract hide-on-large">Since manual black-box testing of GUI-based APplications (GAPs) is tedious and laborious, test engineers create test scripts to automate the testing process. These test scripts interact with GAPs by performing actions on their GUI objects. An extra effort that test engineers put in writing test scripts is paid off when these scripts are run repeatedly. Unfortunately, releasing new versions of GAPs breaks their corresponding test scripts thereby obliterating benefits of test automation.</p><div class="ds-related-work--ctas"><a class="ds2-5-text-link ds2-5-text-link--inline js-tc-loswp--wsj-grid-card-download-pdf-modal js-login-button--fe100e9f"><span class="material-symbols-outlined" style="font-size: 18px" translate="no">download</span><span class="ds2-5-text-link__content">Download free PDF</span></a><script>document.addEventListener('DOMContentLoaded', () => {
+  const csrfToken = document.querySelector("[name='csrf-token']").content;
+  const options = {"source":"loswp--wsj-grid-card-download-pdf-modal","bucket":"outline","entity_id":1536060,"extra":{"source_work_id":1536060}};
+  const button = document.querySelector('.js-tc-loswp--wsj-grid-card-download-pdf-modal');
+  button.addEventListener('click', () => {
+    fetch('/v0/clicks?subdomain_param=api', {
+      method: 'POST',
+      headers: {
+        'Content-Type': 'application/json',
+        'X-CSRF-Token': csrfToken,
+      },
+      keepalive: true,
+      mode: 'same-origin',
+      body: JSON.stringify({
+        ...options,
+        occurred_at: new Date(),
+        hit_id: window.Aedu?.hit_data?.id,
+      }),
+    });
+  });
+});</script><script>document.addEventListener('DOMContentLoaded', () => { const loginButton = document.querySelector('.js-login-button--fe100e9f'); if (!loginButton) { throw new Error('Login button not found'); } const options = { detail: {"postLoginRedirectUrl":"https://www.academia.edu/1536060/REST_A_tool_for_reducing_effort_in_script_based_testing","clickTrackingContext":{"source":"loswp--wsj-grid-card-download-pdf-modal","bucket":"outline","entity_id":1536060,"extra":{"source_work_id":1536060}},"configuredText":{"buttonsPage":{"header":"Read your PDF for free"},"emailEntryPage":{"subheader":"Sign up or log in to continue reading."},"emailLoginPage":{"subheader":"Log in to continue reading."},"emailRegistrationPage":{"subheader":"Sign up to continue reading."}},"registrationParams":{"user_source":"download","doc_id":50939331}} }; loginButton.addEventListener('click', () => { document.dispatchEvent(new CustomEvent('open-login-modal', options)); }); });</script><a class="ds2-5-text-link ds2-5-text-link--inline js-related-work-grid-card-view-pdf" href="https://www.academia.edu/1536060/REST_A_tool_for_reducing_effort_in_script_based_testing"><span class="ds2-5-text-link__content">View PDF</span><span class="material-symbols-outlined" style="font-size: 18px" translate="no">chevron_right</span></a></div></div><div class="ds-related-work--container js-related-work-sidebar-card js-safe-related-work-related-work hidden" data-collection-position="8" data-entity-id="63447394" data-sort-order="default"><a class="ds-related-work--title js-related-work-grid-card-title ds2-5-body-md ds2-5-body-link" href="https://www.academia.edu/63447394/Testing_web_services_A_survey">Testing web services: A survey</a><div class="ds-related-work--metadata"><a class="js-related-work-grid-card-author ds2-5-body-sm ds2-5-body-link" data-author-id="107095423" href="https://independent.academia.edu/MustafaBozkurt31">Mustafa Bozkurt</a></div><p class="ds-related-work--metadata ds2-5-body-xs">Department of Computer Science, King���s College London, Tech. Rep. TR-10-01, 2010</p><p class="ds2-5-body-sm ds-related-work--abstract hide-on-large">The Service-Oriented Computing (SOC) paradigm is allowing computer systems to interact with each other in new ways. According to the literature, SOC allows composition of distributed applications free from their platform and thus reduces the cost of such compositions and makes them easier and faster to develop. Currently web services are the most widely accepted service technology due to the level of autonomy and platform-independency they provide. However, web services also bring challenges. For example, ...</p><div class="ds-related-work--ctas"><a class="ds2-5-text-link ds2-5-text-link--inline js-tc-loswp--wsj-grid-card-download-pdf-modal js-login-button--c8cbb500"><span class="material-symbols-outlined" style="font-size: 18px" translate="no">download</span><span class="ds2-5-text-link__content">Download free PDF</span></a><script>document.addEventListener('DOMContentLoaded', () => {
+  const csrfToken = document.querySelector("[name='csrf-token']").content;
+  const options = {"source":"loswp--wsj-grid-card-download-pdf-modal","bucket":"outline","entity_id":63447394,"extra":{"source_work_id":63447394}};
+  const button = document.querySelector('.js-tc-loswp--wsj-grid-card-download-pdf-modal');
+  button.addEventListener('click', () => {
+    fetch('/v0/clicks?subdomain_param=api', {
+      method: 'POST',
+      headers: {
+        'Content-Type': 'application/json',
+        'X-CSRF-Token': csrfToken,
+      },
+      keepalive: true,
+      mode: 'same-origin',
+      body: JSON.stringify({
+        ...options,
+        occurred_at: new Date(),
+        hit_id: window.Aedu?.hit_data?.id,
+      }),
+    });
+  });
+});</script><script>document.addEventListener('DOMContentLoaded', () => { const loginButton = document.querySelector('.js-login-button--c8cbb500'); if (!loginButton) { throw new Error('Login button not found'); } const options = { detail: {"postLoginRedirectUrl":"https://www.academia.edu/63447394/Testing_web_services_A_survey","clickTrackingContext":{"source":"loswp--wsj-grid-card-download-pdf-modal","bucket":"outline","entity_id":63447394,"extra":{"source_work_id":63447394}},"configuredText":{"buttonsPage":{"header":"Read your PDF for free"},"emailEntryPage":{"subheader":"Sign up or log in to continue reading."},"emailLoginPage":{"subheader":"Log in to continue reading."},"emailRegistrationPage":{"subheader":"Sign up to continue reading."}},"registrationParams":{"user_source":"download","doc_id":75874627}} }; loginButton.addEventListener('click', () => { document.dispatchEvent(new CustomEvent('open-login-modal', options)); }); });</script><a class="ds2-5-text-link ds2-5-text-link--inline js-related-work-grid-card-view-pdf" href="https://www.academia.edu/63447394/Testing_web_services_A_survey"><span class="ds2-5-text-link__content">View PDF</span><span class="material-symbols-outlined" style="font-size: 18px" translate="no">chevron_right</span></a></div></div><div class="ds-related-work--container js-related-work-sidebar-card js-safe-related-work-related-work hidden" data-collection-position="9" data-entity-id="92858061" data-sort-order="default"><a class="ds-related-work--title js-related-work-grid-card-title ds2-5-body-md ds2-5-body-link" href="https://www.academia.edu/92858061/Tool_Demonstration_Testing_JSON_Web_Services_Using">Tool Demonstration : Testing JSON Web Services Using</a><div class="ds-related-work--metadata"><a class="js-related-work-grid-card-author ds2-5-body-sm ds2-5-body-link" data-author-id="121905794" href="https://upm-es.academia.edu/JMari%C3%B1o">Julio Mariño</a></div><p class="ds-related-work--metadata ds2-5-body-xs">2018</p><p class="ds2-5-body-sm ds-related-work--abstract hide-on-large">This article describes a tool, jsongen, which permits testing behavioural aspects of web services that communicate using the JSON data format. Provided a characterisation of the JSON data as a JSON schema, the jsongen tool will: (i) automatically derive a QuickCheck (the property-based testing tool) generator which can generate an infinite number of random JSON values (according to the probability distribution implemented by the generator) that validate against the schema, and (ii) provides a generic QuickCheck state machine which is capable of following the (hyper)links documented in the JSON schema, to automatically explore the web service. The default behaviour of the state machine can be easily customized to include web service specific checks. The approach is demonstrated by applying it to the task of testing a simplified web service for banking.</p><div class="ds-related-work--ctas"><a class="ds2-5-text-link ds2-5-text-link--inline js-tc-loswp--wsj-grid-card-download-pdf-modal js-login-button--c9e9f5dc"><span class="material-symbols-outlined" style="font-size: 18px" translate="no">download</span><span class="ds2-5-text-link__content">Download free PDF</span></a><script>document.addEventListener('DOMContentLoaded', () => {
+  const csrfToken = document.querySelector("[name='csrf-token']").content;
+  const options = {"source":"loswp--wsj-grid-card-download-pdf-modal","bucket":"outline","entity_id":92858061,"extra":{"source_work_id":92858061}};
+  const button = document.querySelector('.js-tc-loswp--wsj-grid-card-download-pdf-modal');
+  button.addEventListener('click', () => {
+    fetch('/v0/clicks?subdomain_param=api', {
+      method: 'POST',
+      headers: {
+        'Content-Type': 'application/json',
+        'X-CSRF-Token': csrfToken,
+      },
+      keepalive: true,
+      mode: 'same-origin',
+      body: JSON.stringify({
+        ...options,
+        occurred_at: new Date(),
+        hit_id: window.Aedu?.hit_data?.id,
+      }),
+    });
+  });
+});</script><script>document.addEventListener('DOMContentLoaded', () => { const loginButton = document.querySelector('.js-login-button--c9e9f5dc'); if (!loginButton) { throw new Error('Login button not found'); } const options = { detail: {"postLoginRedirectUrl":"https://www.academia.edu/92858061/Tool_Demonstration_Testing_JSON_Web_Services_Using","clickTrackingContext":{"source":"loswp--wsj-grid-card-download-pdf-modal","bucket":"outline","entity_id":92858061,"extra":{"source_work_id":92858061}},"configuredText":{"buttonsPage":{"header":"Read your PDF for free"},"emailEntryPage":{"subheader":"Sign up or log in to continue reading."},"emailLoginPage":{"subheader":"Log in to continue reading."},"emailRegistrationPage":{"subheader":"Sign up to continue reading."}},"registrationParams":{"user_source":"download","doc_id":95756225}} }; loginButton.addEventListener('click', () => { document.dispatchEvent(new CustomEvent('open-login-modal', options)); }); });</script><a class="ds2-5-text-link ds2-5-text-link--inline js-related-work-grid-card-view-pdf" href="https://www.academia.edu/92858061/Tool_Demonstration_Testing_JSON_Web_Services_Using"><span class="ds2-5-text-link__content">View PDF</span><span class="material-symbols-outlined" style="font-size: 18px" translate="no">chevron_right</span></a></div></div><button class="ds2-5-text-link ds2-5-text-link--inline safe-related-works--view-more-button js-safe-related-works-related-work--view-more-button"><span class="material-symbols-outlined" style="font-size: 18px" translate="no">keyboard_arrow_down</span><span class="ds2-5-text-link__content">View more papers</span></button></div></div><div class="safe-related-topics--container"><h2 class="safe-related-topics--heading">Related topics</h2><div class="safe-related-topics--list"><div class="safe-related-topics--subgroup"><li class="safe-related-topics--list-item"><a class="ds2-5-body-sm ds2-5-body-link js-related-research-interest" data-entity_id="55181" href="https://www.academia.edu/Documents/in/Operational_Risk">Operational Risk</a><button class="ds-pill-button ds-pill-button--small js-tc-loswp--related-topics--follow js-login-button--67add23b safe-related-topics--pill"><span class="material-symbols-outlined" style="font-size: 16px" translate="no">add</span>Follow</button><script>document.addEventListener('DOMContentLoaded', () => {
+  const csrfToken = document.querySelector("[name='csrf-token']").content;
+  const options = {"source":"loswp--related-topics--follow","bucket":"outline","entity_id":92861694,"extra":{"source_work_id":92861694}};
+  const button = document.querySelector('.js-tc-loswp--related-topics--follow');
+  button.addEventListener('click', () => {
+    fetch('/v0/clicks?subdomain_param=api', {
+      method: 'POST',
+      headers: {
+        'Content-Type': 'application/json',
+        'X-CSRF-Token': csrfToken,
+      },
+      keepalive: true,
+      mode: 'same-origin',
+      body: JSON.stringify({
+        ...options,
+        occurred_at: new Date(),
+        hit_id: window.Aedu?.hit_data?.id,
+      }),
+    });
+  });
+});</script><script>document.addEventListener('DOMContentLoaded', () => { const loginButton = document.querySelector('.js-login-button--67add23b'); if (!loginButton) { throw new Error('Login button not found'); } const options = { detail: {"postLoginRedirectUrl":"https://www.academia.edu/Documents/in/Operational_Risk","clickTrackingContext":{"source":"loswp--related-topics--follow","bucket":"outline","entity_id":92861694,"extra":{"source_work_id":92861694}},"configuredText":{"buttonsPage":{"header":"Follow topics to stay up-to-date"},"emailEntryPage":{"subheader":"Sign up or log in to follow this topic."},"emailLoginPage":{"subheader":"Log in to follow this topic."},"emailRegistrationPage":{"subheader":"Sign up to follow this topic."}},"registrationParams":{"user_source":"download","doc_id":95758948}} }; loginButton.addEventListener('click', () => { document.dispatchEvent(new CustomEvent('open-login-modal', options)); }); });</script></li></div></div></div></div></div><div id="js-react-on-rails-context" style="display:none" data-rails-context="{&quot;inMailer&quot;:false,&quot;i18nLocale&quot;:&quot;en&quot;,&quot;i18nDefaultLocale&quot;:&quot;en&quot;,&quot;href&quot;:&quot;https://www.academia.edu/92861694/API_Testing_Using_Postman_Tool&quot;,&quot;location&quot;:&quot;/92861694/API_Testing_Using_Postman_Tool&quot;,&quot;scheme&quot;:&quot;https&quot;,&quot;host&quot;:&quot;www.academia.edu&quot;,&quot;port&quot;:null,&quot;pathname&quot;:&quot;/92861694/API_Testing_Using_Postman_Tool&quot;,&quot;search&quot;:null,&quot;httpAcceptLanguage&quot;:null,&quot;serverSide&quot;:false}"></div>
+<div class="js-react-on-rails-component" style="display:none" data-component-name="LoginModalManager" data-props="{}" data-trace="false" data-dom-id="LoginModalManager-react-component-fcce28dd-fbcc-4b1f-9329-c6346d167669"></div>
+    <div id="LoginModalManager-react-component-fcce28dd-fbcc-4b1f-9329-c6346d167669"></div>
+    
+
+
+      <div class="about-footer-container"><div class="footer-grid"><div class="links-row"><div class="text-column"><div class="academia-logo"><a href="https://www.academia.edu/?source=footer"><img alt="Academia" src="//a.academia-assets.com/images/design_system/academia_logo_short_white.svg" /></a></div></div><div class="responsive-two-column-container"><div class="inner-two-column-container"><ul class="single-column"><li class="header">Explore</li><li><a href="https://www.academia.edu/documents">Papers</a></li><li><a href="https://www.academia.edu/topics">Topics</a></li></ul><ul class="single-column"><li class="header">Features</li><li><a href="https://www.academia.edu/mentions">Mentions</a></li><li><a href="https://www.academia.edu/analytics">Analytics</a></li><li><a href="https://www.academia.edu/research">PDF Packages</a></li><li><a href="https://www.academia.edu/search/advanced">Advanced Search</a></li><li><a href="https://www.academia.edu/saved_searches">Search Alerts</a></li></ul></div><div class="inner-two-column-container"><ul class="single-column"><li class="header">Journals</li><li><a href="https://www.academia.edu/journals">Academia.edu Journals</a></li><li><a href="https://www.academia.edu/journals/submissions">My submissions</a></li><li><a href="https://www.academia.edu/journals/submissions#reviewer/invitations">Reviewer Hub</a></li><li><a href="https://www.academia.edu/journals/about/why-publish-with-us">Why publish with us</a></li><li><a href="https://www.academia.edu/journals/about/testimonials">Testimonials</a></li></ul><ul class="single-column"><li class="header">Company</li><li><a href="https://www.academia.edu/about">About</a></li><li><a href="https://www.academia.edu/careers">Careers</a></li><li><a href="https://www.academia.edu/press">Press</a></li><li><a href="https://support.academia.edu/hc/en-us">Help Center</a></li><li><a href="https://www.academia.edu/terms">Terms</a></li><li><a href="https://www.academia.edu/privacy">Privacy</a></li><li><a href="https://www.academia.edu/copyright">Copyright</a></li><li><a href="https://www.academia.edu/content_policy">Content Policy</a></li></ul></div></div></div><div class="subfooter-row"><div class="academia-logo"><a href="https://www.academia.edu/?source=footer"><img alt="Academia" src="//a.academia-assets.com/images/design_system/academia_logo_white.svg" /></a></div><div class="text"><div>580 California St., Suite 400</div><div>San Francisco, CA, 94104</div></div><div class="text"><div><a href="https://www.academia.edu/copyright">© 2025 Academia. All rights reserved</a></div></div></div></div></div>
+
+  </body>
+</html>
