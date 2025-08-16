@@ -144,6 +144,7 @@ Please format the output as a JSON structure for easy integration into a web app
 		}
 		fmt.Println("--- ข้อมูลหลังจาก Unmarshal ไปยัง Go struct ---")
 		fmt.Printf("Course Name: %s\n", courseJsonBody.Title)
+		fmt.Println("Purpose: ", courses.Purpose)
 		fmt.Printf("Number of Modules: %d\n", len(courses.Modules))
 		fmt.Printf("First Module Title: %s\n", courses.Modules[0].Title)
 		fmt.Println("---------------------------------------------")
@@ -190,8 +191,14 @@ Please format the output as a JSON structure for easy integration into a web app
 			// fmt.Println("Module : ", moduleData)
 			moduleData.Content = content
 			//find title docs and insert into moduleData
+			content, err := SearchDocuments(moduleData.Title, moduleData.Description, ctx)
+			if err != nil {
+				return fmt.Errorf("failed to search documents for module: %w", err)
+			}
 
-			err := rs.ModuleService.CreateModule(ctx, &moduleData)
+			moduleData.Content = content
+
+			err = rs.ModuleService.CreateModule(ctx, &moduleData)
 			if err != nil {
 				return err
 			}
@@ -202,6 +209,11 @@ Please format the output as a JSON structure for easy integration into a web app
 		if file != nil {
 			fmt.Println("Extracting file content....")
 			docPath, err := SaveFileToDisk(file, ctx)
+			if err != nil {
+				fmt.Printf("Error saving file to disk: %v\n", err)
+				return err
+			}
+
 			fileContent, err := ReadFileData(docPath, ctx)
 			content = fileContent
 			if err != nil {
