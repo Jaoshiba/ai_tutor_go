@@ -65,19 +65,6 @@ func (rs *courseService) CreateCourse(courseJsonBody entities.CourseRequestBody,
 
 	fmt.Println("Im here")
 
-	// var serpres entities.SerpAPIResponse
-
-	txt, err := SearchDocuments(courseJsonBody.Title, courseJsonBody.Description, ctx)
-	if err != nil {
-		return fmt.Errorf("failed to search documents: %w", err)
-	}
-
-	fmt.Println("Search result: ", txt)
-
-	return err
-
-	fmt.Println("Extracting file content....")
-
 	var content string
 	if fromCoures {
 		if file != nil {
@@ -149,6 +136,7 @@ func (rs *courseService) CreateCourse(courseJsonBody entities.CourseRequestBody,
 		}
 		fmt.Println("--- ข้อมูลหลังจาก Unmarshal ไปยัง Go struct ---")
 		fmt.Printf("Course Name: %s\n", courseJsonBody.Title)
+		fmt.Println("Purpose: ", courses.Purpose)
 		fmt.Printf("Number of Modules: %d\n", len(courses.Modules))
 		fmt.Printf("First Module Title: %s\n", courses.Modules[0].Title)
 		fmt.Println("---------------------------------------------")
@@ -176,8 +164,14 @@ func (rs *courseService) CreateCourse(courseJsonBody entities.CourseRequestBody,
 			fmt.Println("Module : ", moduleData)
 
 			//find title docs and insert into moduleData
+			content, err := SearchDocuments(moduleData.Title, moduleData.Description, ctx)
+			if err != nil {
+				return fmt.Errorf("failed to search documents for module: %w", err)
+			}
 
-			err := rs.ModuleService.CreateModule(ctx, &moduleData)
+			moduleData.Content = content
+
+			err = rs.ModuleService.CreateModule(ctx, &moduleData)
 			if err != nil {
 				return err
 			}
@@ -188,6 +182,11 @@ func (rs *courseService) CreateCourse(courseJsonBody entities.CourseRequestBody,
 		if file != nil {
 			fmt.Println("Extracting file content....")
 			docPath, err := SaveFileToDisk(file, ctx)
+			if err != nil {
+				fmt.Printf("Error saving file to disk: %v\n", err)
+				return err
+			}
+
 			fileContent, err := ReadFileData(docPath, ctx)
 			content = fileContent
 			if err != nil {
