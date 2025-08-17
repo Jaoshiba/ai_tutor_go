@@ -161,7 +161,7 @@ func (rs *courseService) CreateCourse(courseJsonBody entities.CourseRequestBody,
 		fmt.Printf("First Module Title: %s\n", courses.Modules[0].Title)
 		fmt.Println("---------------------------------------------")
 
-		fmt.Println("Module : heheheh : ", courses.Modules)
+		// fmt.Println("Module : heheheh : ", courses.Modules)
 
 		//on web
 		// userid := ctx.Locals("userID")
@@ -209,7 +209,7 @@ func (rs *courseService) CreateCourse(courseJsonBody entities.CourseRequestBody,
 
 			moduleData.Content = content
 
-			fmt.Println("Module Data Content: ", moduleData.Content)
+			// fmt.Println("Module Data Content: ", moduleData.Content)
 
 			// err = rs.ModuleService.CreateModule(ctx, &moduleData)
 			// if err != nil {
