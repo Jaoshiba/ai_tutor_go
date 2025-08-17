@@ -42,7 +42,6 @@ func SearchDocuments(moduleName string, description string, ctx *fiber.Ctx) (str
 	// จำกัดจำนวนรอบกันลูปไม่รู้จบ
 	maxAttempts := 3
 
-	var serpAPIResponse entities.SerpAPIResponse
 	var generatedKeywords string
 
 	for attempt := 1; attempt <= maxAttempts; attempt++ {
@@ -58,10 +57,12 @@ func SearchDocuments(moduleName string, description string, ctx *fiber.Ctx) (str
 		generatedKeywords = strings.TrimSpace(kws)
 		fmt.Println("Generated Search Query:", generatedKeywords)
 
+		// keyword := "filetype:pdf " + moduleName + " " + description
+
 		// ----- 2) ยิง SerpAPI -----
 		params := url.Values{}
 		params.Add("q", generatedKeywords)
-		params.Add("engine", "google_scholar") // โฟกัสฝั่งวิชาการก่อน
+		params.Add("engine", "google") // โฟกัสฝั่งวิชาการก่อน
 		params.Add("api_key", serpAPIKey)
 		params.Add("hl", "th")
 		params.Add("gl", "th")
@@ -77,9 +78,16 @@ func SearchDocuments(moduleName string, description string, ctx *fiber.Ctx) (str
 			return "", fmt.Errorf("SerpAPI ตอบกลับด้วยสถานะผิดพลาด %d (attempt %d): %s", status, attempt, string(body))
 		}
 
-		serpAPIResponse = entities.SerpAPIResponse{}
+		var serpAPIResponse entities.SerpAPIResponse
 		if err := json.Unmarshal(body, &serpAPIResponse); err != nil {
 			return "", fmt.Errorf("ไม่สามารถแยกวิเคราะห์ JSON ได้ (attempt %d): %w", attempt, err)
+		}
+
+		fmt.Println("SerpAPI Response:", serpAPIResponse.OrganicResults)
+
+		for _, result := range serpAPIResponse.OrganicResults {
+			fmt.Println("Title:", result.Title)
+			fmt.Println("Link:", result.Link)
 		}
 
 		// ----- 3) ถ้าได้ผลลัพธ์ → ไปประมวลผลไฟล์
@@ -91,6 +99,7 @@ func SearchDocuments(moduleName string, description string, ctx *fiber.Ctx) (str
 					break
 				}
 				documentLink := result.Link
+				fmt.Println("Processing result:", documentLink)
 
 				fileExt := strings.ToLower(filepath.Ext(documentLink))
 
@@ -101,7 +110,7 @@ func SearchDocuments(moduleName string, description string, ctx *fiber.Ctx) (str
 
 				documentTitle := sanitizeFilename(result.Title)
 
-				fmt.Println("Getting file from URL:", documentLink)
+				fmt.Println("\nGetting file from URL: ", documentLink)
 				docPath, err := GetFileFromUrl(documentTitle, documentLink)
 				if err != nil {
 					continue
@@ -113,7 +122,7 @@ func SearchDocuments(moduleName string, description string, ctx *fiber.Ctx) (str
 					fmt.Println("Error reading file data:", err)
 					continue
 				}
-				fmt.Println("File content:", content)
+				fmt.Println("\nFile content:", content)
 				return content, err
 			}
 
@@ -156,6 +165,11 @@ func doSerpAPISearch(fullURL string) ([]byte, int, error) {
 func buildKeywordPrompt(moduleName, description string, attempt int) string {
 	// tips สำหรับรอบถัดไป: ลดข้อจำกัด, เพิ่มคำพ้อง, ตัด filetype ออก, สลับ engine
 	var retryHint string
+	var filetypeFilter string
+
+	// ตั้งค่าตัวกรอง filetype ให้ครอบคลุมทั้ง PDF และ DOC/DOCX
+	filetypeFilter = "filetype:pdf OR filetype:doc OR filetype:docx"
+
 	switch attempt {
 	case 1:
 		retryHint = `
@@ -174,6 +188,7 @@ func buildKeywordPrompt(moduleName, description string, attempt int) string {
 `
 	}
 
+	// รวมตัวกรอง filetype เข้าไปในคำสั่ง Guidelines
 	return fmt.Sprintf(`
 You are an academic research assistant.
 Your task is to create effective and broad Google Scholar search keywords 
@@ -186,13 +201,13 @@ Guidelines for keyword generation:
 1. Keywords must be broad enough to get a variety of relevant results, not overly restrictive.
 2. Include both Thai and English terms for the topic.
 3. Use academic source filters such as: site:ac.th OR site:edu OR site:researchgate.net — but they do not have to match all at once.
-4. Prefer file formats like PDF by adding: filetype:pdf (optional if it limits too much).
+4. **Prefer file formats by adding: (%s)** (optional if it limits too much).
 5. Combine keywords using OR to expand coverage; use AND only when necessary.
 6. Return only the final search query without explanation.
 
 Additional retry hint for this attempt:
 %s
-`, moduleName, description, retryHint)
+`, moduleName, description, filetypeFilter, retryHint)
 }
 
 // กันชื่อไฟล์ให้ปลอดภัย
