@@ -287,13 +287,34 @@ func GetPdfData(file *os.File, ctx *fiber.Ctx) (string, error) {
 
 // ---------- Utils ----------
 func RemoveJsonBlock(text string) string {
+	// 1) ตัดเคส ```json ... ```
 	markdownJsonContentRegex := regexp.MustCompile("(?s)```json\\s*(.*?)\\s*```")
 	matches := markdownJsonContentRegex.FindStringSubmatch(text)
 	if len(matches) > 1 {
 		return matches[1]
 	}
+
+	// 2) ถ้าไม่มีรั้วโค้ด ให้สแกนหา { ... } ก้อนแรกที่วงเล็บปิดครบ
+	depth := 0
+	start := -1
+	for i, r := range text {
+		if r == '{' {
+			if depth == 0 {
+				start = i
+			}
+			depth++
+		} else if r == '}' {
+			depth--
+			if depth == 0 && start >= 0 {
+				return text[start : i+1]
+			}
+		}
+	}
+
+	// 3) fallback: คืน text เดิม
 	return text
 }
+
 
 func SaveFileToDisk(file *multipart.FileHeader, ctx *fiber.Ctx) (string, error) {
 	openedFile, err := file.Open()

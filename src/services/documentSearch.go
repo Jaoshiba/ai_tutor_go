@@ -39,7 +39,6 @@ func SearchDocuments(moduleName string, description string, ctx *fiber.Ctx) (str
 		return "", fmt.Errorf("missing SERPAPI_KEY")
 	}
 
-	// จำกัดจำนวนรอบกันลูปไม่รู้จบ
 	maxAttempts := 3
 
 	var generatedKeywords string
@@ -94,10 +93,10 @@ func SearchDocuments(moduleName string, description string, ctx *fiber.Ctx) (str
 		if len(serpAPIResponse.OrganicResults) > 0 {
 			fmt.Printf("[SearchDocuments] Attempt %d: got %d results\n", attempt, len(serpAPIResponse.OrganicResults))
 
-			for i, result := range serpAPIResponse.OrganicResults {
-				if i >= 2 {
-					break
-				}
+			for _, result := range serpAPIResponse.OrganicResults {
+				// if i >= 2 {
+				// 	break
+				// }
 				documentLink := result.Link
 				fmt.Println("Processing result:", documentLink)
 
@@ -227,7 +226,6 @@ Additional retry hint for this attempt:
 // 	return name
 // }
 
-// ==== ของเดิม (เพิ่มเติมเล็กน้อย: สร้างโฟลเดอร์ถ้ายังไม่มี และเติมนามสกุลจาก URL ได้) ====
 
 func isAllowedContentType(ct string) (ok bool, ext string) {
 	// ตัดพารามิเตอร์ เช่น "; charset=binary"
