@@ -137,7 +137,9 @@ func SearchDocuments(moduleName string, description string, ctx *fiber.Ctx) (str
 	return "", fmt.Errorf("ไม่พบผลลัพธ์จาก SerpAPI หลังลองใหม่ %d รอบ", maxAttempts)
 }
 
-// ===== Helpers =====
+func rateSerpLink() {
+	
+}
 
 // แยกยิง HTTP ให้สั้นลง
 func doSerpAPISearch(fullURL string) ([]byte, int, error) {
