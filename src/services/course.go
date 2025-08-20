@@ -2,137 +2,329 @@ package services
 
 import (
 	"context"
+	"database/sql"
 	"encoding/json"
 	"fmt"
 	"go-fiber-template/domain/entities"
 	repo "go-fiber-template/domain/repositories"
 	"mime/multipart"
-	"os"
+
 	"time"
 
 	"github.com/gofiber/fiber/v2"
 	"github.com/google/uuid"
-	"google.golang.org/genai"
 )
 
 type courseService struct {
-	CourseRepo  repo.IcourseRepository
-	FileService IFileService
+	CourseRepo      repo.IcourseRepository
+	ModuleService   IModuleService
+	GeminiService   IGeminiService
+	ChapterServices IChapterService
 }
 
 type ICourseService interface {
-	CreateCourse(courseJsonBody entities.CourseRequestBody, file *multipart.FileHeader, ctx *fiber.Ctx) error //add userId ด้วย
+	CreateCourse(courseJsonBody entities.CourseRequestBody, file *multipart.FileHeader, fromCoures bool, ctx *fiber.Ctx) error //add userId ด้วย
+	GetCourses(ctx *fiber.Ctx) ([]entities.CourseDataModel, error)
+	GetCourseDetail(ctx *fiber.Ctx, courseID string) (*entities.CourseDetailResponse, error)
 }
 
-func NewCourseService(courseRepo repo.IcourseRepository) ICourseService {
+func NewCourseService(
+	courseRepo repo.IcourseRepository,
+	moduleService IModuleService, // เพิ่มเข้ามา
+	geminiService IGeminiService, // เพิ่มเข้ามา
+	chapterService IChapterService,
+) ICourseService {
 	return &courseService{
-		CourseRepo: courseRepo,
+		CourseRepo:      courseRepo,
+		ModuleService:   moduleService, // กำหนดค่า
+		GeminiService:   geminiService, // กำหนดค่า
+		ChapterServices: chapterService,
 	}
 }
 
-func (rs *courseService) CreateCourse(courseJsonBody entities.CourseRequestBody, file *multipart.FileHeader, ctx *fiber.Ctx) error {
+func (rs *courseService) GetCourses(ctx *fiber.Ctx) ([]entities.CourseDataModel, error) {
+	userID := ctx.Locals("userID").(string) // Get userId from context locals
 
-	//get content from additional file
-	filetype := file.Header.Get("Content-Type")
+	if userID == "" {
+		return nil, fmt.Errorf("user ID is missing from context")
+	}
+
+	course, err := rs.CourseRepo.GetCoursesByUserID(userID)
+	if err != nil {
+		return nil, fmt.Errorf("failed to get course: %w", err)
+	}
+
+	fmt.Println("course data : ", course)
+
+	if course == nil {
+		return nil, fiber.ErrNotFound // Return a Fiber-specific error if not found
+	}
+	return course, nil
+}
+
+func (rs *courseService) genCourse(courseJsonBody entities.CourseRequestBody, content string, ctx context.Context) (entities.CourseGeminiResponse, error) {
+	prompt := fmt.Sprintf(`ฉันมีข้อมูลเบื้องต้น 3 อย่างที่ได้จากผู้ใช้:
+
+			ชื่อ Course: %s
+
+			คำอธิบาย Course: %s
+
+			เนื้อหาจากไฟล์ที่เกียวข้อง %s
+
+			ChatGPT - Course Creation Prompt
+
+You're tasked with creating a comprehensive learning course based on preliminary information provided by the user, including the course name, description, and relevant content.
+
+Act as a knowledgeable course designer with expertise in curriculum development and instructional design, ensuring that the material is organized clearly and logically.
+
+Your audience is educators, instructional designers, or anyone looking to create a structured learning experience for students.
+
+Use the following information provided by the user: Course Name: [Course Name], Course Description: [Course Description], and Content from Related File: [Content]. Your job is to create the course structure by breaking down the content into modules or main topics that should be learned, organizing them in an appropriate sequence from basic to advanced.
+
+Please format the output as a JSON structure for easy integration into a web app, like this example: { "modules": [ { "title": "Module Title 1", "description": "Description for Module 1", }, { "title": "Module Title 2", "description": "Description for Module 2", }, ] } Make sure your response is primarily in Thai as requested.`,
+		courseJsonBody.Title, courseJsonBody.Description, content)
+	modules, err := rs.GeminiService.GenerateContentFromPrompt(ctx, prompt)
+	if err != nil {
+		fmt.Println(err)
+		return entities.CourseGeminiResponse{}, err
+	}
+	var courses entities.CourseGeminiResponse
+
+	err = json.Unmarshal([]byte(modules), &courses)
+	if err != nil {
+		fmt.Println(err)
+		return entities.CourseGeminiResponse{}, err
+	}
+	fmt.Println("--- ข้อมูลหลังจาก Unmarshal ไปยัง Go struct ---")
+	fmt.Printf("Course Name: %s\n", courseJsonBody.Title)
+	fmt.Println("Purpose: ", courses.Purpose)
+	fmt.Printf("Number of Modules: %d\n", len(courses.Modules))
+	fmt.Printf("First Module Title: %s\n", courses.Modules[0].Title)
+	fmt.Println("---------------------------------------------")
+	fmt.Println("Module : heheheh : ", courses.Modules)
+	return courses, nil
+
+}
+
+func (rs *courseService) CreateCourse(courseJsonBody entities.CourseRequestBody, file *multipart.FileHeader, fromCoures bool, ctx *fiber.Ctx) error {
+
+	fmt.Println("Extracting file content....")
+
 	var content string
-	if filetype == "application/pdf" {
-		fileContent, err := GetPdfData(file, ctx) 
+	if fromCoures {
+		if file != nil {
+			fmt.Println("Extracting file content....")
+			docPath, err := SaveFileToDisk(file, ctx)
+			if err != nil {
+				fmt.Printf("Error saving file to disk: %v\n", err)
+				return err
+			}
+			fileContent, err := ReadFileData(docPath, ctx)
+			content = fileContent
+			if err != nil {
+				fmt.Printf("Error processing file with FileService: %v\n", err)
+				return err
+			}
+		} else {
+			fmt.Println("No file uploaded, skipping file processing")
+			content = ""
+		}
+
+		ctx.Locals("content", content)
+
+		courseId := uuid.NewString()
+		if courseId == "" {
+			fmt.Println("NUll coursei")
+		}
+		ctx.Locals("courseID", courseId)
+
+		courses, err := rs.genCourse(courseJsonBody, content, ctx.Context())
+		if err != nil {
+			fmt.Println(err)
+			return err
+		}
+
+		//on web
+		userid := ctx.Locals("userID")
+
+		course := entities.CourseDataModel{
+			CourseID:    courseId,
+			Title:       courseJsonBody.Title,
+			Description: courseJsonBody.Description,
+			Confirmed:   courseJsonBody.Confirmed,
+			UserId:      userid.(string),
+			CreatedAt:   time.Now(),
+			UpdatedAt:   time.Now(),
+		}
+
+		err = rs.CourseRepo.InsertCourse(course)
+		if err != nil {
+			fmt.Println("error insert course")
+			fmt.Println(err)
+			return err
+		}
+
+		// return err
+		// for _, moduleData := range courses.Modules {
+		// 	// fmt.Println("Module : ", moduleData)
+		// 	moduleData.Content = content
+		// 	//find title docs and insert into moduleData
+		// 	content, err := SearchDocuments(moduleData.Title, moduleData.Description, ctx)
+		// 	if err != nil {
+		// 		return fmt.Errorf("failed to search documents for module: %w", err)
+		// 	}
+
+		// 	moduleData.Content = content
+
+		// 	err = rs.ModuleService.CreateModule(ctx, &moduleData)
+		// 	if err != nil {
+		// 		return err
+		// 	}
+		// }
+
+		content, err := SearchDocuments(courses.Modules[0].Title, courses.Modules[0].Description, ctx)
+		if err != nil {
+			fmt.Println("error is : ", err)
+			return err
+		}
+		courses.Modules[0].Content = content
+		err = rs.ModuleService.CreateModule(ctx, &courses.Modules[0])
 		if err != nil {
 			return err
 		}
-		content = fileContent
 
-	} else if filetype == "application/vnd.openxmlformats-officedocument.wordprocessingml.document" || filetype == "application/msword" {
-		fileContent, err := GetDocx_DocData(file, ctx)
-		if err != nil {
-			fmt.Print("error docx type")
+		// fmt.Println("content : ", content)
+
+	} else { //for file upload
+		var content string
+
+		if file != nil {
+			fmt.Println("Extracting file content....")
+			docPath, err := SaveFileToDisk(file, ctx)
+			if err != nil {
+				fmt.Printf("Error saving file to disk: %v\n", err)
+				return err
+			}
+
+			fileContent, err := ReadFileData(docPath, ctx)
+			content = fileContent
+			if err != nil {
+				fmt.Printf("Error processing file with FileService: %v\n", err)
+				return err
+			}
+		} else {
+			return fmt.Errorf("no file found")
+		}
+
+		courses, err := rs.genCourse(courseJsonBody, content, ctx.Context())
+		if err!= nil {
 			return err
 		}
-		content = fileContent
-	}
-	gemini_api_key := (os.Getenv("GEMINI_API_KEY"))
-	if gemini_api_key == "" {
-		return nil
-	}
+		fmt.Println("courses : ", courses)
 
-	bctx := context.Background()
 
-	client, err := genai.NewClient(bctx, &genai.ClientConfig{
-		APIKey:  gemini_api_key,
-		Backend: genai.BackendGeminiAPI,
-	})
-	if err != nil {
-		return err
-	}
-	fmt.Println("Creating Course...")
-	//send to create course
-	promt := fmt.Sprintf(`ฉันมีข้อมูลเบื้องต้น 3 อย่างที่ได้จากผู้ใช้:
 
-		ชื่อ Course: %s
-
-		คำอธิบาย Course: %s
-
-		เนื้อหาที่ได้จากไฟล์แนบ: %s 
-		ฉันต้องการให้คุณช่วยสร้าง Course การเรียนรู้ ที่เหมาะสม โดยแบ่งเนื้อหาออกเป็น Module หรือหัวข้อหลัก ๆ ที่ควรเรียน พร้อมเรียงลำดับตามความเหมาะสมในการเรียนรู้
-
-		ช่วยจัดรูปแบบข้อมูลให้ออกมาเป็น JSON หรือโครงสร้างที่สามารถนำไปใช้กับระบบต่อได้ (เช่นในเว็บแอป) ตัวอย่างโครงสร้างที่ต้องการ:
-		{
-		"modules": [
-			{
-			"title": "ชื่อ Module 1",
-			"description": "คำอธิบายของ Module 1",
-			},
-			...
-		]
+		courseId := uuid.NewString()
+		ctx.Locals("courseID", courseId)
+		ctx.Locals("content", content)
+		for _, moduleData := range courses.Modules {
+			// fmt.Println("Module : ", moduleData)
+			moduleData.Content = content
+			err = rs.ModuleService.CreateModule(ctx, &moduleData)
+			if err != nil {
+				return err
+			}
 		}
-		แต่ละ Module ควรมีหัวข้อการเรียนรู้ (topics) ที่สัมพันธ์กับเนื้อหา
 
-		เรียงลำดับ Modules จากพื้นฐานไปขั้นสูงตามความเหมาะสม
+		
+		title := file.Filename
+		userid := ctx.Locals("userID")
+		course := entities.CourseDataModel{
+			CourseID:    courseId,
+			Title:       title,
+			Description: "",
+			Confirmed:   true,
+			UserId:      userid.(string),
+			CreatedAt:   time.Now(),
+			UpdatedAt:   time.Now(),
+		}
 
-		ไม่ต้องใส่ข้อมูลที่ไม่แน่ใจ เช่น ลิงก์ หรือไฟล์แนบ
+		fmt.Println(course)
 
-		กรุณาสร้าง course โดยอิงจากชื่อ, คำอธิบาย และเนื้อหาที่ให้ไว้ด้านบน และ **ขอเป็นภาษาไทยเป็นหลัก**`,
-		courseJsonBody.CourseName, courseJsonBody.Description, content)
+		err = rs.CourseRepo.InsertCourse(course)
+		if err != nil {
+			fmt.Println("error insert course")
+			fmt.Println(err)
+			return err
+		}
 
-	bctx = context.Background()
-	result, err := client.Models.GenerateContent(
-		bctx,
-		"gemini-2.5-flash",
-		genai.Text(promt),
-		nil,
-	)
-	if err != nil {
-		fmt.Println("Error generating chapters:", err)
-		return err
-	}
-	courseString := RemoveJsonBlock(result.Text())
-	if courseString == "" {
-		return err
-	}
+		//create module
+		// moduleData := entities.GenModule{
+		// 	Title:       file.Filename,
+		// 	Description: " ",
+		// 	Content:     content,
+		// }
+		// err = rs.ModuleService.CreateModule(ctx, &moduleData)
+		// if err != nil {
+		// 	return err
+		// }
 
-	var geminiRes entities.CourseGeminiResponse
-	err = json.Unmarshal([]byte(courseString), &geminiRes)
-	if err != nil {
-		return err
-	}
-
-	fmt.Println("result: ", geminiRes)
-
-	//save course to DB
-	course := entities.CourseDataModel{
-		CourseID:    uuid.NewString(),
-		CourseName:  courseJsonBody.CourseName,
-		Description: courseJsonBody.Description,
-		Confirmed:   courseJsonBody.Confirmed,
-		UserId:      uuid.NewString(),
-		CreatedAt:   time.Now(),
-		UpdatedAt:   time.Now(),
-	}
-	err = rs.CourseRepo.InsertCourse(course)
-	if err != nil {
-		fmt.Println("error insert course")
-		return err
 	}
 
 	return nil
+}
+
+func (rs *courseService) GetCourseDetail(ctx *fiber.Ctx, courseID string) (*entities.CourseDetailResponse, error) {
+
+	fmt.Println("Hello im in GetCourseDetail")
+	courseData, err := rs.CourseRepo.GetCourseByID(courseID)
+	if err != nil {
+		if err == sql.ErrNoRows {
+			return nil, fiber.NewError(fiber.StatusNotFound, "Course not found")
+		}
+		return nil, fmt.Errorf("failed to get course by ID: %w", err)
+	}
+	fmt.Println("after GetCourseById ")
+
+	courseDetail := &entities.CourseDetailResponse{
+		CourseID:    courseData.CourseID,
+		Title:       courseData.Title,
+		Description: courseData.Description,
+		Confirmed:   courseData.Confirmed,
+		Modules:     []entities.ModuleDetail{}, // Initialize empty slice
+	}
+
+	modulesData, err := rs.ModuleService.GetModulesByCourseID(courseID)
+	fmt.Println("after GetModuleByCourseId ")
+	if err != nil {
+		return nil, fmt.Errorf("failed to get modules for course %s: %w", courseID, err)
+	}
+
+	for _, moduleData := range modulesData {
+
+		chaptersData, err := rs.ChapterServices.GetChaptersByModuleID(moduleData.ModuleId)
+		if err != nil {
+			return nil, fmt.Errorf("failed to get chapters for module %s: %w", moduleData.ModuleId, err)
+		}
+
+		var chapterDetails []entities.ChapterDetail
+		for _, chapter := range chaptersData {
+			chapterDetails = append(chapterDetails, entities.ChapterDetail{
+				ChapterId:      chapter.ChapterId,
+				ChapterName:    chapter.ChapterName,
+				ChapterContent: chapter.ChapterContent,
+				IsFinished:     chapter.IsFinished,
+			})
+		}
+
+		courseDetail.Modules = append(courseDetail.Modules, entities.ModuleDetail{
+			ModuleId:    moduleData.ModuleId,
+			ModuleName:  moduleData.ModuleName,
+			Description: moduleData.Description,
+			Chapters:    chapterDetails,
+		})
+
+	}
+
+	return courseDetail, nil
 }

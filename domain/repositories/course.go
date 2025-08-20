@@ -3,7 +3,9 @@ package repositories
 import (
 	"context"
 	"database/sql"
+	"fmt"
 	"go-fiber-template/domain/entities"
+	
 )
 
 type courseRepository struct {
@@ -12,6 +14,8 @@ type courseRepository struct {
 
 type IcourseRepository interface {
 	InsertCourse(course entities.CourseDataModel) error
+	GetCoursesByUserID(userId string) ([]entities.CourseDataModel, error)
+	GetCourseByID(courseID string) (*entities.CourseDataModel, error)
 }
 
 func NewCourseRepository(db *sql.DB) IcourseRepository {
@@ -23,11 +27,12 @@ func NewCourseRepository(db *sql.DB) IcourseRepository {
 func (repo *courseRepository) InsertCourse(course entities.CourseDataModel) error {
 	query := `
 	INSERT INTO courses (
-		courseid, coursename, userid, createat, updateat
-	) VALUES ($1, $2, $3, $4, $5)`
+		id, title, description, userid, createat, updateat
+	) VALUES ($1, $2, $3, $4, $5, $6)`
 	_, err := repo.db.ExecContext(context.Background(), query,
 		course.CourseID,
-		course.CourseName,
+		course.Title,
+		course.Description,
 		course.UserId,
 		course.CreatedAt,
 		course.UpdatedAt,
@@ -36,4 +41,64 @@ func (repo *courseRepository) InsertCourse(course entities.CourseDataModel) erro
 		return err
 	}
 	return nil
+}
+
+func (repo *courseRepository) GetCoursesByUserID(userId string) ([]entities.CourseDataModel, error) {
+	query := `
+		SELECT id, title, description, userid, createat, updateat
+		FROM courses
+		WHERE userid = $1
+	`
+	rows, err := repo.db.QueryContext(context.Background(), query, userId)
+	if err != nil {
+		return nil, err
+	}
+	defer rows.Close() // Ensure rows are closed after function returns
+
+	var courses []entities.CourseDataModel
+	for rows.Next() {
+		var course entities.CourseDataModel
+		if err := rows.Scan(
+			&course.CourseID,
+			&course.Title,
+			&course.Description,
+			&course.UserId,
+			&course.CreatedAt,
+			&course.UpdatedAt,
+		); err != nil {
+			return nil, err
+		}
+		courses = append(courses, course)
+	}
+
+	if err = rows.Err(); err != nil {
+		return nil, err
+	}
+
+	return courses, nil
+}
+
+func (repo *courseRepository) GetCourseByID(courseID string) (*entities.CourseDataModel, error) {
+    query := `
+        SELECT id, title, description, confirmed, userid, createat, updateat
+        FROM courses
+        WHERE id = $1
+    `
+    var course entities.CourseDataModel
+
+    err := repo.db.QueryRowContext(context.Background(), query, courseID).Scan(
+        &course.CourseID,
+        &course.Title,
+        &course.Description,
+        &course.Confirmed,
+        &course.UserId,
+        &course.CreatedAt, // สแกนตรงเข้า time.Time
+        &course.UpdatedAt, // สแกนตรงเข้า time.Time
+    )
+    if err != nil {
+        return nil, fmt.Errorf("failed to get course by ID %s: %w", courseID, err)
+    }
+
+    // ไม่จำเป็นต้องแปลง string เป็น time.Time แล้ว
+    return &course, nil
 }
