@@ -67,18 +67,6 @@ func (rs *courseService) CreateCourse(courseJsonBody entities.CourseRequestBody,
 
 	// var serpres entities.SerpAPIResponse
 
-	txt, err := SearchDocuments(courseJsonBody.Title, courseJsonBody.Description, ctx)
-	if err != nil {
-		return fmt.Errorf("failed to search documents: %w", err)
-	}
-
-	fmt.Println("Search result: ", txt)
-
-	//จุดคั่น
-	// return err
-
-	// content := txt
-
 	fmt.Println("Extracting file content....")
 
 	var content string
@@ -98,7 +86,7 @@ func (rs *courseService) CreateCourse(courseJsonBody entities.CourseRequestBody,
 			}
 		} else {
 			fmt.Println("No file uploaded, skipping file processing")
-			content = txt
+			content = ""
 		}
 
 		ctx.Locals("content", content)
@@ -201,7 +189,11 @@ Please format the output as a JSON structure for easy integration into a web app
 		// 	}
 		// }
 
-		content, err := SearchDocuments(courses.Modules[0].Title, courses.Modules[0].Description, ctx)
+		content, err := SearchDocuments(courseJsonBody.Title, courseJsonBody.Description, courses.Modules[0].Title, courses.Modules[0].Description, ctx)
+		if err != nil {
+			return fmt.Errorf("failed to search documents for module: %w", err)
+		}
+
 		fmt.Println("content : ", content)
 
 	} else { //for file upload
@@ -253,7 +245,7 @@ Please format the output as a JSON structure for easy integration into a web app
 			Description: " ",
 			Content:     content,
 		}
-		err = rs.ModuleService.CreateModule(ctx, &moduleData)
+		err := rs.ModuleService.CreateModule(ctx, &moduleData)
 		if err != nil {
 			return err
 		}

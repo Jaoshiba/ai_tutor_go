@@ -30,7 +30,7 @@ var allowedCTs = map[string]string{
 
 // ==== ปรับฟังก์ชันหลัก ให้มี retry ====
 
-func SearchDocuments(moduleName string, description string, ctx *fiber.Ctx) (string, error) {
+func SearchDocuments(courseName string, courseDescription string, moduleName string, description string, ctx *fiber.Ctx) (string, error) {
 	geminiService := NewGeminiService()
 
 	baseURL := "https://serpapi.com/search"
@@ -46,7 +46,7 @@ func SearchDocuments(moduleName string, description string, ctx *fiber.Ctx) (str
 
 	for attempt := 1; attempt <= maxAttempts; attempt++ {
 		// ----- 1) สร้างคีย์เวิร์ดใหม่ทุกครั้งที่พยายาม -----
-		searchPrompt := buildKeywordPrompt(moduleName, description, attempt)
+		searchPrompt := buildKeywordPrompt(courseName, courseDescription, moduleName, description, attempt)
 
 		fmt.Printf("[SearchDocuments] Attempt %d: generating keywords...\n", attempt)
 		kws, err := geminiService.GenerateContentFromPrompt(context.Background(), searchPrompt)
@@ -162,12 +162,10 @@ func doSerpAPISearch(fullURL string) ([]byte, int, error) {
 }
 
 // สร้างพรอมป์สำหรับรอบต่างๆ: รอบหลังๆ จะ “ขยาย” เงื่อนไขเพื่อค้นให้กว้างขึ้น
-func buildKeywordPrompt(moduleName, description string, attempt int) string {
-	// tips สำหรับรอบถัดไป: ลดข้อจำกัด, เพิ่มคำพ้อง, ตัด filetype ออก, สลับ engine
+func buildKeywordPrompt(courseName, courseDescription, moduleName, moduleDescription string, attempt int) string {
 	var retryHint string
 	var filetypeFilter string
 
-	// ตั้งค่าตัวกรอง filetype ให้ครอบคลุมทั้ง PDF และ DOC/DOCX
 	filetypeFilter = "filetype:pdf OR filetype:doc OR filetype:docx"
 
 	switch attempt {
@@ -188,14 +186,15 @@ func buildKeywordPrompt(moduleName, description string, attempt int) string {
 `
 	}
 
-	// รวมตัวกรอง filetype เข้าไปในคำสั่ง Guidelines
 	return fmt.Sprintf(`
 You are an academic research assistant.
 Your task is to create effective and broad Google Scholar search keywords 
 to find academic documents, PDFs, or research papers relevant to the following topic.
 
-Title: %s
-Description: %s
+Course Title: %s
+Course Description: %s
+Module Title: %s
+Module Description: %s
 
 Guidelines for keyword generation:
 1. Keywords must be broad enough to get a variety of relevant results, not overly restrictive.
@@ -207,7 +206,7 @@ Guidelines for keyword generation:
 
 Additional retry hint for this attempt:
 %s
-`, moduleName, description, filetypeFilter, retryHint)
+`, courseName, courseDescription, moduleName, moduleDescription, filetypeFilter, retryHint)
 }
 
 // กันชื่อไฟล์ให้ปลอดภัย
