@@ -14,6 +14,7 @@ import (
 	"baliance.com/gooxml/document"
 	"github.com/gofiber/fiber/v2"
 	"github.com/ledongthuc/pdf"
+	"github.com/microcosm-cc/bluemonday"
 	"golang.org/x/net/html"
 )
 
@@ -287,11 +288,31 @@ func GetPdfData(file *os.File, ctx *fiber.Ctx) (string, error) {
 
 // ---------- Utils ----------
 func RemoveJsonBlock(text string) string {
+	// 1) ตัดเคส ```json ... ```
 	markdownJsonContentRegex := regexp.MustCompile("(?s)```json\\s*(.*?)\\s*```")
 	matches := markdownJsonContentRegex.FindStringSubmatch(text)
 	if len(matches) > 1 {
 		return matches[1]
 	}
+
+	// 2) ถ้าไม่มีรั้วโค้ด ให้สแกนหา { ... } ก้อนแรกที่วงเล็บปิดครบ
+	depth := 0
+	start := -1
+	for i, r := range text {
+		if r == '{' {
+			if depth == 0 {
+				start = i
+			}
+			depth++
+		} else if r == '}' {
+			depth--
+			if depth == 0 && start >= 0 {
+				return text[start : i+1]
+			}
+		}
+	}
+
+	// 3) fallback: คืน text เดิม
 	return text
 }
 
@@ -330,4 +351,13 @@ func sanitizeFilename(name string) string {
 		name = "document"
 	}
 	return name
+}
+
+func extractContentsFromHTML(raw string) (string, error) {
+	// ใช้ StrictPolicy เพื่อลบทุกอย่าง ยกเว้นข้อความธรรมดา
+	p := bluemonday.StrictPolicy()
+	cleanText := p.Sanitize(raw)
+
+	// TrimSpace เพื่อลบช่องว่างที่เกินมา
+	return strings.TrimSpace(cleanText), nil
 }

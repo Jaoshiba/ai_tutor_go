@@ -14,9 +14,7 @@ import (
 // IGeminiService defines the interface for Gemini AI operations.
 type IGeminiService interface {
 	GenerateContentFromPrompt(ctx context.Context, prompt string) (string, error)
-
-	// คุณอาจเพิ่มเมธอดอื่น ๆ ที่เกี่ยวข้องกับการเรียก Gemini API ในอนาคต
-	// เช่น GenerateCourseStructure(ctx context.Context, title, description, fileContent string) (entities.CourseGeminiResponse, error)
+	CreateFixPrompt(rawText string, errorMessage string) string
 }
 
 // GeminiService is a concrete implementation of IGeminiService.
@@ -65,3 +63,25 @@ func (gs *GeminiService) GenerateContentFromPrompt(ctx context.Context, prompt s
 	return "", fmt.Errorf("ไม่ได้รับเนื้อหาที่สามารถแปลงเป็นข้อความจาก AI ได้")
 }
 
+func (gs *GeminiService) CreateFixPrompt(rawText string, errorMessage string) string {
+    return fmt.Sprintf("You previously provided a JSON response that failed to unmarshal due to the following error:\n\n"+
+"Error: %s\n\n"+
+"The invalid JSON content was:\n%s\n\n"+
+"Instructions:\n"+
+"1. Correct the JSON format strictly according to the original schema.\n"+
+"2. Ensure it is a single valid JSON object.\n"+
+"3. Do NOT add any text, explanation, or apologies.\n"+
+"4. ONLY return the corrected JSON object wrapped in a markdown code block (```json).\n"+
+"5. Maintain the original structure:\n"+
+"{\n"+
+"    \"message\": \"File processed and chapterized successfully.\",\n"+
+"    \"chapters\": [\n"+
+"        {\n"+
+"            \"chapterName\": \"ชื่อบทที่ 1\",\n"+
+"            \"content\": \"เนื้อหาของบทที่ 1 ที่เกี่ยวข้องเท่านั้น\"\n"+
+"        }\n"+
+"    ]\n"+
+"}\n\n"+
+"START NOW and ONLY return the corrected JSON.\n",
+errorMessage, rawText)
+}

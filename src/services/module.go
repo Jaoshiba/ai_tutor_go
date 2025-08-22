@@ -90,7 +90,7 @@ func (ms *ModuleService) CreateModule(ctx *fiber.Ctx, moduleData *entities.GenMo
 	}
 	fmt.Println("Module successfully inserted into database.")
 
-	err = ms.ChapterServices.ChapterrizedText(ctx, courseId, moduleData.Content)
+	err = ms.ChapterServices.ChapterrizedText(ctx, courseId, *moduleData)
 	if err != nil {
 		return err
 	}
