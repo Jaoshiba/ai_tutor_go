@@ -15,6 +15,8 @@ type chaptersRepository struct {
 type IChapterRepository interface {
 	InsertChapter(chapter entities.ChapterDataModel) error
 	GetChaptersByModuleID(moduleID string) ([]entities.ChapterDataModel, error)
+	DeleteChapter(chapterID string) error
+
 }
 
 func NewChapterRepository(db *sql.DB) IChapterRepository {
@@ -95,4 +97,30 @@ func (repo *chaptersRepository) GetChaptersByModuleID(moduleID string) ([]entiti
 	}
 
 	return chapters, nil
+}
+
+func (repo *chaptersRepository) DeleteChapter(chapterID string) error {
+    fmt.Printf("DeleteChapter called for chapter with ID: %s\n", chapterID)
+    
+    query := `
+        DELETE FROM chapters
+        WHERE chapterid = $1
+    `
+
+    result, err := repo.db.ExecContext(context.Background(), query, chapterID)
+    if err != nil {
+        return fmt.Errorf("failed to delete chapter with ID %s: %w", chapterID, err)
+    }
+
+    rowsAffected, err := result.RowsAffected()
+    if err != nil {
+        return fmt.Errorf("failed to get rows affected after deleting chapter: %w", err)
+    }
+
+    if rowsAffected == 0 {
+        return fmt.Errorf("no chapter found with ID %s to delete", chapterID)
+    }
+    
+    fmt.Printf("Successfully deleted %d row for chapter ID: %s\n", rowsAffected, chapterID)
+    return nil
 }

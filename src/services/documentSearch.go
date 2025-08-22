@@ -39,7 +39,6 @@ func SearchDocuments(courseName string, courseDescription string, moduleName str
 		return "", fmt.Errorf("missing SERPAPI_KEY")
 	}
 
-	// จำกัดจำนวนรอบกันลูปไม่รู้จบ
 	maxAttempts := 3
 
 	var generatedKeywords string
@@ -57,11 +56,11 @@ func SearchDocuments(courseName string, courseDescription string, moduleName str
 		generatedKeywords = strings.TrimSpace(kws)
 		fmt.Println("Generated Search Query:", generatedKeywords)
 
-		// keyword := "filetype:pdf " + moduleName + " " + description
+		keyword := fmt.Sprintf("สอน %s %s ใน %s ", moduleName, description, courseName)
 
 		// ----- 2) ยิง SerpAPI -----
 		params := url.Values{}
-		params.Add("q", generatedKeywords)
+		params.Add("q", keyword)
 		params.Add("engine", "google") // โฟกัสฝั่งวิชาการก่อน
 		params.Add("api_key", serpAPIKey)
 		params.Add("hl", "th")
@@ -94,10 +93,10 @@ func SearchDocuments(courseName string, courseDescription string, moduleName str
 		if len(serpAPIResponse.OrganicResults) > 0 {
 			fmt.Printf("[SearchDocuments] Attempt %d: got %d results\n", attempt, len(serpAPIResponse.OrganicResults))
 
-			for i, result := range serpAPIResponse.OrganicResults {
-				if i >= 2 {
-					break
-				}
+			for _, result := range serpAPIResponse.OrganicResults {
+				// if i >= 2 {
+				// 	break
+				// }
 				documentLink := result.Link
 				fmt.Println("Processing result:", documentLink)
 
@@ -138,7 +137,9 @@ func SearchDocuments(courseName string, courseDescription string, moduleName str
 	return "", fmt.Errorf("ไม่พบผลลัพธ์จาก SerpAPI หลังลองใหม่ %d รอบ", maxAttempts)
 }
 
-// ===== Helpers =====
+func rateSerpLink() {
+
+}
 
 // แยกยิง HTTP ให้สั้นลง
 func doSerpAPISearch(fullURL string) ([]byte, int, error) {
@@ -225,8 +226,6 @@ Additional retry hint for this attempt:
 // 	}
 // 	return name
 // }
-
-// ==== ของเดิม (เพิ่มเติมเล็กน้อย: สร้างโฟลเดอร์ถ้ายังไม่มี และเติมนามสกุลจาก URL ได้) ====
 
 func isAllowedContentType(ct string) (ok bool, ext string) {
 	// ตัดพารามิเตอร์ เช่น "; charset=binary"

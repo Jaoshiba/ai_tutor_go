@@ -12,3 +12,15 @@ type SerpAPIResponse struct {
 	} `json:"organic_results"`
 	// Add other fields you might need, e.g., "knowledge_graph", "related_searches", etc.
 }
+
+type SerpURL struct {
+	URL         string  `json:"url"`
+	Title       string  `json:"title"`
+	Description string  `json:"description"`
+	Score float64 `json:"score"`
+}
+
+type SerpURLScore struct {
+	SerpURL []SerpURL `json:"serpURL"`
+	
+}
