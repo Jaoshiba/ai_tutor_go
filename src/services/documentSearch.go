@@ -1,6 +1,7 @@
 package services
 
 import (
+	"bytes"
 	"context"
 	"encoding/json"
 	"fmt"
@@ -87,16 +88,25 @@ func SearchDocuments(courseName string, courseDescription string, moduleName str
 		for _, result := range serpAPIResponse.OrganicResults {
 			fmt.Println("Title:", result.Title)
 			fmt.Println("Link:", result.Link)
+
 		}
+
+		GetHtmlElement(serpAPIResponse.OrganicResults[0].Link, ctx)
+
+		fmt.Println("Processing SerpAPI results...")
+
+		return "", err
+
+		fmt.Println("after return")
 
 		// ----- 3) ถ้าได้ผลลัพธ์ → ไปประมวลผลไฟล์
 		if len(serpAPIResponse.OrganicResults) > 0 {
 			fmt.Printf("[SearchDocuments] Attempt %d: got %d results\n", attempt, len(serpAPIResponse.OrganicResults))
 
-			for _, result := range serpAPIResponse.OrganicResults {
-				// if i >= 2 {
-				// 	break
-				// }
+			for i, result := range serpAPIResponse.OrganicResults {
+				if i >= 2 {
+					break
+				}
 				documentLink := result.Link
 				fmt.Println("Processing result:", documentLink)
 
@@ -121,7 +131,7 @@ func SearchDocuments(courseName string, courseDescription string, moduleName str
 					fmt.Println("Error reading file data:", err)
 					continue
 				}
-				fmt.Println("\nFile content:", content)
+				// fmt.Println("\nFile content:", content)
 				return content, err
 			}
 
@@ -187,6 +197,7 @@ func buildKeywordPrompt(courseName, courseDescription, moduleName, moduleDescrip
 `
 	}
 
+	// รวมตัวกรอง filetype เข้าไปในคำสั่ง Guidelines
 	return fmt.Sprintf(`
 You are an academic research assistant.
 Your task is to create effective and broad Google Scholar search keywords 
@@ -268,4 +279,62 @@ func GetFileFromUrl(fileTitle string, fileUrl string) (string, error) {
 	}
 
 	return fullPath, nil
+}
+
+func GetHtmlElement(link string, ctx *fiber.Ctx) error {
+	fmt.Println("Getting HTML content from link:", link)
+
+	browserlessAPIKey := os.Getenv("BROWSERLESS_API_KEY")
+	if browserlessAPIKey == "" {
+		fmt.Println("Error: Missing BROWSERLESS_API_KEY")
+		return ctx.Status(fiber.StatusInternalServerError).SendString("Missing BROWSERLESS_API_KEY")
+	}
+
+	payload := map[string]string{"url": link}
+	jsonPayload, err := json.Marshal(payload)
+	if err != nil {
+		return ctx.Status(fiber.StatusInternalServerError).SendString(fmt.Sprintf("Failed to marshal JSON payload: %v", err))
+	}
+
+	browserlessURL := fmt.Sprintf("https://production-sfo.browserless.io/content?token=%s", browserlessAPIKey)
+	req, err := http.NewRequest("POST", browserlessURL, bytes.NewBuffer(jsonPayload))
+	if err != nil {
+		return ctx.Status(fiber.StatusInternalServerError).SendString(fmt.Sprintf("Failed to create request: %v", err))
+	}
+	req.Header.Set("Content-Type", "application/json")
+
+	client := &http.Client{}
+	resp, err := client.Do(req)
+	if err != nil {
+		fmt.Printf("Error making POST request: %v", err)
+		return ctx.Status(fiber.StatusInternalServerError).SendString(fmt.Sprintf("Failed to post content to browserless.io: %v", err))
+	}
+	defer resp.Body.Close()
+
+	if resp.StatusCode != http.StatusOK {
+		body, _ := io.ReadAll(resp.Body)
+		fmt.Printf("browserless.io API error: %s", string(body))
+		return ctx.Status(resp.StatusCode).SendString(fmt.Sprintf("browserless.io API error: %s", string(body)))
+	}
+
+	fmt.Println("Response status code:", resp.StatusCode)
+
+	body, err := io.ReadAll(resp.Body)
+	if err != nil {
+		fmt.Printf("Failed to read response body: %v", err)
+		return ctx.Status(fiber.StatusInternalServerError).SendString(fmt.Sprintf("Failed to read response body: %v", err))
+	}
+
+	// fmt.Println("Response body string: ", string(body))
+	fmt.Println("HTML content retrieved successfully.")
+
+	text, err := extractContentsFromHTML(string(body))
+	if err != nil {
+		fmt.Printf("Failed to extract contents from HTML: %v", err)
+		return ctx.Status(fiber.StatusInternalServerError).SendString(fmt.Sprintf("Failed to extract contents from HTML: %v", err))
+	}
+
+	fmt.Println("Extracted text content:", text)
+
+	return ctx.SendString(string(body))
 }

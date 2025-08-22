@@ -14,6 +14,7 @@ import (
 	"baliance.com/gooxml/document"
 	"github.com/gofiber/fiber/v2"
 	"github.com/ledongthuc/pdf"
+	"github.com/microcosm-cc/bluemonday"
 	"golang.org/x/net/html"
 )
 
@@ -315,7 +316,6 @@ func RemoveJsonBlock(text string) string {
 	return text
 }
 
-
 func SaveFileToDisk(file *multipart.FileHeader, ctx *fiber.Ctx) (string, error) {
 	openedFile, err := file.Open()
 	if err != nil {
@@ -351,4 +351,13 @@ func sanitizeFilename(name string) string {
 		name = "document"
 	}
 	return name
+}
+
+func extractContentsFromHTML(raw string) (string, error) {
+	// ใช้ StrictPolicy เพื่อลบทุกอย่าง ยกเว้นข้อความธรรมดา
+	p := bluemonday.StrictPolicy()
+	cleanText := p.Sanitize(raw)
+
+	// TrimSpace เพื่อลบช่องว่างที่เกินมา
+	return strings.TrimSpace(cleanText), nil
 }
