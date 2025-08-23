@@ -1,6 +1,7 @@
 package services
 
 import (
+	"bytes"
 	"context"
 	"encoding/json"
 	"fmt"
@@ -29,7 +30,7 @@ var allowedCTs = map[string]string{
 	"application/vnd.openxmlformats-officedocument.wordprocessingml.document": ".docx",
 }
 
-func SearchDocuments(moduleName string, description string, ctx *fiber.Ctx) (string, error) {
+func SearchDocuments( courseName, courseDescription, moduleName, moduleDescription string, ctx *fiber.Ctx) (string, error) {
 	geminiService := NewGeminiService()
 
 	baseURL := "https://serpapi.com/search"
@@ -42,7 +43,7 @@ func SearchDocuments(moduleName string, description string, ctx *fiber.Ctx) (str
 	var generatedKeywords string
 
 	for attempt := 1; attempt <= maxAttempts; attempt++ {
-		searchPrompt := buildKeywordPrompt(moduleName, description, attempt)
+		searchPrompt := buildKeywordPrompt(moduleName, moduleDescription, courseName, courseDescription, attempt)
 		fmt.Printf("[SearchDocuments] Attempt %d: generating keywords...\n", attempt)
 
 		kws, err := geminiService.GenerateContentFromPrompt(context.Background(), searchPrompt)
@@ -51,6 +52,9 @@ func SearchDocuments(moduleName string, description string, ctx *fiber.Ctx) (str
 		}
 		generatedKeywords = strings.TrimSpace(kws)
 		fmt.Println("Generated Search Query:", generatedKeywords)
+
+		// generatedKeywords := fmt.Sprintf("สอน %s %s ใน %s -site:youtube.com -site:facebook.com", moduleName, moduleDescription, courseName)
+
 
 		params := url.Values{}
 		params.Add("q", generatedKeywords)
@@ -127,6 +131,7 @@ func SearchDocuments(moduleName string, description string, ctx *fiber.Ctx) (str
 
 func rateSerpLink() {
 
+
 }
 
 func doSerpAPISearch(fullURL string) ([]byte, int, error) {
@@ -149,7 +154,7 @@ func doSerpAPISearch(fullURL string) ([]byte, int, error) {
 	return body, resp.StatusCode, nil
 }
 
-func buildKeywordPrompt(moduleName, description string, attempt int) string {
+func buildKeywordPrompt(moduleName, moduleDescription, courseName, courseDescription string, attempt int) string {
 	var retryHint string
 
 	switch attempt {
@@ -178,8 +183,10 @@ You are an academic research assistant.
 Your task is to create effective and broad Google search keywords 
 to find **HTML pages** relevant to the following topic, which you will later scrape for content.
 
-Title: %s
-Description: %s
+Course Title: %s
+Course Description: %s
+Module Title: %s
+Module Description: %s
 
 Guidelines for keyword generation:
 1. Keywords must be broad enough to get a variety of relevant HTML results.
@@ -193,7 +200,7 @@ Guidelines for keyword generation:
 
 Additional retry hint for this attempt:
 %s
-`, moduleName, description, retryHint)
+`,courseName, courseDescription, moduleName, moduleDescription, retryHint)
 }
 
 func isAllowedContentType(ct string) (ok bool, ext string) {
@@ -239,4 +246,62 @@ func GetFileFromUrl(fileTitle string, fileUrl string) (string, error) {
 	
 
 	return fullPath, nil
+}
+
+func GetHtmlElement(link string, ctx *fiber.Ctx) error {
+	fmt.Println("Getting HTML content from link:", link)
+
+	browserlessAPIKey := os.Getenv("BROWSERLESS_API_KEY")
+	if browserlessAPIKey == "" {
+		fmt.Println("Error: Missing BROWSERLESS_API_KEY")
+		return ctx.Status(fiber.StatusInternalServerError).SendString("Missing BROWSERLESS_API_KEY")
+	}
+
+	payload := map[string]string{"url": link}
+	jsonPayload, err := json.Marshal(payload)
+	if err != nil {
+		return ctx.Status(fiber.StatusInternalServerError).SendString(fmt.Sprintf("Failed to marshal JSON payload: %v", err))
+	}
+
+	browserlessURL := fmt.Sprintf("https://production-sfo.browserless.io/content?token=%s", browserlessAPIKey)
+	req, err := http.NewRequest("POST", browserlessURL, bytes.NewBuffer(jsonPayload))
+	if err != nil {
+		return ctx.Status(fiber.StatusInternalServerError).SendString(fmt.Sprintf("Failed to create request: %v", err))
+	}
+	req.Header.Set("Content-Type", "application/json")
+
+	client := &http.Client{}
+	resp, err := client.Do(req)
+	if err != nil {
+		fmt.Printf("Error making POST request: %v", err)
+		return ctx.Status(fiber.StatusInternalServerError).SendString(fmt.Sprintf("Failed to post content to browserless.io: %v", err))
+	}
+	defer resp.Body.Close()
+
+	if resp.StatusCode != http.StatusOK {
+		body, _ := io.ReadAll(resp.Body)
+		fmt.Printf("browserless.io API error: %s", string(body))
+		return ctx.Status(resp.StatusCode).SendString(fmt.Sprintf("browserless.io API error: %s", string(body)))
+	}
+
+	fmt.Println("Response status code:", resp.StatusCode)
+
+	body, err := io.ReadAll(resp.Body)
+	if err != nil {
+		fmt.Printf("Failed to read response body: %v", err)
+		return ctx.Status(fiber.StatusInternalServerError).SendString(fmt.Sprintf("Failed to read response body: %v", err))
+	}
+
+	// fmt.Println("Response body string: ", string(body))
+	fmt.Println("HTML content retrieved successfully.")
+
+	text, err := extractContentsFromHTML(string(body))
+	if err != nil {
+		fmt.Printf("Failed to extract contents from HTML: %v", err)
+		return ctx.Status(fiber.StatusInternalServerError).SendString(fmt.Sprintf("Failed to extract contents from HTML: %v", err))
+	}
+
+	fmt.Println("Extracted text content:", text)
+
+	return ctx.SendString(string(body))
 }

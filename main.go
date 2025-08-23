@@ -80,7 +80,7 @@ func main() {
 
 	geminiService := sv.NewGeminiService()
 
-	svChapter := sv.NewChapterServices(chapterRepo, pineconeRepo)
+	svChapter := sv.NewChapterServices(chapterRepo, pineconeRepo ,geminiService)
 	sv1 := sv.NewModuleService(fileRepo, svChapter)
 	svCourse := sv.NewCourseService(courseRepo, sv1, geminiService, svChapter)
 

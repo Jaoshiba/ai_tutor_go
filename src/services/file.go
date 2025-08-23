@@ -14,7 +14,6 @@ import (
 	"baliance.com/gooxml/document"
 	"github.com/gofiber/fiber/v2"
 	"github.com/ledongthuc/pdf"
-	// "golang.org/x/net/html"
 	"github.com/microcosm-cc/bluemonday"
 )
 
@@ -225,7 +224,6 @@ func RemoveJsonBlock(text string) string {
 	// 3) fallback: คืน text เดิม
 	return text
 }
-
 
 func SaveFileToDisk(file *multipart.FileHeader, ctx *fiber.Ctx) (string, error) {
 	openedFile, err := file.Open()

@@ -46,19 +46,22 @@ func (rs *courseService) GetCourses(ctx *fiber.Ctx) ([]entities.CourseDataModel,
 	userID := ctx.Locals("userID").(string) // Get userId from context locals
 
 	if userID == "" {
+		fmt.Println("no user id")
 		return nil, fmt.Errorf("user ID is missing from context")
 	}
 
 	course, err := rs.CourseRepo.GetCoursesByUserID(userID)
 	if err != nil {
+		fmt.Println("error get courses : ")
 		return nil, fmt.Errorf("failed to get course: %w", err)
 	}
 
 	fmt.Println("course data : ", course)
 
-	if course == nil {
-		return nil, fiber.ErrNotFound // Return a Fiber-specific error if not found
-	}
+	// if course == nil {
+	// 	return nil, fiber.ErrNotFound // Return a Fiber-specific error if not found
+	// }
+	
 	return course, nil
 }
 
@@ -108,6 +111,10 @@ Please format the output as a JSON structure for easy integration into a web app
 
 func (rs *courseService) CreateCourse(courseJsonBody entities.CourseRequestBody, file *multipart.FileHeader, fromCoures bool, ctx *fiber.Ctx) error {
 
+	fmt.Println("Im here")
+
+	// var serpres entities.SerpAPIResponse
+
 	fmt.Println("Extracting file content....")
 
 	var content string
@@ -127,6 +134,7 @@ func (rs *courseService) CreateCourse(courseJsonBody entities.CourseRequestBody,
 			}
 		} else {
 			fmt.Println("No file uploaded, skipping file processing")
+			content = ""
 			content = ""
 		}
 
@@ -182,9 +190,9 @@ func (rs *courseService) CreateCourse(courseJsonBody entities.CourseRequestBody,
 		// 	}
 		// }
 
-		content, err := SearchDocuments(courses.Modules[0].Title, courses.Modules[0].Description, ctx)
+		content, err := SearchDocuments(courseJsonBody.Title, courseJsonBody.Description, courses.Modules[0].Title, courses.Modules[0].Description, ctx)
 		if err != nil {
-			fmt.Println("error is : ", err)
+			fmt.Println("failed to search documents for module : ", err)
 			return err
 		}
 		courses.Modules[0].Content = content
@@ -193,7 +201,7 @@ func (rs *courseService) CreateCourse(courseJsonBody entities.CourseRequestBody,
 			return err
 		}
 
-		// fmt.Println("content : ", content)
+		fmt.Println("content : ", content)
 
 	} else { //for file upload
 		var content string
@@ -217,12 +225,10 @@ func (rs *courseService) CreateCourse(courseJsonBody entities.CourseRequestBody,
 		}
 
 		courses, err := rs.genCourse(courseJsonBody, content, ctx.Context())
-		if err!= nil {
+		if err != nil {
 			return err
 		}
 		fmt.Println("courses : ", courses)
-
-
 
 		courseId := uuid.NewString()
 		ctx.Locals("courseID", courseId)
@@ -236,7 +242,6 @@ func (rs *courseService) CreateCourse(courseJsonBody entities.CourseRequestBody,
 			}
 		}
 
-		
 		title := file.Filename
 		userid := ctx.Locals("userID")
 		course := entities.CourseDataModel{
@@ -268,6 +273,17 @@ func (rs *courseService) CreateCourse(courseJsonBody entities.CourseRequestBody,
 		// if err != nil {
 		// 	return err
 		// }
+
+		//create module
+		moduleData := entities.GenModule{
+			Title:       file.Filename,
+			Description: " ",
+			Content:     content,
+		}
+		err = rs.ModuleService.CreateModule(ctx, &moduleData)
+		if err != nil {
+			return err
+		}
 
 	}
 
