@@ -13,9 +13,9 @@ require (
 	github.com/joho/godotenv v1.5.1
 	github.com/ledongthuc/pdf v0.0.0-20250511090121-5959a4027728
 	github.com/lib/pq v1.10.9
+	github.com/microcosm-cc/bluemonday v1.0.27
 	github.com/pinecone-io/go-pinecone/v4 v4.1.2
 	golang.org/x/crypto v0.40.0
-	golang.org/x/net v0.42.0
 	golang.org/x/oauth2 v0.30.0
 	google.golang.org/api v0.239.0
 	google.golang.org/genai v1.17.0
@@ -48,7 +48,6 @@ require (
 	github.com/mattn/go-colorable v0.1.13 // indirect
 	github.com/mattn/go-isatty v0.0.20 // indirect
 	github.com/mattn/go-runewidth v0.0.15 // indirect
-	github.com/microcosm-cc/bluemonday v1.0.27 // indirect
 	github.com/oapi-codegen/runtime v1.1.1 // indirect
 	github.com/pmezard/go-difflib v1.0.0 // indirect
 	github.com/rivo/uniseg v0.2.0 // indirect
@@ -62,6 +61,7 @@ require (
 	go.opentelemetry.io/otel v1.37.0 // indirect
 	go.opentelemetry.io/otel/metric v1.37.0 // indirect
 	go.opentelemetry.io/otel/trace v1.37.0 // indirect
+	golang.org/x/net v0.42.0 // indirect
 	golang.org/x/sync v0.16.0 // indirect
 	golang.org/x/sys v0.35.0 // indirect
 	golang.org/x/text v0.28.0 // indirect
