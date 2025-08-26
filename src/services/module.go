@@ -20,6 +20,7 @@ type ModuleService struct {
 type IModuleService interface {
 	CreateModule(ctx *fiber.Ctx, moduleData *entities.GenModule) error
 	GetModulesByCourseID(courseID string) ([]entities.ModuleDataModel, error)
+	DeleteModuleByCourseID(courseID string) error
 }
 
 func NewModuleService(modulesRepository repo.IModuleRepository, chapterservice IChapterService) IModuleService {
@@ -105,4 +106,19 @@ func (ms *ModuleService) GetModulesByCourseID(courseID string) ([]entities.Modul
 		return nil, fmt.Errorf("failed to retrieve modules from repository for course %s: %w", courseID, err)
 	}
 	return modules, nil
+}
+
+func (ms *ModuleService) DeleteModuleByCourseID(courseID string) error {
+
+	if courseID=="" {
+		return fmt.Errorf("no course id found")
+	}
+	err := ms.modulesRepository.DeleteModuleByCourseID(courseID)
+	if err != nil {
+		fmt.Println(err)
+		return fmt.Errorf("cant delete module")
+	}
+
+
+	return nil
 }

@@ -101,3 +101,21 @@ func (h *HTTPGateway) GetCourseDetail(c *fiber.Ctx) error {
 	fmt.Printf("Successfully retrieved details for Course ID: %s\n", courseID)
 	return c.Status(fiber.StatusOK).JSON(courseDetail)
 }
+
+func (h *HTTPGateway) DeleteCourse(c *fiber.Ctx) error {
+
+	courseID := c.Params("courseId")
+	if courseID == "" {
+		return fiber.NewError(fiber.StatusBadRequest, "Course ID is required")
+	}
+
+	err := h.CourseService.DeleteCourse(c, courseID)
+	if err != nil {
+		fmt.Println("Error deleting course:", err) // แนะนำให้ log ข้อผิดพลาด
+		return fiber.NewError(fiber.StatusInternalServerError, "Failed to delete course")
+	}
+
+	return c.Status(fiber.StatusOK).JSON(fiber.Map{
+		"message": "Course deleted successfully",
+	})
+}
