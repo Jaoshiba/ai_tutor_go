@@ -26,12 +26,12 @@ func (db *examRepository) InsertExam(exam entities.ExamDataModel) error {
 	fmt.Println("InsertExam called with exam:", exam)
 	query := `
 		INSERT INTO exams (
-			examid, chapterid, passscore, questionnum, createdat, updatedat
+			examid, moduleid, passscore, questionnum, createdat, updatedat
 		) VALUES ($1, $2, $3, $4, $5, $6)`
 
 	_, err := db.db.ExecContext(context.Background(), query,
 		exam.ExamId,
-		exam.ChapterId,
+		exam.ModuleId,
 		exam.PassScore,
 		exam.QuestionNum,
 		exam.CreatedAt,
@@ -42,5 +42,3 @@ func (db *examRepository) InsertExam(exam entities.ExamDataModel) error {
 	}
 	return nil
 }
-
-
