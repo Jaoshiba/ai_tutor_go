@@ -26,6 +26,7 @@ type ICourseService interface {
 	CreateCourse(courseJsonBody entities.CourseRequestBody, file *multipart.FileHeader, fromCoures bool, ctx *fiber.Ctx) error //add userId ด้วย
 	GetCourses(ctx *fiber.Ctx) ([]entities.CourseDataModel, error)
 	GetCourseDetail(ctx *fiber.Ctx, courseID string) (*entities.CourseDetailResponse, error)
+	DeleteCourse(ctx *fiber.Ctx, courseID string) error
 }
 
 func NewCourseService(
@@ -348,4 +349,34 @@ func (rs *courseService) GetCourseDetail(ctx *fiber.Ctx, courseID string) (*enti
 	}
 
 	return courseDetail, nil
+}
+
+func (rs *courseService) DeleteCourse(ctx *fiber.Ctx, courseID string) error {
+
+	modules, err := rs.ModuleService.GetModulesByCourseID(courseID)
+	if err != nil {
+
+		return fmt.Errorf("no module with this courseid")
+	}
+	for _, m := range modules {
+		moduleId := m.ModuleId
+
+		fmt.Println("deleting chapters in module : ", moduleId)
+		err = rs.ChapterServices.DeleteChapterByModuleID(moduleId)
+		if err != nil {
+			fmt.Println("Error deleting chapters for module:", moduleId, "Error:", err)
+			return err
+		}
+	}
+	err = rs.ModuleService.DeleteModuleByCourseID(courseID)
+	if err != nil {
+		fmt.Println("Error deleting modules for course:", courseID, "Error:", err)
+		return err
+	}
+	err = rs.CourseRepo.DeleteCourse(courseID)
+	if err!= nil {
+		fmt.Println("Error deleting course:", courseID, "Error:", err)
+		return err
+	}
+	return nil
 }

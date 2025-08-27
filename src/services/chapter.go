@@ -26,6 +26,7 @@ type ChapterServices struct {
 type IChapterService interface {
 	ChapterrizedText(ctx *fiber.Ctx, courseId string, moduleData entities.GenModule) error
 	GetChaptersByModuleID(moduleID string) ([]entities.ChapterDataModel, error)
+	DeleteChapterByModuleID(moduleID string) error
 }
 
 func NewChapterServices(chapterRepository repositories.IChapterRepository, pineconeRepo repositories.IPineconeRepository, GeminiService IGeminiService) IChapterService {
@@ -226,7 +227,7 @@ prompt := fmt.Sprintf(
         chaps, err = c.GeminiService.GenerateContentFromPrompt(ctx.Context(), fixPrompt)
         if err != nil {
             // ถ้าการเรียก API แก้ไขเกิดข้อผิดพลาด ให้ return error
-            return fmt.Errorf("Gemini fix prompt generation failed on retry %d: %w", i+1, err)
+            return fmt.Errorf("gemini fix prompt generation failed on retry %d: %w", i+1, err)
         }
     }
 
@@ -294,4 +295,18 @@ func (c *ChapterServices) GetChaptersByModuleID(moduleID string) ([]entities.Cha
 		return nil, fmt.Errorf("failed to retrieve chapters from repository for module %s: %w", moduleID, err)
 	}
 	return chapters, nil
+}
+
+func (c *ChapterServices) DeleteChapterByModuleID(moduleID string) error {
+
+	if moduleID==""{
+		return fmt.Errorf("no course id found")
+	}
+	err := c.ChapterRepository.DeleteChapterByModuleID(moduleID)
+	if err!=nil {
+		fmt.Println("cant delete module")
+		return err
+	}
+
+	return nil
 }

@@ -43,3 +43,4 @@ func (db *examRepository) InsertExam(exam entities.ExamDataModel) error {
 	return nil
 }
 
+
