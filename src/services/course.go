@@ -47,19 +47,22 @@ func (rs *courseService) GetCourses(ctx *fiber.Ctx) ([]entities.CourseDataModel,
 
 	userID := uuid.NewString()
 	if userID == "" {
+		fmt.Println("no user id")
 		return nil, fmt.Errorf("user ID is missing from context")
 	}
 
 	course, err := rs.CourseRepo.GetCoursesByUserID(userID)
 	if err != nil {
+		fmt.Println("error get courses : ")
 		return nil, fmt.Errorf("failed to get course: %w", err)
 	}
 
 	fmt.Println("course data : ", course)
 
-	if course == nil {
-		return nil, fiber.ErrNotFound // Return a Fiber-specific error if not found
-	}
+	// if course == nil {
+	// 	return nil, fiber.ErrNotFound // Return a Fiber-specific error if not found
+	// }
+
 	return course, nil
 }
 
@@ -172,39 +175,38 @@ func (rs *courseService) CreateCourse(courseJsonBody entities.CourseRequestBody,
 		}
 
 		// return err
-		// for _, moduleData := range courses.Modules {
-		// 	// fmt.Println("Module : ", moduleData)
-		// 	moduleData.Content = content
-		// 	//find title docs and insert into moduleData
-		// 	content, err := SearchDocuments(moduleData.Title, moduleData.Description, ctx)
-		// 	if err != nil {
-		// 		return fmt.Errorf("failed to search documents for module: %w", err)
-		// 	}
+		for i, moduleData := range courses.Modules {
+			// fmt.Println("Module : ", moduleData)
+			if i > 5 {
+				break
+			}
+			moduleData.Content = content
+			//find title docs and insert into moduleData
+			content, err := SearchDocuments(courseJsonBody.Title, courseJsonBody.Description, moduleData.Title, moduleData.Description, ctx)
+			if err != nil {
+				return fmt.Errorf("failed to search documents for module: %w", err)
+			}
 
-		// 	moduleData.Content = content
+			moduleData.Content = content
 
-		// 	err = rs.ModuleService.CreateModule(ctx, &moduleData)
-		// 	if err != nil {
-		// 		return err
-		// 	}
+			fmt.Printf("Module %d content: %s\n", i+1, content)
+
+			err = rs.ModuleService.CreateModule(ctx, &moduleData)
+			if err != nil {
+				return err
+			}
+		}
+
+		// content, err := SearchDocuments(courseJsonBody.Title, courseJsonBody.Description, courses.Modules[0].Title, courses.Modules[0].Description, ctx)
+		// if err != nil {
+		// 	fmt.Println("failed to search documents for module : ", err)
+		// 	return err
 		// }
-
-		content, err := SearchDocuments(courseJsonBody.Title, courseJsonBody.Description, courses.Modules[0].Title, courses.Modules[0].Description, ctx)
-		if err != nil {
-			fmt.Println("error is : ", err)
-			return err
-		}
-		courses.Modules[0].Content = content
-		err = rs.ModuleService.CreateModule(ctx, &courses.Modules[0])
-		if err != nil {
-			return err
-		}
-
-		// fmt.Println("content : ", content)
-		content, err = SearchDocuments(courseJsonBody.Title, courseJsonBody.Description, courses.Modules[0].Title, courses.Modules[0].Description, ctx)
-		if err != nil {
-			return fmt.Errorf("failed to search documents for module: %w", err)
-		}
+		// courses.Modules[0].Content = content
+		// err = rs.ModuleService.CreateModule(ctx, &courses.Modules[0])
+		// if err != nil {
+		// 	return err
+		// }
 
 		fmt.Println("content : ", content)
 

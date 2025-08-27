@@ -28,7 +28,7 @@ type IChapterService interface {
 	GetChaptersByModuleID(moduleID string) ([]entities.ChapterDataModel, error)
 }
 
-func NewChapterServices(chapterRepository repositories.IChapterRepository, pineconeRepo repositories.IPineconeRepository) IChapterService {
+func NewChapterServices(chapterRepository repositories.IChapterRepository, pineconeRepo repositories.IPineconeRepository, GeminiService IGeminiService) IChapterService {
 	if chapterRepository == nil {
 		log.Fatal("❌ ChapterServices initialized with nil repository") // บรรทัดนี้คุณมีอยู่แล้ว
 	} else {
@@ -38,6 +38,7 @@ func NewChapterServices(chapterRepository repositories.IChapterRepository, pinec
 	return &ChapterServices{
 		ChapterRepository: chapterRepository,
 		PineconeRepo:      pineconeRepo,
+		GeminiService: GeminiService,
 	}
 }
 

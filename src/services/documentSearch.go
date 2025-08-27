@@ -11,8 +11,6 @@ import (
 	"net/url"
 	"os"
 	"path/filepath"
-
-	// "regexp"
 	"strings"
 
 	"github.com/gofiber/fiber/v2"
@@ -22,16 +20,16 @@ var allowedExts = map[string]bool{
 	".pdf":  true,
 	".doc":  true,
 	".docx": true,
+	".html": true,
 }
 var allowedCTs = map[string]string{
+	"application/html":   ".html",
 	"application/pdf":    ".pdf",
 	"application/msword": ".doc",
 	"application/vnd.openxmlformats-officedocument.wordprocessingml.document": ".docx",
 }
 
-// ==== ปรับฟังก์ชันหลัก ให้มี retry ====
-
-func SearchDocuments(courseName string, courseDescription string, moduleName string, description string, ctx *fiber.Ctx) (string, error) {
+func SearchDocuments(courseName, courseDescription, moduleName, moduleDescription string, ctx *fiber.Ctx) (string, error) {
 	geminiService := NewGeminiService()
 
 	baseURL := "https://serpapi.com/search"
@@ -41,28 +39,24 @@ func SearchDocuments(courseName string, courseDescription string, moduleName str
 	}
 
 	maxAttempts := 3
-
 	var generatedKeywords string
 
 	for attempt := 1; attempt <= maxAttempts; attempt++ {
-		// ----- 1) สร้างคีย์เวิร์ดใหม่ทุกครั้งที่พยายาม -----
-		searchPrompt := buildKeywordPrompt(courseName, courseDescription, moduleName, description, attempt)
-
+		searchPrompt := buildKeywordPrompt(moduleName, moduleDescription, courseName, courseDescription, attempt)
 		fmt.Printf("[SearchDocuments] Attempt %d: generating keywords...\n", attempt)
+
 		kws, err := geminiService.GenerateContentFromPrompt(context.Background(), searchPrompt)
 		if err != nil {
-			// ถ้า Gemini ล้มเหลว ให้หยุดเลย (เพราะไม่มีคีย์เวิร์ดไปค้น)
 			return "", fmt.Errorf("error generating search keywords (attempt %d): %w", attempt, err)
 		}
 		generatedKeywords = strings.TrimSpace(kws)
 		fmt.Println("Generated Search Query:", generatedKeywords)
 
-		keyword := fmt.Sprintf("สอน %s %s ใน %s ", moduleName, description, courseName)
+		generatedKeywords := fmt.Sprintf("สอน %s %s ใน %s -site:youtube.com -site:facebook.com", moduleName, moduleDescription, courseName)
 
-		// ----- 2) ยิง SerpAPI -----
 		params := url.Values{}
-		params.Add("q", keyword)
-		params.Add("engine", "google") // โฟกัสฝั่งวิชาการก่อน
+		params.Add("q", generatedKeywords)
+		params.Add("engine", "google")
 		params.Add("api_key", serpAPIKey)
 		params.Add("hl", "th")
 		params.Add("gl", "th")
@@ -72,15 +66,15 @@ func SearchDocuments(courseName string, courseDescription string, moduleName str
 		fmt.Printf("[SearchDocuments] Attempt %d: request SerpAPI...\n", attempt)
 		body, status, err := doSerpAPISearch(fullURL)
 		if err != nil {
-			return "", fmt.Errorf("ไม่สามารถส่งคำขอ SerpAPI ได้ (attempt %d): %w", attempt, err)
+			return "", fmt.Errorf("could not make SerpAPI request (attempt %d): %w", attempt, err)
 		}
 		if status != http.StatusOK {
-			return "", fmt.Errorf("SerpAPI ตอบกลับด้วยสถานะผิดพลาด %d (attempt %d): %s", status, attempt, string(body))
+			return "", fmt.Errorf("SerpAPI returned status code %d (attempt %d): %s", status, attempt, string(body))
 		}
 
 		var serpAPIResponse entities.SerpAPIResponse
 		if err := json.Unmarshal(body, &serpAPIResponse); err != nil {
-			return "", fmt.Errorf("ไม่สามารถแยกวิเคราะห์ JSON ได้ (attempt %d): %w", attempt, err)
+			return "", fmt.Errorf("could not parse JSON (attempt %d): %w", attempt, err)
 		}
 
 		fmt.Println("SerpAPI Response:", serpAPIResponse.OrganicResults)
@@ -88,33 +82,23 @@ func SearchDocuments(courseName string, courseDescription string, moduleName str
 		for _, result := range serpAPIResponse.OrganicResults {
 			fmt.Println("Title:", result.Title)
 			fmt.Println("Link:", result.Link)
-
 		}
 
-		GetHtmlElement(serpAPIResponse.OrganicResults[0].Link, ctx)
-
-		fmt.Println("Processing SerpAPI results...")
-
-		return "", err
-
-		fmt.Println("after return")
-
-		// ----- 3) ถ้าได้ผลลัพธ์ → ไปประมวลผลไฟล์
 		if len(serpAPIResponse.OrganicResults) > 0 {
 			fmt.Printf("[SearchDocuments] Attempt %d: got %d results\n", attempt, len(serpAPIResponse.OrganicResults))
 
-			for i, result := range serpAPIResponse.OrganicResults {
-				if i >= 2 {
-					break
-				}
+			for _, result := range serpAPIResponse.OrganicResults {
 				documentLink := result.Link
 				fmt.Println("Processing result:", documentLink)
 
 				fileExt := strings.ToLower(filepath.Ext(documentLink))
+				if fileExt == "" {
+					fileExt = ".html"
+				}
 
 				if !allowedExts[fileExt] {
 					fmt.Printf("Skipping file from URL: %s - not a supported document type\n", documentLink)
-					continue // ข้ามไปผลลัพธ์ถัดไป
+					continue
 				}
 
 				documentTitle := sanitizeFilename(result.Title)
@@ -131,77 +115,71 @@ func SearchDocuments(courseName string, courseDescription string, moduleName str
 					fmt.Println("Error reading file data:", err)
 					continue
 				}
-				// fmt.Println("\nFile content:", content)
+
+				fmt.Println("\nFile content:", content)
 				return content, err
 			}
-
-			// fmt.Println("SerpAPI Response:", serpAPIResponse)
 			return "", err
 		}
-
-		// ----- 4) ถ้า "ว่าง" → วนเริ่มใหม่ (กลับไปสร้างคีย์เวิร์ดใหม่) -----
 		fmt.Printf("[SearchDocuments] Attempt %d: empty results. Regenerating keywords...\n", attempt)
 	}
 
-	// ครบทุกความพยายามแล้วก็ยังว่าง
-	return "", fmt.Errorf("ไม่พบผลลัพธ์จาก SerpAPI หลังลองใหม่ %d รอบ", maxAttempts)
+	return "", fmt.Errorf("no results found from SerpAPI after %d attempts", maxAttempts)
 }
 
 func rateSerpLink() {
 
 }
 
-// แยกยิง HTTP ให้สั้นลง
 func doSerpAPISearch(fullURL string) ([]byte, int, error) {
 	req, err := http.NewRequest("GET", fullURL, nil)
 	if err != nil {
-		return nil, 0, fmt.Errorf("ไม่สามารถสร้างคำขอ HTTP ได้: %w", err)
+		return nil, 0, fmt.Errorf("could not create HTTP request: %w", err)
 	}
 
 	client := &http.Client{}
 	resp, err := client.Do(req)
 	if err != nil {
-		return nil, 0, fmt.Errorf("ไม่สามารถส่งคำขอ HTTP ได้: %w", err)
+		return nil, 0, fmt.Errorf("could not send HTTP request: %w", err)
 	}
 	defer resp.Body.Close()
 
 	body, err := io.ReadAll(resp.Body)
 	if err != nil {
-		return nil, 0, fmt.Errorf("ไม่สามารถอ่านเนื้อหาการตอบกลับได้: %w", err)
+		return nil, 0, fmt.Errorf("could not read response body: %w", err)
 	}
 	return body, resp.StatusCode, nil
 }
 
-// สร้างพรอมป์สำหรับรอบต่างๆ: รอบหลังๆ จะ “ขยาย” เงื่อนไขเพื่อค้นให้กว้างขึ้น
-func buildKeywordPrompt(courseName, courseDescription, moduleName, moduleDescription string, attempt int) string {
+func buildKeywordPrompt(moduleName, moduleDescription, courseName, courseDescription string, attempt int) string {
 	var retryHint string
-	var filetypeFilter string
-
-	filetypeFilter = "filetype:pdf OR filetype:doc OR filetype:docx"
 
 	switch attempt {
 	case 1:
 		retryHint = `
-- ให้โฟกัสคำหลักสองภาษา (ไทย/อังกฤษ) และคงความกว้างของผลลัพธ์
-- พยายามหลีกเลี่ยงคำเฉพาะเกินไป
+- Focus on bilingual keywords (Thai/English) and HTML pages.
+- Use trusted websites like Medium, W3Schools, StackOverflow, Wikipedia, .ac.th, .edu, .gov, .org.
+- Do not limit by PDF/DOC files.
 `
 	case 2:
 		retryHint = `
-- ขยายคำค้นด้วยคำพ้อง/หัวข้อข้างเคียง และอย่าจำกัดด้วย filetype
-- ผสม site:ac.th OR site:edu OR site:researchgate.net เฉพาะบางส่วน ไม่ต้องใส่ทุกตัว
+- Broaden keywords with synonyms or related topics.
+- Use trusted general websites: Medium, W3Schools, StackOverflow, reputable blogs, ResearchGate.
+- Focus on HTML and avoid downloadable files.
 `
 	default:
 		retryHint = `
-- เน้นคำทั่วไปที่เป็นคำ umbrella (เช่น formulation, methodology, review, guideline)
-- ตัด site: ออกถ้าจำเป็น เพื่อให้ได้ผลลัพธ์กว้างขึ้น
+- Use umbrella/general keywords for broader results.
+- Select trusted and HTML-based online sources.
+- Remove site: or filetype filters if necessary.
 `
 	}
 
 	// รวมตัวกรอง filetype เข้าไปในคำสั่ง Guidelines
 	return fmt.Sprintf(`
 You are an academic research assistant.
-Your task is to create effective and broad Google Scholar search keywords 
-to find academic documents, PDFs, or research papers relevant to the following topic.
+Your task is to create effective and broad Google search keywords 
+to find **HTML pages** relevant to the following topic, which you will later scrape for content.
 
 Course Title: %s
 Course Description: %s
@@ -209,37 +187,21 @@ Module Title: %s
 Module Description: %s
 
 Guidelines for keyword generation:
-1. Keywords must be broad enough to get a variety of relevant results, not overly restrictive.
+1. Keywords must be broad enough to get a variety of relevant HTML results.
 2. Include both Thai and English terms for the topic.
-3. Use academic source filters such as: site:ac.th OR site:edu OR site:researchgate.net — but they do not have to match all at once.
-4. **Prefer file formats by adding: (%s)** (optional if it limits too much).
-5. Combine keywords using OR to expand coverage; use AND only when necessary.
+3. Prefer trusted websites, including:
+   - Academic sites: .ac.th, .edu, .gov, .org
+   - General trusted sites: Medium, W3Schools, StackOverflow, well-known blogs
+4. Combine keywords using OR to expand coverage; use AND only when necessary.
+5. Do NOT include filetype restrictions (no PDF/DOC limits).
 6. Return only the final search query without explanation.
 
 Additional retry hint for this attempt:
 %s
-`, courseName, courseDescription, moduleName, moduleDescription, filetypeFilter, retryHint)
+`, courseName, courseDescription, moduleName, moduleDescription, retryHint)
 }
 
-// กันชื่อไฟล์ให้ปลอดภัย
-// func sanitizeFilename(name string) string {
-// 	name = strings.TrimSpace(name)
-// 	// แทนที่อักขระต้องห้ามด้วยขีดกลาง
-// 	illegal := regexp.MustCompile(`[<>:"/\\|?*\x00-\x1F]`)
-// 	name = illegal.ReplaceAllString(name, "-")
-// 	// ย่อให้ไม่ยาวเกินไป
-// 	if len(name) > 120 {
-// 		name = name[:120]
-// 	}
-// 	// กันไม่ให้ชื่อว่าง
-// 	if name == "" {
-// 		name = "document"
-// 	}
-// 	return name
-// }
-
 func isAllowedContentType(ct string) (ok bool, ext string) {
-	// ตัดพารามิเตอร์ เช่น "; charset=binary"
 	ct = strings.ToLower(strings.TrimSpace(strings.Split(ct, ";")[0]))
 	ext, ok = allowedCTs[ct]
 	return
@@ -248,10 +210,9 @@ func isAllowedContentType(ct string) (ok bool, ext string) {
 func GetFileFromUrl(fileTitle string, fileUrl string) (string, error) {
 	downloadDir := "fileDocs"
 	if err := os.MkdirAll(downloadDir, 0o755); err != nil {
-		return "", fmt.Errorf("ไม่สามารถสร้างโฟลเดอร์ปลายทาง: %w", err)
+		return "", fmt.Errorf("failed to create destination folder: %w", err)
 	}
 
-	// พยายามดึงนามสกุลจาก URL (เช่น .pdf)
 	ext := filepath.Ext(strings.Split(strings.Split(fileUrl, "?")[0], "#")[0])
 	if ext == "" {
 		ext = ".bin"
@@ -260,22 +221,22 @@ func GetFileFromUrl(fileTitle string, fileUrl string) (string, error) {
 
 	out, err := os.Create(fullPath)
 	if err != nil {
-		return "", fmt.Errorf("ไม่สามารถสร้างไฟล์: %w", err)
+		return "", fmt.Errorf("failed to create file: %w", err)
 	}
 	defer out.Close()
 
 	resp, err := http.Get(fileUrl)
 	if err != nil {
-		return "", fmt.Errorf("ไม่สามารถดึงไฟล์จาก URL ได้: %w", err)
+		return "", fmt.Errorf("failed to fetch file from URL: %w", err)
 	}
 	defer resp.Body.Close()
 
 	if resp.StatusCode != http.StatusOK {
-		return "", fmt.Errorf("ไม่สามารถเข้าถึงไฟล์ได้: สถานะ %d", resp.StatusCode)
+		return "", fmt.Errorf("could not access file: status %d", resp.StatusCode)
 	}
 
 	if _, err = io.Copy(out, resp.Body); err != nil {
-		return "", fmt.Errorf("ไม่สามารถคัดลอกไฟล์ได้: %w", err)
+		return "", fmt.Errorf("failed to copy file: %w", err)
 	}
 
 	return fullPath, nil

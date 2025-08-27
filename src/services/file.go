@@ -15,7 +15,6 @@ import (
 	"github.com/gofiber/fiber/v2"
 	"github.com/ledongthuc/pdf"
 	"github.com/microcosm-cc/bluemonday"
-	"golang.org/x/net/html"
 )
 
 func ReadFileData(docPath string, ctx *fiber.Ctx) (string, error) {
@@ -56,7 +55,19 @@ func ReadFileData(docPath string, ctx *fiber.Ctx) (string, error) {
 	}
 }
 
-// ---------- HTML → ดึงลิงก์ PDF ที่ฝังอยู่ แล้วอ่านต่อด้วย GetPdfData ----------
+func extractContentsFromHTML(raw string) (string, error) {
+	// ใช้ StrictPolicy เพื่อลบทุกอย่าง ยกเว้นข้อความธรรมดา
+	p := bluemonday.StrictPolicy()
+	cleanText := p.Sanitize(raw)
+
+	// TrimSpace เพื่อลบช่องว่างที่เกินมา
+
+	spaceRegexp := regexp.MustCompile(`[\s\p{Zs}]+`)
+	cleanText = spaceRegexp.ReplaceAllString(cleanText, " ")
+
+	return strings.TrimSpace(cleanText), nil
+}
+
 func GetHtmlData(file *os.File, ctx *fiber.Ctx) (string, error) {
 	fmt.Println("GetHtmlData func called with file:", file.Name())
 
@@ -67,38 +78,13 @@ func GetHtmlData(file *os.File, ctx *fiber.Ctx) (string, error) {
 	}
 	htmlContent := string(fileBytes)
 
-	// 1) พยายามหา URL ของ PDF ที่ฝังอยู่ในหน้า
-	if pdfURL := extractPDFURLFromHTML(htmlContent); pdfURL != "" {
-		fmt.Println("Found embedded PDF URL:", pdfURL)
-
-		// ตั้งชื่อไฟล์จากชื่อ HTML เดิม
-		title := strings.TrimSuffix(filepath.Base(file.Name()), filepath.Ext(file.Name()))
-		if title == "" {
-			title = "document"
-		}
-		title = sanitizeFilename(title)
-
-		// ดาวน์โหลด PDF จริง
-		if err := os.MkdirAll("fileDocs", 0o755); err != nil {
-			return "", fmt.Errorf("ไม่สามารถสร้างโฟลเดอร์ปลายทาง: %w", err)
-		}
-		destPath := filepath.Join("fileDocs", title+".pdf")
-		if err := downloadFile(pdfURL, destPath); err != nil {
-			return "", fmt.Errorf("ดาวน์โหลด PDF ที่ฝังอยู่ไม่สำเร็จ: %w", err)
-		}
-
-		// เปิด PDF แล้วส่งต่อเข้า pipeline เดิม
-		pf, err := os.Open(destPath)
-		if err != nil {
-			return "", fmt.Errorf("เปิดไฟล์ PDF ที่ดาวน์โหลดไม่สำเร็จ: %w", err)
-		}
-		defer pf.Close()
-
-		return GetPdfData(pf, ctx)
+	content, err := extractContentsFromHTML(htmlContent)
+	if err != nil {
+		fmt.Println(err)
+		return "", err
 	}
 
-	// 2) ไม่เจอ PDF — คืน HTML ดิบ (พฤติกรรมเดิม)
-	return htmlContent, nil
+	return content, nil
 }
 
 // ---------- Extractors: หา URL ของ PDF จาก HTML ----------
@@ -107,86 +93,6 @@ var (
 	reHrefPDF = regexp.MustCompile(`(?i)<a[^>]+href=["']([^"']+\.pdf(?:\?[^"']*)?)["']`)
 	reSrcPDF  = regexp.MustCompile(`(?i)\b(?:data|src)=["']([^"']+\.pdf(?:\?[^"']*)?)["']`)
 )
-
-func extractPDFURLFromHTML(htmlStr string) string {
-	// 0) meta citation_pdf_url / bepress_citation_pdf_url
-	if m := reMetaPDF.FindStringSubmatch(htmlStr); len(m) > 1 {
-		return htmlUnescape(m[1])
-	}
-	// 1) DOM: object/embed/iframe ชี้ไป .pdf
-	if u := scanDOMForPDF(htmlStr); u != "" {
-		return u
-	}
-	// 2) <a href="...pdf">
-	if m := reHrefPDF.FindStringSubmatch(htmlStr); len(m) > 1 {
-		return htmlUnescape(m[1])
-	}
-	// 3) fallback: data|src="...pdf"
-	if m := reSrcPDF.FindStringSubmatch(htmlStr); len(m) > 1 {
-		return htmlUnescape(m[1])
-	}
-	return ""
-}
-
-func scanDOMForPDF(htmlStr string) string {
-	doc, err := html.Parse(strings.NewReader(htmlStr))
-	if err != nil {
-		return ""
-	}
-	var find func(*html.Node) string
-	find = func(n *html.Node) string {
-		if n.Type == html.ElementNode {
-			switch strings.ToLower(n.Data) {
-			case "object", "embed", "iframe":
-				if u := getAttr(n, "data"); strings.HasSuffix(strings.ToLower(u), ".pdf") {
-					return htmlUnescape(u)
-				}
-				if u := getAttr(n, "src"); strings.HasSuffix(strings.ToLower(u), ".pdf") {
-					return htmlUnescape(u)
-				}
-			case "meta":
-				name := strings.ToLower(getAttr(n, "name"))
-				if name == "citation_pdf_url" || name == "bepress_citation_pdf_url" {
-					if u := getAttr(n, "content"); u != "" {
-						return htmlUnescape(u)
-					}
-				}
-			case "a":
-				if u := getAttr(n, "href"); strings.HasSuffix(strings.ToLower(u), ".pdf") {
-					return htmlUnescape(u)
-				}
-			}
-		}
-		for c := n.FirstChild; c != nil; c = c.NextSibling {
-			if v := find(c); v != "" {
-				return v
-			}
-		}
-		return ""
-	}
-	return find(doc)
-}
-
-func getAttr(n *html.Node, key string) string {
-	for _, a := range n.Attr {
-		if strings.EqualFold(a.Key, key) {
-			return a.Val
-		}
-	}
-	return ""
-}
-
-func htmlUnescape(s string) string {
-	replacer := strings.NewReplacer(
-		"&amp;", "&",
-		"&#x2F;", "/",
-		"&quot;", "\"",
-		"&#39;", "'",
-		"&lt;", "<",
-		"&gt;", ">",
-	)
-	return replacer.Replace(s)
-}
 
 // ---------- Downloader ช่วยดาวน์โหลด PDF ----------
 func downloadFile(fileURL, destPath string) error {
@@ -351,13 +257,4 @@ func sanitizeFilename(name string) string {
 		name = "document"
 	}
 	return name
-}
-
-func extractContentsFromHTML(raw string) (string, error) {
-	// ใช้ StrictPolicy เพื่อลบทุกอย่าง ยกเว้นข้อความธรรมดา
-	p := bluemonday.StrictPolicy()
-	cleanText := p.Sanitize(raw)
-
-	// TrimSpace เพื่อลบช่องว่างที่เกินมา
-	return strings.TrimSpace(cleanText), nil
 }
