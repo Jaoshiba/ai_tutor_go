@@ -16,6 +16,7 @@ type IChapterRepository interface {
 	InsertChapter(chapter entities.ChapterDataModel) error
 	GetChaptersByModuleID(moduleID string) ([]entities.ChapterDataModel, error)
 	DeleteChapter(chapterID string) error
+	DeleteChapterByModuleID(moduleID string) error
 
 }
 
@@ -98,6 +99,24 @@ func (repo *chaptersRepository) GetChaptersByModuleID(moduleID string) ([]entiti
 
 	return chapters, nil
 }
+
+// chapters_repo.go
+func (repo *chaptersRepository) DeleteChapterByModuleID(moduleID string) error {
+    if moduleID == "" {
+        return fmt.Errorf("moduleID is empty")
+    }
+    const q = `DELETE FROM chapters WHERE moduleid = $1`
+    result, err := repo.db.ExecContext(context.Background(), q, moduleID)
+    if err != nil {
+        return fmt.Errorf("delete chapters by module_id failed: %w", err)
+    }
+    // ไม่ต้อง error เมื่อ 0 แถว
+    if n, _ := result.RowsAffected(); n > 0 {
+        fmt.Printf("Deleted %d chapter(s) for module_id=%s\n", n, moduleID)
+    }
+    return nil
+}
+
 
 func (repo *chaptersRepository) DeleteChapter(chapterID string) error {
     fmt.Printf("DeleteChapter called for chapter with ID: %s\n", chapterID)

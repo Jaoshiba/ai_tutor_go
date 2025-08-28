@@ -16,6 +16,7 @@ type modulesRepository struct {
 type IModuleRepository interface {
 	InsertModule(module entities.ModuleDataModel) error
 	GetModulesByCourseID(courseID string) ([]entities.ModuleDataModel, error)
+    DeleteModuleByCourseID (courseID string) error
 }
 
 func NewModulesRepository(db *sql.DB) IModuleRepository {
@@ -86,4 +87,20 @@ func (repo *modulesRepository) GetModulesByCourseID(courseID string) ([]entities
     }
 
     return modules, nil
+}
+
+// modules_repo.go
+func (repo *modulesRepository) DeleteModuleByCourseID(courseID string) error {
+    if courseID == "" {
+        return fmt.Errorf("courseID is empty")
+    }
+    const q = `DELETE FROM modules WHERE courseid = $1` // แก้ $1
+    result, err := repo.db.ExecContext(context.Background(), q, courseID)
+    if err != nil {
+        return fmt.Errorf("delete modules by course_id failed: %w", err)
+    }
+    if n, _ := result.RowsAffected(); n > 0 {
+        fmt.Printf("Deleted %d module(s) for course_id=%s\n", n, courseID)
+    }
+    return nil
 }

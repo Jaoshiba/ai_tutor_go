@@ -16,6 +16,7 @@ type IcourseRepository interface {
 	InsertCourse(course entities.CourseDataModel) error
 	GetCoursesByUserID(userId string) ([]entities.CourseDataModel, error)
 	GetCourseByID(courseID string) (*entities.CourseDataModel, error)
+	DeleteCourse(courseID string) error
 }
 
 func NewCourseRepository(db *sql.DB) IcourseRepository {
@@ -101,4 +102,22 @@ func (repo *courseRepository) GetCourseByID(courseID string) (*entities.CourseDa
 
     // ไม่จำเป็นต้องแปลง string เป็น time.Time แล้ว
     return &course, nil
+}
+
+// courses_repo.go
+func (repo *courseRepository) DeleteCourse(courseID string) error {
+    if courseID == "" {
+        return fmt.Errorf("courseID is empty")
+    }
+    const q = `DELETE FROM courses WHERE id = $1`
+    result, err := repo.db.ExecContext(context.Background(), q, courseID)
+    if err != nil {
+        return fmt.Errorf("delete course failed: %w", err)
+    }
+
+    if n, _ := result.RowsAffected(); n == 0 {
+        return nil
+    }
+    fmt.Println("Deleted course:", courseID)
+    return nil
 }

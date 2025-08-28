@@ -11,17 +11,16 @@ import (
 )
 
 type QuestionService struct {
-	
 }
 
 type IQuestionService interface {
-	QuestionsCreate(content string) ([]entities.QuestionDataModel, error)
+	QuestionsCreate(content string, difficulty string, questionNum int) ([]interface{}, error)
 }
 
-func QuestionsCreate(content string) ([]entities.QuestionDataModel, error) {
+func QuestionsCreate(content string, difficulty string, questionNum int) ([]interface{}, error) {
 
 	fmt.Println("Questions Generate called...")
-	var questions []entities.QuestionDataModel
+	var questions []interface{}
 
 	gemini_api_key := (os.Getenv("GEMINI_API_KEY"))
 	if gemini_api_key == "" {
@@ -38,39 +37,35 @@ func QuestionsCreate(content string) ([]entities.QuestionDataModel, error) {
 		return questions, err
 	}
 
-	promt := fmt.Sprintf(`Please generate multiple-choice questions based on the provided text.
+	promt := fmt.Sprintf(`
+		โปรดสร้างคำถามแบบผสมจากข้อความที่ให้มา
+		จำนวนคำถามทั้งหมดคือ %d ข้อ
+		ระดับความยากโดยรวมคือ %s
 
-	For each question, ensure there are exactly 4 options, and one of them is the correct answer.
+		ผลลัพธ์จะต้องเป็น JSON array ของ objects เท่านั้น
+		คำถามจะต้องมีรูปแบบผสมผสานจากประเภทต่อไปนี้ พร้อมโครงสร้าง JSON ที่ถูกต้อง:
 
-	The output MUST be a JSON array of objects.
-	Each object in the array MUST strictly adhere to the following structure:
-	{
-	"question": "The generated question text.",
-	"options": ["Option A", "Option B", "Option C", "Option D"],
-	"answer": "The correct option text (must match one of the options)."
-	}
+		1.  **คำถามแบบเลือกตอบ (Multiple-Choice):**
+			-   โครงสร้าง: {"type": "multiple-choice", "question": "...", "options": ["...", "...", "...", "..."], "answer": "..."}
+			-   แต่ละคำถามต้องมี 4 ตัวเลือกเสมอ
 
-	Do not include any introductory or concluding remarks, explanations, or preambles outside the JSON array.
-	All string values within the JSON MUST be properly escaped (e.g., double quotes " must be \\").
+		2.  **คำถามแบบเติมคำในช่องว่าง (Fill-in-the-Blank):**
+			-   โครงสร้าง: {"type": "fill-in-the-blank", "question": "...", "answer": "..."}
+			-   ช่องว่างในคำถามต้องแสดงด้วยขีดเส้นใต้ (เช่น "______")
 
-	Example format:
-	[
-		{
-			"question": "ข้อใดคือประเภทของระบบปฏิบัติการ?",
-			"options": ["หน่วยความจำ", "โปรเซสเซอร์", "ซอฟต์แวร์ระบบ", "เครือข่าย"],
-			"answer": "ซอฟต์แวร์ระบบ"
-		},
-		{
-			"question": "ฟังก์ชันหลักของ CPU คืออะไร?",
-			"options": ["เก็บข้อมูลถาวร", "ประมวลผลคำสั่ง", "แสดงผลกราฟิก", "เชื่อมต่ออินเทอร์เน็ต"],
-			"answer": "ประมวลผลคำสั่ง"
-		}
-	]
+		3.  **คำถามแบบเรียงลำดับ (Ordering/Sequencing):**
+			-   โครงสร้าง: {"type": "ordering", "question": "...", "options": ["...", "..."], "answer": ["...", "..."]}
+			-   อาร์เรย์ "options" ต้องมีขั้นตอนที่สลับตำแหน่งกัน
+			-   อาร์เรย์ "answer" ต้องมีขั้นตอนเดียวกันที่เรียงลำดับอย่างถูกต้อง
 
-	Please generate [NUMBER_OF_QUESTIONS] questions based on the following text:
-	---
-	%s
-	---`, content)
+		ห้ามใส่ข้อความนำหรือสรุปใด ๆ นอกเหนือจาก JSON array
+		ค่าที่เป็น string ทั้งหมดใน JSON ต้องถูก escape อย่างถูกต้อง (เช่น " ต้องเป็น \\")
+		---
+		%s
+		---`,
+		questionNum,
+		difficulty,
+		content)
 
 	fmt.Println("Wait for Gemini to create your questions...")
 	fmt.Println("content: ", content)
@@ -92,6 +87,8 @@ func QuestionsCreate(content string) ([]entities.QuestionDataModel, error) {
 		return questions, fmt.Errorf("no content returned from Gemini")
 	}
 
+	fmt.Println("result from gemini: ", result.Text())
+
 	questionsFromGemini := RemoveJsonBlock(result.Text())
 	fmt.Println("Questions from Gemini: ", questionsFromGemini)
 	if questionsFromGemini == "" {
@@ -99,11 +96,49 @@ func QuestionsCreate(content string) ([]entities.QuestionDataModel, error) {
 		return questions, fmt.Errorf("no questions generated from Gemini")
 	}
 
-	err = json.Unmarshal([]byte(questionsFromGemini), &questions)
-	if err != nil {
-		fmt.Println("Error unmarshalling JSON:", err)
+	fmt.Println("result after remove json block: ", questionsFromGemini)
+
+	var rawQuestions []json.RawMessage
+	if err := json.Unmarshal([]byte(questionsFromGemini), &rawQuestions); err != nil {
+		fmt.Println("Error unmarshaling to raw messages:", err)
 		return questions, err
 	}
+
+	for _, rawQ := range rawQuestions {
+		var baseQuestion struct {
+			Type string `json:"type"`
+		}
+		// อ่านเฉพาะ "type" เพื่อระบุประเภทคำถาม
+		if err := json.Unmarshal(rawQ, &baseQuestion); err != nil {
+			continue
+		}
+		fmt.Println("Base Question Type:", baseQuestion.Type)
+
+		switch baseQuestion.Type {
+		case "multiple-choice":
+			var choiceQuestion entities.ChoiceOption
+			if err := json.Unmarshal(rawQ, &choiceQuestion); err != nil {
+				fmt.Println("Error unmarshaling multiple-choice question:", err)
+				continue
+			}
+			questions = append(questions, choiceQuestion)
+		case "fill-in-the-blank":
+			var fillInBlankQuestion entities.FillInBlank
+			if err := json.Unmarshal(rawQ, &fillInBlankQuestion); err != nil {
+				fmt.Println("Error unmarshaling fill-in-the-blank question:", err)
+				continue
+			}
+			questions = append(questions, fillInBlankQuestion)
+		case "ordering":
+			var orderingQuestion entities.Ordering
+			if err := json.Unmarshal(rawQ, &orderingQuestion); err != nil {
+				fmt.Println("Error unmarshaling ordering question:", err)
+				continue
+			}
+			questions = append(questions, orderingQuestion)
+		}
+	}
+
 	fmt.Println("Finished generating questions...")
 
 	fmt.Println("question", questions)

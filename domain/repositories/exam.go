@@ -3,6 +3,7 @@ package repositories
 import (
 	"context"
 	"database/sql"
+	"encoding/json"
 	"fmt"
 	"go-fiber-template/domain/entities"
 )
@@ -21,19 +22,27 @@ func NewExamRepository(db *sql.DB) IExamRepository {
 	}
 }
 
-func (db *examRepository) InsertExam(exam entities.ExamDataModel) error {
+func (er *examRepository) InsertExam(exam entities.ExamDataModel) error {
 
 	fmt.Println("InsertExam called with exam:", exam)
+
+	questionsJSON, err := json.Marshal(exam.Questions)
+	if err != nil {
+		fmt.Println("Error marshalling questions:", err)
+		return err
+	}
+
 	query := `
 		INSERT INTO exams (
-			examid, chapterid, passscore, questionnum, createdat, updatedat
-		) VALUES ($1, $2, $3, $4, $5, $6)`
+			examid, moduleid, passscore, questionnum, questions, createdat, updatedat
+		) VALUES ($1, $2, $3, $4, $5, $6, $7)`
 
-	_, err := db.db.ExecContext(context.Background(), query,
+	_, err = er.db.ExecContext(context.Background(), query,
 		exam.ExamId,
-		exam.ChapterId,
+		exam.ModuleId,
 		exam.PassScore,
 		exam.QuestionNum,
+		questionsJSON,
 		exam.CreatedAt,
 		exam.UpdatedAt,
 	)
@@ -42,4 +51,3 @@ func (db *examRepository) InsertExam(exam entities.ExamDataModel) error {
 	}
 	return nil
 }
-

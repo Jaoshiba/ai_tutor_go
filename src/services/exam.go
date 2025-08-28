@@ -1,6 +1,7 @@
 package services
 
 import (
+	"fmt"
 	"go-fiber-template/domain/entities"
 	repo "go-fiber-template/domain/repositories"
 	"time"
@@ -9,12 +10,12 @@ import (
 )
 
 type ExamService struct {
-	examRepository repo.IExamRepository
+	examRepository  repo.IExamRepository
 	QuestionService QuestionService
 }
 
 type IExamService interface {
-	ExamGenerate(chapters []entities.ChapterDataModel) error
+	ExamGenerate(examRequest entities.ExamRequest) error
 }
 
 func NewExamService(examRepository repo.IExamRepository) IExamService {
@@ -23,28 +24,32 @@ func NewExamService(examRepository repo.IExamRepository) IExamService {
 	}
 }
 
-func (es *ExamService) ExamGenerate(chapters []entities.ChapterDataModel) error {
+func (es *ExamService) ExamGenerate(examRequest entities.ExamRequest) error {
 
-	for _, chapter := range chapters {
-		content := chapter.ChapterContent
-		questions, err := QuestionsCreate(content)
-		if err != nil {
-			return err
-		}
-		exam := entities.ExamDataModel{
-			ExamId:      uuid.NewString(),
-			ChapterId:   chapter.ChapterId,
-			PassScore:   (len(questions) * 70) / 100,
-			QuestionNum: len(questions),
-			CreatedAt:   time.Now(),
-			UpdatedAt:   time.Now(),
-		}
-		//save exam to database
-		err = es.examRepository.InsertExam(exam)
-		if err != nil {
-			return err
-		}
+	content := examRequest.Content
+
+	questions, err := QuestionsCreate(content, examRequest.Difficulty, examRequest.QuestionNum)
+	if err != nil {
+		return err
 	}
+
+	fmt.Println("questions in exam: ", questions)
+
+	exam := entities.ExamDataModel{
+		ExamId:      uuid.NewString(),
+		ModuleId:    examRequest.ModuleId,
+		PassScore:   (len(questions) * 70) / 100,
+		QuestionNum: len(questions),
+		Questions:   questions,
+		CreatedAt:   time.Now(),
+		UpdatedAt:   time.Now(),
+	}
+	//save exam to database
+	err = es.examRepository.InsertExam(exam)
+	if err != nil {
+		return err
+	}
+	fmt.Println("Exam saved to database finished: ", exam)
 
 	return nil
 }

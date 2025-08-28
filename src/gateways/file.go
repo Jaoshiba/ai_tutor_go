@@ -1,6 +1,7 @@
 package gateways
 
 import (
+	"fmt"
 	"go-fiber-template/domain/entities"
 
 	"github.com/gofiber/fiber/v2"
@@ -8,6 +9,7 @@ import (
 
 func (h *HTTPGateway) UploadFile(ctx *fiber.Ctx) error {
 
+	fmt.Println("UploadFile func called")
 	file, err := ctx.FormFile("file")
 	if err != nil {
 		return ctx.Status(fiber.StatusUnprocessableEntity).JSON(entities.ResponseMessage{Message: "invalid file"})
@@ -22,7 +24,10 @@ func (h *HTTPGateway) UploadFile(ctx *fiber.Ctx) error {
 
 	CoursejsonBody.Title = Coursename
 
-	h.CourseService.CreateCourse(CoursejsonBody, file, false, ctx)
+	err = h.CourseService.CreateCourse(CoursejsonBody, file, false, ctx)
+	if err != nil {
+		return ctx.Status(fiber.StatusInternalServerError).JSON(entities.ResponseMessage{Message: "Failed to create course"})
+	}
 
 	// h.ModuleService.CreateModule(file, Coursename, ctx)
 

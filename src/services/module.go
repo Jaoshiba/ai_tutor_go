@@ -15,17 +15,20 @@ import (
 type ModuleService struct {
 	modulesRepository repo.IModuleRepository
 	ChapterServices   IChapterService
+	ExamService       IExamService
 }
 
 type IModuleService interface {
 	CreateModule(ctx *fiber.Ctx, moduleData *entities.GenModule) error
 	GetModulesByCourseID(courseID string) ([]entities.ModuleDataModel, error)
+	DeleteModuleByCourseID(courseID string) error
 }
 
-func NewModuleService(modulesRepository repo.IModuleRepository, chapterservice IChapterService) IModuleService {
+func NewModuleService(modulesRepository repo.IModuleRepository, chapterservice IChapterService, examService IExamService) IModuleService {
 	return &ModuleService{
 		modulesRepository: modulesRepository,
 		ChapterServices:   chapterservice,
+		ExamService:       examService,
 	}
 }
 
@@ -73,12 +76,13 @@ func (ms *ModuleService) CreateModule(ctx *fiber.Ctx, moduleData *entities.GenMo
 
 	module := entities.ModuleDataModel{
 		ModuleId:    moduleId,
-		ModuleName:  moduleData.Title, // Use Title from Gemini's response
-		CourseId:    courseId,         // Use CourseId retrieved from context
-		UserId:      userIdStr,        // Use UserId retrieved from context
+		ModuleName:  moduleData.Title,
+		CourseId:    courseId,
+		UserId:      userIdStr,
+		Content:     moduleData.Content,
 		CreatedAt:   time.Now(),
 		UpdatedAt:   time.Now(),
-		Description: moduleData.Description, // Use Description from Gemini's response
+		Description: moduleData.Description,
 	}
 
 	fmt.Println("Module to be inserted:", module)
@@ -90,10 +94,17 @@ func (ms *ModuleService) CreateModule(ctx *fiber.Ctx, moduleData *entities.GenMo
 	}
 	fmt.Println("Module successfully inserted into database.")
 
-	err = ms.ChapterServices.ChapterrizedText(ctx, courseId, *moduleData)
-	if err != nil {
-		return err
+	examRequest := entities.ExamRequest{
+		ModuleId:    moduleId,
+		Content:     moduleData.Content,
+		Difficulty:  "medium",
+		QuestionNum: 10,
 	}
+	err = ms.ExamService.ExamGenerate(examRequest)
+	// err = ms.ChapterServices.ChapterrizedText(ctx, courseId, *moduleData)
+	// if err != nil {
+	// 	return err
+	// }
 
 	fmt.Println("All chapters processed for module", moduleId) // This log should be after the loop.
 
@@ -106,4 +117,18 @@ func (ms *ModuleService) GetModulesByCourseID(courseID string) ([]entities.Modul
 		return nil, fmt.Errorf("failed to retrieve modules from repository for course %s: %w", courseID, err)
 	}
 	return modules, nil
+}
+
+func (ms *ModuleService) DeleteModuleByCourseID(courseID string) error {
+
+	if courseID == "" {
+		return fmt.Errorf("no course id found")
+	}
+	err := ms.modulesRepository.DeleteModuleByCourseID(courseID)
+	if err != nil {
+		fmt.Println(err)
+		return fmt.Errorf("cant delete module")
+	}
+
+	return nil
 }
