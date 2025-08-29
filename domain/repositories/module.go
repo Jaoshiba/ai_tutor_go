@@ -5,8 +5,6 @@ import (
 	"database/sql"
 	"fmt"
 	"go-fiber-template/domain/entities"
-	
-	
 )
 
 type modulesRepository struct {
@@ -16,7 +14,7 @@ type modulesRepository struct {
 type IModuleRepository interface {
 	InsertModule(module entities.ModuleDataModel) error
 	GetModulesByCourseID(courseID string) ([]entities.ModuleDataModel, error)
-    DeleteModuleByCourseID (courseID string) error
+	DeleteModuleByCourseID(courseID string) error
 }
 
 func NewModulesRepository(db *sql.DB) IModuleRepository {
@@ -50,57 +48,57 @@ func (repo *modulesRepository) InsertModule(module entities.ModuleDataModel) err
 }
 
 func (repo *modulesRepository) GetModulesByCourseID(courseID string) ([]entities.ModuleDataModel, error) {
-    query := `
+	query := `
         SELECT moduleid, modulename, courseid, userid, createat, updateat, description
         FROM modules
         WHERE courseid = $1
         ORDER BY createat
     `
-    rows, err := repo.db.QueryContext(context.Background(), query, courseID)
-    if err != nil {
-        return nil, fmt.Errorf("failed to query modules by course ID %s: %w", courseID, err)
-    }
-    defer rows.Close()
+	rows, err := repo.db.QueryContext(context.Background(), query, courseID)
+	if err != nil {
+		return nil, fmt.Errorf("failed to query modules by course ID %s: %w", courseID, err)
+	}
+	defer rows.Close()
 
-    var modules []entities.ModuleDataModel
-    for rows.Next() {
-        var module entities.ModuleDataModel
-        // สแกนตรงเข้าสู่ฟิลด์ที่เป็น time.Time ของ struct ได้เลย
-        if err := rows.Scan(
-            &module.ModuleId,
-            &module.ModuleName,
-            &module.CourseId,
-            &module.UserId,
-            &module.CreatedAt, // สแกนตรงนี้
-            &module.UpdatedAt, // สแกนตรงนี้
-            &module.Description,
-        ); err != nil {
-            return nil, fmt.Errorf("failed to scan module row: %w", err)
-        }
+	var modules []entities.ModuleDataModel
+	for rows.Next() {
+		var module entities.ModuleDataModel
+		// สแกนตรงเข้าสู่ฟิลด์ที่เป็น time.Time ของ struct ได้เลย
+		if err := rows.Scan(
+			&module.ModuleId,
+			&module.ModuleName,
+			&module.CourseId,
+			&module.UserId,
+			&module.CreatedAt,
+			&module.UpdatedAt,
+			&module.Description,
+		); err != nil {
+			return nil, fmt.Errorf("failed to scan module row: %w", err)
+		}
 
-        // ไม่ต้องมีการแปลง string เป็น time.Time อีกแล้ว
-        modules = append(modules, module)
-    }
+		// ไม่ต้องมีการแปลง string เป็น time.Time อีกแล้ว
+		modules = append(modules, module)
+	}
 
-    if err = rows.Err(); err != nil {
-        return nil, fmt.Errorf("error during modules row iteration: %w", err)
-    }
+	if err = rows.Err(); err != nil {
+		return nil, fmt.Errorf("error during modules row iteration: %w", err)
+	}
 
-    return modules, nil
+	return modules, nil
 }
 
 // modules_repo.go
 func (repo *modulesRepository) DeleteModuleByCourseID(courseID string) error {
-    if courseID == "" {
-        return fmt.Errorf("courseID is empty")
-    }
-    const q = `DELETE FROM modules WHERE courseid = $1` // แก้ $1
-    result, err := repo.db.ExecContext(context.Background(), q, courseID)
-    if err != nil {
-        return fmt.Errorf("delete modules by course_id failed: %w", err)
-    }
-    if n, _ := result.RowsAffected(); n > 0 {
-        fmt.Printf("Deleted %d module(s) for course_id=%s\n", n, courseID)
-    }
-    return nil
+	if courseID == "" {
+		return fmt.Errorf("courseID is empty")
+	}
+	const q = `DELETE FROM modules WHERE courseid = $1` // แก้ $1
+	result, err := repo.db.ExecContext(context.Background(), q, courseID)
+	if err != nil {
+		return fmt.Errorf("delete modules by course_id failed: %w", err)
+	}
+	if n, _ := result.RowsAffected(); n > 0 {
+		fmt.Printf("Deleted %d module(s) for course_id=%s\n", n, courseID)
+	}
+	return nil
 }

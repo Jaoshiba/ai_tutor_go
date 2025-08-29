@@ -67,14 +67,13 @@ func (rs *courseService) GetCourses(ctx *fiber.Ctx) ([]entities.CourseDataModel,
 	return course, nil
 }
 
-func (rs *courseService) genCourse(courseJsonBody entities.CourseRequestBody, content string, ctx context.Context) (entities.CourseGeminiResponse, error) {
+func (rs *courseService) genCourse(courseJsonBody entities.CourseRequestBody, ctx context.Context) (entities.CourseGeminiResponse, error) {
 	prompt := fmt.Sprintf(`ฉันมีข้อมูลเบื้องต้น 3 อย่างที่ได้จากผู้ใช้:
 
 			ชื่อ Course: %s
 
 			คำอธิบาย Course: %s
 
-			เนื้อหาจากไฟล์ที่เกียวข้อง %s
 
 			ChatGPT - Course Creation Prompt
 
@@ -87,7 +86,7 @@ Your audience is educators, instructional designers, or anyone looking to create
 Use the following information provided by the user: Course Name: [Course Name], Course Description: [Course Description], and Content from Related File: [Content]. Your job is to create the course structure by breaking down the content into modules or main topics that should be learned, organizing them in an appropriate sequence from basic to advanced.
 
 Please format the output as a JSON structure for easy integration into a web app, like this example: { "modules": [ { "title": "Module Title 1", "description": "Description for Module 1", }, { "title": "Module Title 2", "description": "Description for Module 2", }, ] } Make sure your response is primarily in Thai as requested.`,
-		courseJsonBody.Title, courseJsonBody.Description, content)
+		courseJsonBody.Title, courseJsonBody.Description)
 	modules, err := rs.GeminiService.GenerateContentFromPrompt(ctx, prompt)
 	if err != nil {
 		fmt.Println(err)
@@ -121,26 +120,24 @@ func (rs *courseService) CreateCourse(courseJsonBody entities.CourseRequestBody,
 
 	var content string
 	if fromCoures {
-		if file != nil {
-			fmt.Println("Extracting file content....")
-			docPath, err := SaveFileToDisk(file, ctx)
-			if err != nil {
-				fmt.Printf("Error saving file to disk: %v\n", err)
-				return err
-			}
-			fileContent, err := ReadFileData(docPath, ctx)
-			content = fileContent
-			if err != nil {
-				fmt.Printf("Error processing file with FileService: %v\n", err)
-				return err
-			}
-		} else {
-			fmt.Println("No file uploaded, skipping file processing")
-			content = ""
-			content = ""
-		}
-
-		ctx.Locals("content", content)
+		// if file != nil {
+		// 	fmt.Println("Extracting file content....")
+		// 	docPath, err := SaveFileToDisk(file, ctx)
+		// 	if err != nil {
+		// 		fmt.Printf("Error saving file to disk: %v\n", err)
+		// 		return err
+		// 	}
+		// 	fileContent, err := ReadFileData(docPath, ctx)
+		// 	content = fileContent
+		// 	if err != nil {
+		// 		fmt.Printf("Error processing file with FileService: %v\n", err)
+		// 		return err
+		// 	}
+		// } else {
+		// 	fmt.Println("No file uploaded, skipping file processing")
+		// 	content = ""
+		// 	content = ""
+		// }
 
 		courseId := uuid.NewString()
 		if courseId == "" {
@@ -148,7 +145,7 @@ func (rs *courseService) CreateCourse(courseJsonBody entities.CourseRequestBody,
 		}
 		ctx.Locals("courseID", courseId)
 
-		courses, err := rs.genCourse(courseJsonBody, content, ctx.Context())
+		courses, err := rs.genCourse(courseJsonBody, ctx.Context())
 		if err != nil {
 			fmt.Println(err)
 			return err
@@ -175,28 +172,35 @@ func (rs *courseService) CreateCourse(courseJsonBody entities.CourseRequestBody,
 			return err
 		}
 
-		// return err
-		for i, moduleData := range courses.Modules {
-			// fmt.Println("Module : ", moduleData)
-			if i > 5 {
-				break
-			}
-			moduleData.Content = content
-			//find title docs and insert into moduleData
-			content, err := SearchDocuments(courseJsonBody.Title, courseJsonBody.Description, moduleData.Title, moduleData.Description, ctx)
-			if err != nil {
-				return fmt.Errorf("failed to search documents for module: %w", err)
-			}
-
-			moduleData.Content = content
-
-			fmt.Printf("Module %d content: %s\n", i+1, content)
-
-			err = rs.ModuleService.CreateModule(ctx, &moduleData)
-			if err != nil {
-				return err
-			}
+		err = rs.ModuleService.CreateModule(ctx, courses, courseJsonBody.Title, courseJsonBody.Description)
+		if err != nil {
+			fmt.Println("error insert module", err)
+			return err
 		}
+
+		// return err
+		// for i, moduleData := range courses.Modules {
+		// 	// fmt.Println("Module : ", moduleData)
+		// 	if i > 5 {
+		// 		break
+		// 	}
+		// 	moduleData.Content = content
+		// 	//find title docs and insert into moduleData
+		// 	serpReturn, err := SearchDocuments(courseJsonBody.Title, courseJsonBody.Description, moduleData.Title, moduleData.Description, ctx)
+		// 	if err != nil {
+		// 		return fmt.Errorf("failed to search documents for module: %w", err)
+		// 	}
+
+		// 	moduleData.Content = serpReturn.Content
+		// 	moduleData.Source = serpReturn.Source
+
+		// 	fmt.Printf("Module %d content: %s\n", i+1, content)
+
+		// 	err = rs.ModuleService.CreateModule(ctx, &moduleData)
+		// 	if err != nil {
+		// 		return err
+		// 	}
+		// }
 
 		// content, err := SearchDocuments(courseJsonBody.Title, courseJsonBody.Description, courses.Modules[0].Title, courses.Modules[0].Description, ctx)
 		// if err != nil {
@@ -214,25 +218,25 @@ func (rs *courseService) CreateCourse(courseJsonBody entities.CourseRequestBody,
 	} else { //for file upload
 		var content string
 
-		if file != nil {
-			fmt.Println("Extracting file content....")
-			docPath, err := SaveFileToDisk(file, ctx)
-			if err != nil {
-				fmt.Printf("Error saving file to disk: %v\n", err)
-				return err
-			}
+		// if file != nil {
+		// 	fmt.Println("Extracting file content....")
+		// 	docPath, err := SaveFileToDisk(file, ctx)
+		// 	if err != nil {
+		// 		fmt.Printf("Error saving file to disk: %v\n", err)
+		// 		return err
+		// 	}
 
-			fileContent, err := ReadFileData(docPath, ctx)
-			content = fileContent
-			if err != nil {
-				fmt.Printf("Error processing file with FileService: %v\n", err)
-				return err
-			}
-		} else {
-			return fmt.Errorf("no file found")
-		}
+		// 	fileContent, err := ReadFileData(docPath, ctx)
+		// 	content = fileContent
+		// 	if err != nil {
+		// 		fmt.Printf("Error processing file with FileService: %v\n", err)
+		// 		return err
+		// 	}
+		// } else {
+		// 	return fmt.Errorf("no file found")
+		// }
 
-		courses, err := rs.genCourse(courseJsonBody, content, ctx.Context())
+		courses, err := rs.genCourse(courseJsonBody, ctx.Context())
 		if err != nil {
 			return err
 		}
@@ -376,7 +380,7 @@ func (rs *courseService) DeleteCourse(ctx *fiber.Ctx, courseID string) error {
 		return err
 	}
 	err = rs.CourseRepo.DeleteCourse(courseID)
-	if err!= nil {
+	if err != nil {
 		fmt.Println("Error deleting course:", courseID, "Error:", err)
 		return err
 	}
