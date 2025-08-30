@@ -16,6 +16,7 @@ type ExamService struct {
 
 type IExamService interface {
 	ExamGenerate(examRequest entities.ExamRequest) error
+	GetExamsByModuleID(moduleId string) ([]entities.ExamDataModel, error)
 }
 
 func NewExamService(examRepository repo.IExamRepository) IExamService {
@@ -53,3 +54,21 @@ func (es *ExamService) ExamGenerate(examRequest entities.ExamRequest) error {
 
 	return nil
 }
+
+func (es *ExamService) GetExamsByModuleID(moduleId string) ([]entities.ExamDataModel, error) {
+	exams, err := es.examRepository.GetExamsByModuleID(moduleId)
+	if err != nil {
+		fmt.Println("Error getting exams from repo:", err)
+		return []entities.ExamDataModel{}, err
+	}
+
+	if len(exams) == 0 {
+		return []entities.ExamDataModel{}, fmt.Errorf("no exams found for module id: %s", moduleId)
+	}
+
+	return exams, nil
+}
+
+// func (es *ExamService) GetExamsByCourseID(courseId string) ([]entities.ExamDataModel, error) {
+
+// } 

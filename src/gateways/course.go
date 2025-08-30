@@ -60,9 +60,12 @@ func (h *HTTPGateway) GetCourseByUser(c *fiber.Ctx) error {
 	}
 
 	courses, err := h.CourseService.GetCourses(c)
+
+	fmt.Println(courses)
 	if err != nil {
 		return c.Status(fiber.StatusInternalServerError).JSON(entities.ResponseMessage{Message: "Failed to retrieve courses"})
 	}
+
 	return c.Status(fiber.StatusOK).JSON(fiber.Map{
 		"message": "Courses retrieved successfully",
 		"data":    courses,

@@ -44,9 +44,9 @@ func NewCourseService(
 }
 
 func (rs *courseService) GetCourses(ctx *fiber.Ctx) ([]entities.CourseDataModel, error) {
-	// userID := ctx.Locals("userID").(string) // Get userId from context locals
+	userID := ctx.Locals("userID").(string) // Get userId from context locals
 
-	userID := uuid.NewString()
+	// userID := uuid.NewString()
 	if userID == "" {
 		fmt.Println("no user id")
 		return nil, fmt.Errorf("user ID is missing from context")
@@ -155,8 +155,8 @@ func (rs *courseService) CreateCourse(courseJsonBody entities.CourseRequestBody,
 		}
 
 		//on web
-		// userid := ctx.Locals("userID")
-		userId := uuid.NewString()
+		userId := ctx.Locals("userID").(string)
+		// userId := uuid.NewString()
 
 		course := entities.CourseDataModel{
 			CourseID:    courseId,
@@ -241,6 +241,9 @@ func (rs *courseService) CreateCourse(courseJsonBody entities.CourseRequestBody,
 		courseId := uuid.NewString()
 		ctx.Locals("courseID", courseId)
 		ctx.Locals("content", content)
+		userid := ctx.Locals("userID").(string)
+	
+		
 		for _, moduleData := range courses.Modules {
 			// fmt.Println("Module : ", moduleData)
 			moduleData.Content = content
@@ -251,7 +254,7 @@ func (rs *courseService) CreateCourse(courseJsonBody entities.CourseRequestBody,
 		}
 
 		title := file.Filename
-		userid := uuid.NewString()
+		
 		course := entities.CourseDataModel{
 			CourseID:    courseId,
 			Title:       title,

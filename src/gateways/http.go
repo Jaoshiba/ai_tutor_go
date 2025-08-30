@@ -14,6 +14,7 @@ import (
 type HTTPGateway struct {
 	UserService       service.IUsersService
 	ModuleService     service.IModuleService
+	ExamsService      service.IExamService
 	GoogleAuthService auth.IGoogleOAuth
 	AuthService       auth.IAuthService
 	ChapterService    service.IChapterService
@@ -24,6 +25,7 @@ func NewHTTPGateway(
 	app *fiber.App,
 	users service.IUsersService,
 	modules service.IModuleService,
+	exams service.IExamService,
 	googleAuth auth.IGoogleOAuth,
 	authService auth.IAuthService,
 	chapterService service.IChapterService,
@@ -32,6 +34,7 @@ func NewHTTPGateway(
 	gateway := &HTTPGateway{
 		UserService:       users,
 		ModuleService:     modules,
+		ExamsService:      exams,
 		GoogleAuthService: googleAuth,
 		AuthService:       authService,
 		ChapterService:    chapterService,
@@ -44,6 +47,7 @@ func NewHTTPGateway(
 
 	GatewayModules(*gateway, app)
 	GatewayCourse(*gateway, app)
+	GatewayExams(*gateway, app)
 	GatewayProtected(*gateway, app)
 
 }
