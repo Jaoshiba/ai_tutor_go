@@ -34,8 +34,8 @@ func (er *examRepository) InsertExam(exam entities.ExamDataModel) error {
 
 	query := `
 		INSERT INTO exams (
-			examid, moduleid, passscore, questionnum, questions, createdat, updatedat
-		) VALUES ($1, $2, $3, $4, $5, $6, $7)`
+			examid, moduleid, passscore, questionnum, questions, refid, createdat, updatedat
+		) VALUES ($1, $2, $3, $4, $5, $6, $7, $8)`
 
 	_, err = er.db.ExecContext(context.Background(), query,
 		exam.ExamId,
@@ -43,6 +43,7 @@ func (er *examRepository) InsertExam(exam entities.ExamDataModel) error {
 		exam.PassScore,
 		exam.QuestionNum,
 		questionsJSON,
+		exam.RefId,
 		exam.CreatedAt,
 		exam.UpdatedAt,
 	)

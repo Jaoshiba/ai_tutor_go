@@ -18,6 +18,7 @@ type SerpURLScore struct {
 }
 
 type SerpReturn struct {
+	RefId   string        `json:"refId"`
 	Content string        `json:"content"`
 	Source  OrganicResult `json:"source"`
 }

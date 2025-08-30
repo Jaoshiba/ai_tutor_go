@@ -236,23 +236,23 @@ func (rs *courseService) CreateCourse(courseJsonBody entities.CourseRequestBody,
 		// 	return fmt.Errorf("no file found")
 		// }
 
-		courses, err := rs.genCourse(courseJsonBody, ctx.Context())
-		if err != nil {
-			return err
-		}
-		fmt.Println("courses : ", courses)
+		// courses, err := rs.genCourse(courseJsonBody, ctx.Context())
+		// if err != nil {
+		// 	return err
+		// }
+		// fmt.Println("courses : ", courses)
 
 		courseId := uuid.NewString()
 		ctx.Locals("courseID", courseId)
 		ctx.Locals("content", content)
-		for _, moduleData := range courses.Modules {
-			// fmt.Println("Module : ", moduleData)
-			moduleData.Content = content
-			err = rs.ModuleService.CreateModule(ctx, &moduleData)
-			if err != nil {
-				return err
-			}
-		}
+		// for _, moduleData := range courses.Modules {
+		// 	// fmt.Println("Module : ", moduleData)
+		// 	moduleData.Content = content
+		// 	err = rs.ModuleService.CreateModule(ctx, &moduleData)
+		// 	if err != nil {
+		// 		return err
+		// 	}
+		// }
 
 		title := file.Filename
 		userid := uuid.NewString()
@@ -268,7 +268,7 @@ func (rs *courseService) CreateCourse(courseJsonBody entities.CourseRequestBody,
 
 		fmt.Println(course)
 
-		err = rs.CourseRepo.InsertCourse(course)
+		err := rs.CourseRepo.InsertCourse(course)
 		if err != nil {
 			fmt.Println("error insert course")
 			fmt.Println(err)
@@ -286,13 +286,18 @@ func (rs *courseService) CreateCourse(courseJsonBody entities.CourseRequestBody,
 		// 	return err
 		// }
 
-		//create module
 		moduleData := entities.GenModule{
 			Title:       file.Filename,
 			Description: " ",
 			Content:     content,
 		}
-		err = rs.ModuleService.CreateModule(ctx, &moduleData)
+		courses := entities.CourseGeminiResponse{
+			Purpose: "Upload File",
+			Modules: []entities.GenModule{moduleData},
+		}
+		//create module
+
+		err = rs.ModuleService.CreateModule(ctx, courses, courseJsonBody.Title, courseJsonBody.Description)
 		if err != nil {
 			return err
 		}

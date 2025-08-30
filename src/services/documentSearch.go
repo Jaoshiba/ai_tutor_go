@@ -139,10 +139,13 @@ func (ds *docSearchService) SearchDocuments(courseName, courseDescription, modul
 
 				fmt.Println("\nFile content:", content)
 
+				refId := uuid.NewString()
+
 				serpRes.Content = content
+				serpRes.RefId = refId
 
 				ref := entities.RefDataModel{
-					RefId:    uuid.NewString(),
+					RefId:    refId,
 					ModuleId: moduleId,
 					Title:    result.Title,
 					Link:     result.Link,
