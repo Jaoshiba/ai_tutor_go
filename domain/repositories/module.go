@@ -14,7 +14,8 @@ type modulesRepository struct {
 type IModuleRepository interface {
 	InsertModule(module entities.ModuleDataModel) error
 	GetModulesByCourseID(courseID string) ([]entities.ModuleDataModel, error)
-	DeleteModuleByCourseID(courseID string) error
+	GetModuleByModuleId(moduleId string) (*entities.ModuleDataModel, error)
+	DeleteModulesByCourseID(courseID string) error
 }
 
 func NewModulesRepository(db *sql.DB) IModuleRepository {
@@ -45,6 +46,35 @@ func (repo *modulesRepository) InsertModule(module entities.ModuleDataModel) err
 		return err
 	}
 	return nil
+}
+
+func (repo *modulesRepository) GetModuleByModuleId(moduleId string) (*entities.ModuleDataModel, error) {
+	query := `
+        SELECT moduleid, modulename, courseid, userid, createat, updateat, description
+        FROM modules
+        WHERE moduleid = $1
+    `
+	row := repo.db.QueryRowContext(context.Background(), query, moduleId)
+
+	var module entities.ModuleDataModel
+	if err := row.Scan(
+		&module.ModuleId,
+		&module.ModuleName,
+		&module.CourseId,
+		&module.UserId,
+		&module.CreatedAt,
+		&module.UpdatedAt,
+		&module.Description,
+	); err != nil {
+		if err == sql.ErrNoRows {
+			// Handle the case where no module is found
+			return nil, nil
+		}
+		// Handle other potential errors during scanning
+		return nil, fmt.Errorf("failed to scan module row for module ID %s: %w", moduleId, err)
+	}
+
+	return &module, nil
 }
 
 func (repo *modulesRepository) GetModulesByCourseID(courseID string) ([]entities.ModuleDataModel, error) {
@@ -88,7 +118,7 @@ func (repo *modulesRepository) GetModulesByCourseID(courseID string) ([]entities
 }
 
 // modules_repo.go
-func (repo *modulesRepository) DeleteModuleByCourseID(courseID string) error {
+func (repo *modulesRepository) DeleteModulesByCourseID(courseID string) error {
 	if courseID == "" {
 		return fmt.Errorf("courseID is empty")
 	}

@@ -142,7 +142,7 @@ func (ms *ModuleService) DeleteModuleByCourseID(courseID string) error {
 	if courseID == "" {
 		return fmt.Errorf("no course id found")
 	}
-	err := ms.modulesRepository.DeleteModuleByCourseID(courseID)
+	err := ms.modulesRepository.DeleteModulesByCourseID(courseID)
 	if err != nil {
 		fmt.Println(err)
 		return fmt.Errorf("cant delete module")
