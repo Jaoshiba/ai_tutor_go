@@ -6,14 +6,17 @@ import (
 	"encoding/json"
 	"fmt"
 	"go-fiber-template/domain/entities"
+	repo "go-fiber-template/domain/repositories"
 	"io"
 	"net/http"
 	"net/url"
 	"os"
 	"path/filepath"
 	"strings"
+	"time"
 
 	"github.com/gofiber/fiber/v2"
+	"github.com/google/uuid"
 )
 
 var allowedExts = map[string]bool{
@@ -29,13 +32,29 @@ var allowedCTs = map[string]string{
 	"application/vnd.openxmlformats-officedocument.wordprocessingml.document": ".docx",
 }
 
-func SearchDocuments(courseName, courseDescription, moduleName, moduleDescription string, ctx *fiber.Ctx) (string, error) {
+type docSearchService struct {
+	refRepository repo.IRefInterface
+}
+
+type IDocSearchService interface {
+	SearchDocuments(courseName, courseDescription, moduleName, moduleDescription string, moduleId string, ctx *fiber.Ctx) (entities.SerpReturn, error)
+}
+
+func NewDocSearchService(ref repo.IRefInterface) IDocSearchService {
+	return &docSearchService{
+		refRepository: ref,
+	}
+}
+
+func (ds *docSearchService) SearchDocuments(courseName, courseDescription, moduleName, moduleDescription string, moduleId string, ctx *fiber.Ctx) (entities.SerpReturn, error) {
+	var serpRes entities.SerpReturn
+
 	geminiService := NewGeminiService()
 
 	baseURL := "https://serpapi.com/search"
 	serpAPIKey := os.Getenv("SERPAPI_KEY")
 	if serpAPIKey == "" {
-		return "", fmt.Errorf("missing SERPAPI_KEY")
+		return serpRes, fmt.Errorf("missing SERPAPI_KEY")
 	}
 
 	maxAttempts := 3
@@ -47,7 +66,7 @@ func SearchDocuments(courseName, courseDescription, moduleName, moduleDescriptio
 
 		kws, err := geminiService.GenerateContentFromPrompt(context.Background(), searchPrompt)
 		if err != nil {
-			return "", fmt.Errorf("error generating search keywords (attempt %d): %w", attempt, err)
+			return serpRes, fmt.Errorf("error generating search keywords (attempt %d): %w", attempt, err)
 		}
 		generatedKeywords = strings.TrimSpace(kws)
 		fmt.Println("Generated Search Query:", generatedKeywords)
@@ -66,15 +85,15 @@ func SearchDocuments(courseName, courseDescription, moduleName, moduleDescriptio
 		fmt.Printf("[SearchDocuments] Attempt %d: request SerpAPI...\n", attempt)
 		body, status, err := doSerpAPISearch(fullURL)
 		if err != nil {
-			return "", fmt.Errorf("could not make SerpAPI request (attempt %d): %w", attempt, err)
+			return serpRes, fmt.Errorf("could not make SerpAPI request (attempt %d): %w", attempt, err)
 		}
 		if status != http.StatusOK {
-			return "", fmt.Errorf("SerpAPI returned status code %d (attempt %d): %s", status, attempt, string(body))
+			return serpRes, fmt.Errorf("SerpAPI returned status code %d (attempt %d): %s", status, attempt, string(body))
 		}
 
 		var serpAPIResponse entities.SerpAPIResponse
 		if err := json.Unmarshal(body, &serpAPIResponse); err != nil {
-			return "", fmt.Errorf("could not parse JSON (attempt %d): %w", attempt, err)
+			return serpRes, fmt.Errorf("could not parse JSON (attempt %d): %w", attempt, err)
 		}
 
 		fmt.Println("SerpAPI Response:", serpAPIResponse.OrganicResults)
@@ -83,6 +102,8 @@ func SearchDocuments(courseName, courseDescription, moduleName, moduleDescriptio
 			fmt.Println("Title:", result.Title)
 			fmt.Println("Link:", result.Link)
 		}
+
+		serpRes.Source = serpAPIResponse.OrganicResults
 
 		if len(serpAPIResponse.OrganicResults) > 0 {
 			fmt.Printf("[SearchDocuments] Attempt %d: got %d results\n", attempt, len(serpAPIResponse.OrganicResults))
@@ -117,14 +138,32 @@ func SearchDocuments(courseName, courseDescription, moduleName, moduleDescriptio
 				}
 
 				fmt.Println("\nFile content:", content)
-				return content, err
+
+				serpRes.Content = content
+
+				ref := entities.RefDataModel{
+					RefId:    uuid.NewString(),
+					ModuleId: moduleId,
+					Title:    result.Title,
+					Link:     result.Link,
+					Content:  content,
+					SearchAt: time.Now(),
+				}
+
+				err = ds.refRepository.InsertRef(ref)
+				if err != nil {
+					fmt.Println("Error inserting ref:", err)
+					continue
+				}
+
+				return serpRes, err
 			}
-			return "", err
+			return serpRes, err
 		}
 		fmt.Printf("[SearchDocuments] Attempt %d: empty results. Regenerating keywords...\n", attempt)
 	}
 
-	return "", fmt.Errorf("no results found from SerpAPI after %d attempts", maxAttempts)
+	return serpRes, fmt.Errorf("no results found from SerpAPI after %d attempts", maxAttempts)
 }
 
 func rateSerpLink() {

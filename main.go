@@ -66,6 +66,7 @@ func main() {
 	courseRepo := repo.NewCourseRepository(postgresql)
 	pineconeRepo := repo.NewPineconeRepository(pineconeIdxConn)
 	examRepo := repo.NewExamRepository(postgresql)
+	refRepo := repo.NewRefRepository(postgresql)
 
 	if userRepo == nil || fileRepo == nil || chapterRepo == nil || courseRepo == nil {
 		log.Fatalf("One or more repositories failed to initialize and are NIL.")
@@ -83,8 +84,9 @@ func main() {
 	geminiService := sv.NewGeminiService()
 
 	svExam := sv.NewExamService(examRepo)
+	svdocSearch := sv.NewDocSearchService(refRepo)
 	svChapter := sv.NewChapterServices(chapterRepo, pineconeRepo, geminiService)
-	sv1 := sv.NewModuleService(fileRepo, svChapter, svExam)
+	sv1 := sv.NewModuleService(fileRepo, svChapter, svExam, svdocSearch)
 	svCourse := sv.NewCourseService(courseRepo, sv1, geminiService, svChapter)
 
 	// สร้าง Gateway และผูก Routes ทั้งหมด
