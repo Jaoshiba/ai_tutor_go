@@ -1,13 +1,22 @@
 package gateways
 
-// import (
-// 	"go-fiber-template/domain/entities"
+import (
+	"fmt"
 
-// 	"github.com/gofiber/fiber/v2"
-// 	ws "github.com/gofiber/websocket/v2"
-// )
+	"github.com/gofiber/contrib/websocket"
+)
 
-// func (h *HTTPGateway) WebSocket(wsconn *ws.Conn) error {
+func (h *HTTPGateway) AskChatWs(wsconn *websocket.Conn) {
 
-// 	return ctx.Status(fiber.StatusOK).JSON(entities.ResponseModel{Message: "success"})
-// }
+	fmt.Println("WebSocket connected. Waiting for messages...")
+
+	defer func() {
+		fmt.Println("WebSocket connection closed.")
+		wsconn.Close()
+	}()
+
+	for {
+		// perform read question and answer that question
+	}
+
+}

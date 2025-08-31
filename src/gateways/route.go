@@ -3,6 +3,7 @@
 package gateways
 
 import (
+	"github.com/gofiber/contrib/websocket"
 	"github.com/gofiber/fiber/v2"
 	// "go-fiber-template/src/middlewares" // เพิ่ม import สำหรับ middlewares หากต้องการใช้ JWTAuthMiddleware แยก
 )
@@ -51,6 +52,11 @@ func GatewayRefs(gateway HTTPGateway, app *fiber.App) {
 	api := app.Group("/api/v1/ref")
 
 	api.Get("/:moduleId", gateway.GetRefsByModuleId)
+}
+
+func GatewayAskChat(gateway HTTPGateway, app *fiber.App) {
+	api := app.Group("/api/v1/ask")
+	api.Post("/ws/chat", websocket.New(gateway.AskChatWs))
 }
 
 // GatewayProtected สำหรับเส้นทางทั้งหมดที่ต้องการการตรวจสอบสิทธิ์ (Protected Routes)
