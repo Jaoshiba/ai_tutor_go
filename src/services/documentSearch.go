@@ -38,6 +38,7 @@ type docSearchService struct {
 
 type IDocSearchService interface {
 	SearchDocuments(courseName, courseDescription, moduleName, moduleDescription string, moduleId string, ctx *fiber.Ctx) (entities.SerpReturn, error)
+	GetRefsByModuleId(moduleId string, ctx *fiber.Ctx) ([]entities.RefDataModel, error)
 }
 
 func NewDocSearchService(ref repo.IRefInterface) IDocSearchService {
@@ -340,4 +341,16 @@ func GetHtmlElement(link string, ctx *fiber.Ctx) error {
 	fmt.Println("Extracted text content:", text)
 
 	return ctx.SendString(string(body))
+}
+
+func (ds *docSearchService) GetRefsByModuleId(moduleId string, ctx *fiber.Ctx) ([]entities.RefDataModel, error) {
+
+	var refs []entities.RefDataModel
+
+	refs, err := ds.refRepository.GetRefsByModuleId(moduleId)
+	if err != nil {
+		return nil, fmt.Errorf("failed to get refs by module ID: %w", err)
+	}
+
+	return refs, err
 }

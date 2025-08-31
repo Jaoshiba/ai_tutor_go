@@ -47,6 +47,12 @@ func GatewayModules(gateway HTTPGateway, app *fiber.App) {
 	api.Post("/upload", gateway.UploadFile)
 }
 
+func GatewayRefs(gateway HTTPGateway, app *fiber.App) {
+	api := app.Group("/api/v1/ref")
+
+	api.Get("/:moduleId", gateway.GetRefsByModuleId)
+}
+
 // GatewayProtected สำหรับเส้นทางทั้งหมดที่ต้องการการตรวจสอบสิทธิ์ (Protected Routes)
 func GatewayProtected(gateway HTTPGateway, app *fiber.App) {
 	// สร้าง Group ของ routes ที่ต้องการการตรวจสอบสิทธิ์

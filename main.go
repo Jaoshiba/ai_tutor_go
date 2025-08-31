@@ -91,7 +91,7 @@ func main() {
 
 	// สร้าง Gateway และผูก Routes ทั้งหมด
 	// ต้องส่ง AuthService และ UserService เข้าไปใน NewHTTPGateway ด้วย
-	gw.NewHTTPGateway(app, sv0, sv1, svGoogleAuth, svAuth, svChapter, svCourse) // <--- ตรวจสอบพารามิเตอร์
+	gw.NewHTTPGateway(app, sv0, sv1, svGoogleAuth, svAuth, svChapter, svCourse, svdocSearch) // <--- ตรวจสอบพารามิเตอร์
 
 	// ให้บริการไฟล์ static (เช่น dashboard.html)
 	app.Use("/dashboard", filesystem.New(filesystem.Config{
