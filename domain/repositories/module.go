@@ -13,9 +13,9 @@ type modulesRepository struct {
 
 type IModuleRepository interface {
 	InsertModule(module entities.ModuleDataModel) error
-	GetModulesByCourseID(courseID string) ([]entities.ModuleDataModel, error)
+	GetModulesByCourseId(courseID string) ([]entities.ModuleDataModel, error)
 	GetModuleByModuleId(moduleId string) (*entities.ModuleDataModel, error)
-	DeleteModulesByCourseID(courseID string) error
+	DeleteModulesByCourseId(courseID string) error
 }
 
 func NewModulesRepository(db *sql.DB) IModuleRepository {
@@ -77,7 +77,7 @@ func (repo *modulesRepository) GetModuleByModuleId(moduleId string) (*entities.M
 	return &module, nil
 }
 
-func (repo *modulesRepository) GetModulesByCourseID(courseID string) ([]entities.ModuleDataModel, error) {
+func (repo *modulesRepository) GetModulesByCourseId(courseID string) ([]entities.ModuleDataModel, error) {
 	query := `
         SELECT moduleid, modulename, courseid, userid, createat, updateat, description
         FROM modules
@@ -118,7 +118,7 @@ func (repo *modulesRepository) GetModulesByCourseID(courseID string) ([]entities
 }
 
 // modules_repo.go
-func (repo *modulesRepository) DeleteModulesByCourseID(courseID string) error {
+func (repo *modulesRepository) DeleteModulesByCourseId(courseID string) error {
 	if courseID == "" {
 		return fmt.Errorf("courseID is empty")
 	}

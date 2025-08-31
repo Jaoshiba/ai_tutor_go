@@ -15,6 +15,7 @@ import (
 	"strings"
 	"time"
 
+	cohereClient "github.com/cohere-ai/cohere-go/v2/client"
 	"github.com/gofiber/fiber/v2"
 	"github.com/google/uuid"
 )
@@ -34,6 +35,7 @@ var allowedCTs = map[string]string{
 
 type docSearchService struct {
 	refRepository repo.IRefInterface
+	PineconeRepo  repo.IPineconeRepository
 }
 
 type IDocSearchService interface {
@@ -41,14 +43,36 @@ type IDocSearchService interface {
 	GetRefsByModuleId(moduleId string, ctx *fiber.Ctx) ([]entities.RefDataModel, error)
 }
 
-func NewDocSearchService(ref repo.IRefInterface) IDocSearchService {
+func NewDocSearchService(ref repo.IRefInterface, pineconeRepo repo.IPineconeRepository) IDocSearchService {
 	return &docSearchService{
 		refRepository: ref,
+		PineconeRepo:  pineconeRepo,
 	}
 }
 
 func (ds *docSearchService) SearchDocuments(courseName, courseDescription, moduleName, moduleDescription string, moduleId string, ctx *fiber.Ctx) (entities.SerpReturn, error) {
 	var serpRes entities.SerpReturn
+
+	userIdRaw := ctx.Locals("userID")
+	if userIdRaw == nil {
+		fmt.Println("Error: User ID not found in context locals for DocSearchService.")
+		return serpRes, fiber.NewError(fiber.StatusUnauthorized, "User ID not found in context")
+	}
+	userIdStr, ok := userIdRaw.(string)
+	if !ok || userIdStr == "" {
+		fmt.Println("Error: Invalid or missing user ID format in context locals for DocSearchService.")
+		return serpRes, fiber.NewError(fiber.StatusUnauthorized, "Invalid or missing user ID")
+	}
+
+	coheereapikey := os.Getenv("COHERE_API_KEY")
+	if coheereapikey == "" {
+		return serpRes, fmt.Errorf("missing COHERE_API_KEY")
+	}
+	co := cohereClient.NewClient(cohereClient.WithToken(coheereapikey))
+
+	nameSpaceName := userIdStr
+
+	fmt.Println("nameSpaceName: ", nameSpaceName)
 
 	geminiService := NewGeminiService()
 
@@ -159,6 +183,8 @@ func (ds *docSearchService) SearchDocuments(courseName, courseDescription, modul
 					fmt.Println("Error inserting ref:", err)
 					continue
 				}
+
+				err = ds.PineconeRepo.UpsertVector(ref, co, ctx)
 
 				return serpRes, err
 			}

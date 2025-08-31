@@ -84,7 +84,7 @@ func main() {
 	geminiService := sv.NewGeminiService()
 
 	svExam := sv.NewExamService(examRepo)
-	svdocSearch := sv.NewDocSearchService(refRepo)
+	svdocSearch := sv.NewDocSearchService(refRepo, pineconeRepo)
 	svChapter := sv.NewChapterServices(chapterRepo, pineconeRepo, geminiService)
 	sv1 := sv.NewModuleService(fileRepo, svChapter, svExam, svdocSearch)
 	svCourse := sv.NewCourseService(courseRepo, sv1, geminiService, svChapter)

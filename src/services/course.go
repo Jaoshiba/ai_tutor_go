@@ -25,8 +25,8 @@ type courseService struct {
 type ICourseService interface {
 	CreateCourse(courseJsonBody entities.CourseRequestBody, file *multipart.FileHeader, fromCoures bool, ctx *fiber.Ctx) error //add userId ด้วย
 	GetCourses(ctx *fiber.Ctx) ([]entities.CourseDataModel, error)
-	GetCourseDetail(ctx *fiber.Ctx, courseID string) (*entities.CourseDetailResponse, error)
-	DeleteCourse(ctx *fiber.Ctx, courseID string) error
+	GetCourseDetail(ctx *fiber.Ctx, courseId string) (*entities.CourseDetailResponse, error)
+	DeleteCourse(ctx *fiber.Ctx, courseId string) error
 }
 
 func NewCourseService(
@@ -52,7 +52,7 @@ func (rs *courseService) GetCourses(ctx *fiber.Ctx) ([]entities.CourseDataModel,
 		return nil, fmt.Errorf("user ID is missing from context")
 	}
 
-	course, err := rs.CourseRepo.GetCoursesByUserID(userID)
+	course, err := rs.CourseRepo.GetCoursesByUserId(userID)
 	if err != nil {
 		fmt.Println("error get courses : ")
 		return nil, fmt.Errorf("failed to get course: %w", err)
@@ -143,7 +143,7 @@ func (rs *courseService) CreateCourse(courseJsonBody entities.CourseRequestBody,
 		if courseId == "" {
 			fmt.Println("NUll coursei")
 		}
-		ctx.Locals("courseID", courseId)
+		ctx.Locals("courseId", courseId)
 
 		courses, err := rs.genCourse(courseJsonBody, ctx.Context())
 		if err != nil {
@@ -156,7 +156,7 @@ func (rs *courseService) CreateCourse(courseJsonBody entities.CourseRequestBody,
 		userId := uuid.NewString()
 
 		course := entities.CourseDataModel{
-			CourseID:    courseId,
+			CourseId:    courseId,
 			Title:       courseJsonBody.Title,
 			Description: courseJsonBody.Description,
 			Confirmed:   courseJsonBody.Confirmed,
@@ -243,7 +243,7 @@ func (rs *courseService) CreateCourse(courseJsonBody entities.CourseRequestBody,
 		// fmt.Println("courses : ", courses)
 
 		courseId := uuid.NewString()
-		ctx.Locals("courseID", courseId)
+		ctx.Locals("courseId", courseId)
 		ctx.Locals("content", content)
 		// for _, moduleData := range courses.Modules {
 		// 	// fmt.Println("Module : ", moduleData)
@@ -257,7 +257,7 @@ func (rs *courseService) CreateCourse(courseJsonBody entities.CourseRequestBody,
 		title := file.Filename
 		userid := uuid.NewString()
 		course := entities.CourseDataModel{
-			CourseID:    courseId,
+			CourseId:    courseId,
 			Title:       title,
 			Description: "",
 			Confirmed:   true,
@@ -307,10 +307,10 @@ func (rs *courseService) CreateCourse(courseJsonBody entities.CourseRequestBody,
 	return nil
 }
 
-func (rs *courseService) GetCourseDetail(ctx *fiber.Ctx, courseID string) (*entities.CourseDetailResponse, error) {
+func (rs *courseService) GetCourseDetail(ctx *fiber.Ctx, courseId string) (*entities.CourseDetailResponse, error) {
 
 	fmt.Println("Hello im in GetCourseDetail")
-	courseData, err := rs.CourseRepo.GetCourseByID(courseID)
+	courseData, err := rs.CourseRepo.GetCourseById(courseId)
 	if err != nil {
 		if err == sql.ErrNoRows {
 			return nil, fiber.NewError(fiber.StatusNotFound, "Course not found")
@@ -320,17 +320,17 @@ func (rs *courseService) GetCourseDetail(ctx *fiber.Ctx, courseID string) (*enti
 	fmt.Println("after GetCourseById ")
 
 	courseDetail := &entities.CourseDetailResponse{
-		CourseID:    courseData.CourseID,
+		CourseId:    courseData.CourseId,
 		Title:       courseData.Title,
 		Description: courseData.Description,
 		Confirmed:   courseData.Confirmed,
 		Modules:     []entities.ModuleDetail{}, // Initialize empty slice
 	}
 
-	modulesData, err := rs.ModuleService.GetModulesByCourseID(courseID)
-	fmt.Println("after GetModuleByCourseId ")
+	modulesData, err := rs.ModuleService.GetModulesByCourseId(courseId)
+	fmt.Println("after GetModuleBycourseId ")
 	if err != nil {
-		return nil, fmt.Errorf("failed to get modules for course %s: %w", courseID, err)
+		return nil, fmt.Errorf("failed to get modules for course %s: %w", courseId, err)
 	}
 
 	for _, moduleData := range modulesData {
@@ -362,12 +362,12 @@ func (rs *courseService) GetCourseDetail(ctx *fiber.Ctx, courseID string) (*enti
 	return courseDetail, nil
 }
 
-func (rs *courseService) DeleteCourse(ctx *fiber.Ctx, courseID string) error {
+func (rs *courseService) DeleteCourse(ctx *fiber.Ctx, courseId string) error {
 
-	modules, err := rs.ModuleService.GetModulesByCourseID(courseID)
+	modules, err := rs.ModuleService.GetModulesByCourseId(courseId)
 	if err != nil {
 
-		return fmt.Errorf("no module with this courseid")
+		return fmt.Errorf("no module with this courseId")
 	}
 	for _, m := range modules {
 		moduleId := m.ModuleId
@@ -379,14 +379,14 @@ func (rs *courseService) DeleteCourse(ctx *fiber.Ctx, courseID string) error {
 			return err
 		}
 	}
-	err = rs.ModuleService.DeleteModuleByCourseID(courseID)
+	err = rs.ModuleService.DeleteModuleByCourseId(courseId)
 	if err != nil {
-		fmt.Println("Error deleting modules for course:", courseID, "Error:", err)
+		fmt.Println("Error deleting modules for course:", courseId, "Error:", err)
 		return err
 	}
-	err = rs.CourseRepo.DeleteCourse(courseID)
+	err = rs.CourseRepo.DeleteCourse(courseId)
 	if err != nil {
-		fmt.Println("Error deleting course:", courseID, "Error:", err)
+		fmt.Println("Error deleting course:", courseId, "Error:", err)
 		return err
 	}
 	return nil

@@ -5,7 +5,7 @@ import (
 )
 
 type CourseDataModel struct {
-	CourseID    string    `json:"course_id" db:"id"`
+	CourseId    string    `json:"course_id" db:"id"`
 	Title       string    `json:"Title" db:"title"`
 	Description string    `json:"description" db:"description"`
 	Confirmed   bool      `json:"confirmed" db:"confirmed"`
@@ -46,7 +46,7 @@ type ChapterDetail struct {
 	// คุณอาจจะเพิ่ม CreatedAt, UpdatedAt ถ้าต้องการแสดง
 }
 type CourseDetailResponse struct {
-	CourseID    string         `json:"course_id"`
+	CourseId    string         `json:"course_id"`
 	Title       string         `json:"title"`
 	Description string         `json:"description"`
 	Confirmed   bool           `json:"confirmed"`
