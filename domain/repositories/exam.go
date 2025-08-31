@@ -52,3 +52,35 @@ func (er *examRepository) InsertExam(exam entities.ExamDataModel) error {
 	}
 	return nil
 }
+
+func (er *examRepository) GetExamsByRefId(refId string) ([]entities.ExamDataModel, error) {
+
+	query := `SELECT examid, moduleid, passscore, questionnum, questions, refid, createdat, updatedat FROM exams WHERE refid = $1`
+	rows, err := er.db.QueryContext(context.Background(), query, refId)
+	if err != nil {
+		return nil, err
+	}
+	defer rows.Close()
+
+	var exams []entities.ExamDataModel
+
+	for rows.Next() {
+		var exam entities.ExamDataModel
+		if err := rows.Scan(
+			&exam.ExamId,
+			&exam.ModuleId,
+			&exam.PassScore,
+			&exam.QuestionNum,
+			&exam.Questions,
+			&exam.RefId,
+			&exam.CreatedAt,
+			&exam.UpdatedAt,
+		); err != nil {
+			return nil, err
+		}
+		exams = append(exams, exam)
+	}
+
+	return exams, nil
+
+}

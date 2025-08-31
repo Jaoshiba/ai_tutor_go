@@ -50,9 +50,7 @@ func (ms *ModuleService) CreateModule(ctx *fiber.Ctx, moduleData entities.Course
 			return fmt.Errorf("failed to search documents for module: %w", err)
 		}
 
-		moduleData.Content = serpReturn.Content
-
-		fmt.Printf("Module %d content: %s\n", i+1, moduleData.Content)
+		fmt.Printf("Module %d content: %s\n", i+1, serpReturn.Content)
 
 		// userIdRaw := ctx.Locals("userID")
 		// // Always check for nil first, then perform type assertion.
@@ -92,7 +90,6 @@ func (ms *ModuleService) CreateModule(ctx *fiber.Ctx, moduleData entities.Course
 			ModuleName:  moduleData.Title,
 			CourseId:    courseId,
 			UserId:      userIdStr,
-			Content:     moduleData.Content,
 			CreatedAt:   time.Now(),
 			UpdatedAt:   time.Now(),
 			Description: moduleData.Description,
@@ -109,7 +106,8 @@ func (ms *ModuleService) CreateModule(ctx *fiber.Ctx, moduleData entities.Course
 
 		examRequest := entities.ExamRequest{
 			ModuleId:    moduleId,
-			Content:     moduleData.Content,
+			Content:     serpReturn.Content,
+			RefId:       serpReturn.RefId,
 			Difficulty:  "medium",
 			QuestionNum: 10,
 		}
