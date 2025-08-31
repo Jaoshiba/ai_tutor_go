@@ -215,6 +215,10 @@ func (rs *courseService) CreateCourse(courseJsonBody entities.CourseRequestBody,
 
 		fmt.Println("content : ", content)
 
+
+
+
+
 	} else { //for file upload
 		var content string
 
@@ -251,7 +255,7 @@ func (rs *courseService) CreateCourse(courseJsonBody entities.CourseRequestBody,
 		for _, moduleData := range courses.Modules {
 			// fmt.Println("Module : ", moduleData)
 			moduleData.Content = content
-			err = rs.ModuleService.CreateModule(ctx, &moduleData)
+			err = rs.ModuleService.CreateModule(ctx, &moduleData, courseJsonBody.Title, courseJsonBody.Description)
 			if err != nil {
 				return err
 			}
