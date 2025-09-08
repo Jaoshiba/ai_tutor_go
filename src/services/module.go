@@ -21,8 +21,8 @@ type ModuleService struct {
 
 type IModuleService interface {
 	CreateModule(ctx *fiber.Ctx, moduleData entities.CourseGeminiResponse, courseTitle string, courseDescription string) error
-	GetModulesByCourseID(courseID string) ([]entities.ModuleDataModel, error)
-	DeleteModuleByCourseID(courseID string) error
+	GetModulesByCourseId(courseID string) ([]entities.ModuleDataModel, error)
+	DeleteModuleByCourseId(courseID string) error
 }
 
 func NewModuleService(modulesRepository repo.IModuleRepository, chapterservice IChapterService, examService IExamService, docSearchService IDocSearchService) IModuleService {
@@ -50,9 +50,7 @@ func (ms *ModuleService) CreateModule(ctx *fiber.Ctx, moduleData entities.Course
 			return fmt.Errorf("failed to search documents for module: %w", err)
 		}
 
-		moduleData.Content = serpReturn.Content
-
-		fmt.Printf("Module %d content: %s\n", i+1, moduleData.Content)
+		fmt.Printf("Module %d content: %s\n", i+1, serpReturn.Content)
 
 		// userIdRaw := ctx.Locals("userID")
 		// // Always check for nil first, then perform type assertion.
@@ -92,7 +90,6 @@ func (ms *ModuleService) CreateModule(ctx *fiber.Ctx, moduleData entities.Course
 			ModuleName:  moduleData.Title,
 			CourseId:    courseId,
 			UserId:      userIdStr,
-			Content:     moduleData.Content,
 			CreatedAt:   time.Now(),
 			UpdatedAt:   time.Now(),
 			Description: moduleData.Description,
@@ -109,7 +106,8 @@ func (ms *ModuleService) CreateModule(ctx *fiber.Ctx, moduleData entities.Course
 
 		examRequest := entities.ExamRequest{
 			ModuleId:    moduleId,
-			Content:     moduleData.Content,
+			Content:     serpReturn.Content,
+			RefId:       serpReturn.RefId,
 			Difficulty:  "medium",
 			QuestionNum: 10,
 		}
@@ -128,21 +126,21 @@ func (ms *ModuleService) CreateModule(ctx *fiber.Ctx, moduleData entities.Course
 
 	return nil
 }
-func (ms *ModuleService) GetModulesByCourseID(courseID string) ([]entities.ModuleDataModel, error) {
+func (ms *ModuleService) GetModulesByCourseId(courseID string) ([]entities.ModuleDataModel, error) {
 
-	modules, err := ms.modulesRepository.GetModulesByCourseID(courseID)
+	modules, err := ms.modulesRepository.GetModulesByCourseId(courseID)
 	if err != nil {
 		return nil, fmt.Errorf("failed to retrieve modules from repository for course %s: %w", courseID, err)
 	}
 	return modules, nil
 }
 
-func (ms *ModuleService) DeleteModuleByCourseID(courseID string) error {
+func (ms *ModuleService) DeleteModuleByCourseId(courseID string) error {
 
 	if courseID == "" {
 		return fmt.Errorf("no course id found")
 	}
-	err := ms.modulesRepository.DeleteModuleByCourseID(courseID)
+	err := ms.modulesRepository.DeleteModulesByCourseId(courseID)
 	if err != nil {
 		fmt.Println(err)
 		return fmt.Errorf("cant delete module")

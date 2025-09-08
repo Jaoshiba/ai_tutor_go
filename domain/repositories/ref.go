@@ -13,6 +13,7 @@ type refRepository struct {
 
 type IRefInterface interface {
 	InsertRef(ref entities.RefDataModel) error
+	GetRefsByModuleId(moduleId string) ([]entities.RefDataModel, error)
 }
 
 func NewRefRepository(db *sql.DB) IRefInterface {
@@ -42,4 +43,37 @@ func (rr *refRepository) InsertRef(ref entities.RefDataModel) error {
 		return err
 	}
 	return nil
+}
+
+func (rr *refRepository) GetRefsByModuleId(moduleId string) ([]entities.RefDataModel, error) {
+	query := `
+		SELECT refid, moduleid, title, link, content, searchat
+		FROM moduleref
+		WHERE moduleid = $1`
+
+	rows, err := rr.db.QueryContext(context.Background(), query, moduleId)
+	if err != nil {
+		return nil, err
+	}
+	defer rows.Close()
+
+	var refs []entities.RefDataModel
+	for rows.Next() {
+		var ref entities.RefDataModel
+		if err := rows.Scan(
+			&ref.RefId,
+			&ref.ModuleId,
+			&ref.Title,
+			&ref.Link,
+			&ref.Content,
+			&ref.SearchAt,
+		); err != nil {
+			return nil, err
+		}
+		refs = append(refs, ref)
+
+	}
+
+	return refs, nil
+
 }

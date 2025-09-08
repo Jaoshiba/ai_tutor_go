@@ -79,19 +79,17 @@ func main() {
 	}
 	svAuth := authService.NewAuthService(userRepo)            // สร้าง AuthService
 	sv0 := sv.NewUsersService(userRepo)                       // สร้าง UsersServic
-	svGoogleAuth := authService.NewGoogleOAuthService(svAuth) // สร้าง GoogleOAuthService โดยฉีด AuthService
-
 	geminiService := sv.NewGeminiService()
 
 	svExam := sv.NewExamService(examRepo)
-	svdocSearch := sv.NewDocSearchService(refRepo)
+	svdocSearch := sv.NewDocSearchService(refRepo, pineconeRepo)
 	svChapter := sv.NewChapterServices(chapterRepo, pineconeRepo, geminiService)
 	sv1 := sv.NewModuleService(fileRepo, svChapter, svExam, svdocSearch)
 	svCourse := sv.NewCourseService(courseRepo, sv1, geminiService, svChapter)
 
 	// สร้าง Gateway และผูก Routes ทั้งหมด
 	// ต้องส่ง AuthService และ UserService เข้าไปใน NewHTTPGateway ด้วย
-	gw.NewHTTPGateway(app, sv0, sv1, svExam, svGoogleAuth, svAuth, svChapter, svCourse) // <--- ตรวจสอบพารามิเตอร์
+	gw.NewHTTPGateway(app, sv0, sv1, svExam, svAuth, svChapter, svCourse, svdocSearch) // <--- ตรวจสอบพารามิเตอร์
 
 	// ให้บริการไฟล์ static (เช่น dashboard.html)
 	app.Use("/dashboard", filesystem.New(filesystem.Config{

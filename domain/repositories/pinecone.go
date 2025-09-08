@@ -18,7 +18,7 @@ type PineconeRepository struct {
 }
 
 type IPineconeRepository interface {
-	UpsertVector(chapter entities.ChapterDataModel, co *cohereClient.Client, ctx *fiber.Ctx, userId string) error
+	UpsertVector(chapter entities.RefDataModel, co *cohereClient.Client, ctx *fiber.Ctx) error
 }
 
 func NewPineconeRepository(pineconeIdxConn *pinecone.IndexConnection) IPineconeRepository {
@@ -27,7 +27,7 @@ func NewPineconeRepository(pineconeIdxConn *pinecone.IndexConnection) IPineconeR
 	}
 }
 
-func (pc *PineconeRepository) UpsertVector(chapter entities.ChapterDataModel, co *cohereClient.Client, ctx *fiber.Ctx, userId string) error {
+func (pc *PineconeRepository) UpsertVector(ref entities.RefDataModel, co *cohereClient.Client, ctx *fiber.Ctx) error {
 	fmt.Println("upsertVector call...")
 	// limit := uint32(100)
 	// namespaces, err := indexConn.ListNamespaces(ctx.Context(), &pinecone.ListNamespacesParams{
@@ -38,8 +38,18 @@ func (pc *PineconeRepository) UpsertVector(chapter entities.ChapterDataModel, co
 	// }
 
 	//get userId to create namespace
-	// userIdRaw := ctx.Locals("userId")
-	// userId := userIdRaw.(string)
+	userIdRaw := ctx.Locals("userID")
+	if userIdRaw == nil {
+		fmt.Println("Error: User ID not found in context locals for DocSearchService.")
+		return fiber.NewError(fiber.StatusUnauthorized, "User ID not found in context")
+	}
+	userIdStr, ok := userIdRaw.(string)
+	if !ok || userIdStr == "" {
+		fmt.Println("Error: Invalid or missing user ID format in context locals for DocSearchService.")
+		return fiber.NewError(fiber.StatusUnauthorized, "Invalid or missing user ID")
+	}
+
+	userId := userIdStr
 	namespace := userId + "-namespace"
 
 	fmt.Println("namespace: ", namespace)
@@ -55,20 +65,23 @@ func (pc *PineconeRepository) UpsertVector(chapter entities.ChapterDataModel, co
 	// denseValue := make([]float32, pineconeDimension)
 	//add initial record to namespace to create namespace
 
+	courseId := ctx.Locals("courseID")
+
 	vectorId := uuid.NewString()
 	metadata, err := structpb.NewStruct(map[string]interface{}{
-		"chapterid":   chapter.ChapterId,
-		"chaptername": chapter.ChapterName,
-		"userid":      chapter.UserID,
-		"courseid":    chapter.CourseId,
+		"refId":    ref.RefId,
+		"moduleId": ref.ModuleId,
+		"courseId": courseId,
+		"Title":    ref.Title,
+		"Link":     ref.Link,
+		"searchat": ref.SearchAt,
 	})
 	if err != nil {
 		fmt.Println("error create metadata: ", err)
 		return err
 	}
 
-	//create denseValue from chapter content
-	denseValue, err := EmbeddingText(co, chapter.ChapterContent, ctx)
+	denseValue, err := EmbeddingText(co, ref.Content, ctx)
 	if err != nil {
 		fmt.Println("error create denseValue: ", err)
 		return err

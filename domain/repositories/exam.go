@@ -35,8 +35,8 @@ func (er *examRepository) InsertExam(exam entities.ExamDataModel) error {
 
 	query := `
 		INSERT INTO exams (
-			examid, moduleid, passscore, questionnum, questions, createdat, updatedat
-		) VALUES ($1, $2, $3, $4, $5, $6, $7)`
+			examid, moduleid, passscore, questionnum, questions, refid, createdat, updatedat
+		) VALUES ($1, $2, $3, $4, $5, $6, $7, $8)`
 
 	_, err = er.db.ExecContext(context.Background(), query,
 		exam.ExamId,
@@ -44,6 +44,7 @@ func (er *examRepository) InsertExam(exam entities.ExamDataModel) error {
 		exam.PassScore,
 		exam.QuestionNum,
 		questionsJSON,
+		exam.RefId,
 		exam.CreatedAt,
 		exam.UpdatedAt,
 	)
@@ -53,13 +54,11 @@ func (er *examRepository) InsertExam(exam entities.ExamDataModel) error {
 	return nil
 }
 
-func (er *examRepository) GetExamsByModuleID(moduleId string) ([]entities.ExamDataModel, error) {
-	query := `SELECT *
-	          FROM exams WHERE moduleid = $1`
+func (er *examRepository) GetExamsByRefId(refId string) ([]entities.ExamDataModel, error) {
 
-	rows, err := er.db.QueryContext(context.Background(), query, moduleId)
+	query := `SELECT examid, moduleid, passscore, questionnum, questions, refid, createdat, updatedat FROM exams WHERE refid = $1`
+	rows, err := er.db.QueryContext(context.Background(), query, refId)
 	if err != nil {
-		fmt.Println("Error querying exams:", err)
 		return nil, err
 	}
 	defer rows.Close()
@@ -68,37 +67,52 @@ func (er *examRepository) GetExamsByModuleID(moduleId string) ([]entities.ExamDa
 
 	for rows.Next() {
 		var exam entities.ExamDataModel
-		var questionsJSON []byte
-
-		err := rows.Scan(
+		if err := rows.Scan(
 			&exam.ExamId,
 			&exam.ModuleId,
 			&exam.PassScore,
 			&exam.QuestionNum,
-			&questionsJSON,
+			&exam.Questions,
+			&exam.RefId,
 			&exam.CreatedAt,
 			&exam.UpdatedAt,
-		)
-		if err != nil {
-			fmt.Println("Error scanning row:", err)
+		); err != nil {
 			return nil, err
 		}
-
-		// แปลง JSON กลับเป็น struct slice
-		err = json.Unmarshal(questionsJSON, &exam.Questions)
-		if err != nil {
-			fmt.Println("Error unmarshalling questions:", err)
-			return nil, err
-		}
-
 		exams = append(exams, exam)
 	}
 
-	// ตรวจสอบ error หลัง loop
-	if err = rows.Err(); err != nil {
+	return exams, nil
+
+}
+
+// GetExamsByModuleID implements IExamRepository.
+func (er *examRepository) GetExamsByModuleID(moduleId string) ([]entities.ExamDataModel, error) {
+	query := `SELECT examid, moduleid, passscore, questionnum, questions, refid, createdat, updatedat FROM exams WHERE moduleid = $1`
+	rows, err := er.db.QueryContext(context.Background(), query, moduleId)
+	if err != nil {
 		return nil, err
+	}
+	defer rows.Close()
+
+	var exams []entities.ExamDataModel
+
+	for rows.Next() {
+		var exam entities.ExamDataModel
+		if err := rows.Scan(
+			&exam.ExamId,
+			&exam.ModuleId,
+			&exam.PassScore,
+			&exam.QuestionNum,
+			&exam.Questions,
+			&exam.RefId,
+			&exam.CreatedAt,
+			&exam.UpdatedAt,
+		); err != nil {
+			return nil, err
+		}
+		exams = append(exams, exam)
 	}
 
 	return exams, nil
 }
-

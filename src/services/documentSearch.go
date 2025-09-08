@@ -15,6 +15,7 @@ import (
 	"strings"
 	"time"
 
+	cohereClient "github.com/cohere-ai/cohere-go/v2/client"
 	"github.com/gofiber/fiber/v2"
 	"github.com/google/uuid"
 )
@@ -34,20 +35,44 @@ var allowedCTs = map[string]string{
 
 type docSearchService struct {
 	refRepository repo.IRefInterface
+	PineconeRepo  repo.IPineconeRepository
 }
 
 type IDocSearchService interface {
 	SearchDocuments(courseName, courseDescription, moduleName, moduleDescription string, moduleId string, ctx *fiber.Ctx) (entities.SerpReturn, error)
+	GetRefsByModuleId(moduleId string, ctx *fiber.Ctx) ([]entities.RefDataModel, error)
 }
 
-func NewDocSearchService(ref repo.IRefInterface) IDocSearchService {
+func NewDocSearchService(ref repo.IRefInterface, pineconeRepo repo.IPineconeRepository) IDocSearchService {
 	return &docSearchService{
 		refRepository: ref,
+		PineconeRepo:  pineconeRepo,
 	}
 }
 
 func (ds *docSearchService) SearchDocuments(courseName, courseDescription, moduleName, moduleDescription string, moduleId string, ctx *fiber.Ctx) (entities.SerpReturn, error) {
 	var serpRes entities.SerpReturn
+
+	userIdRaw := ctx.Locals("userID")
+	if userIdRaw == nil {
+		fmt.Println("Error: User ID not found in context locals for DocSearchService.")
+		return serpRes, fiber.NewError(fiber.StatusUnauthorized, "User ID not found in context")
+	}
+	userIdStr, ok := userIdRaw.(string)
+	if !ok || userIdStr == "" {
+		fmt.Println("Error: Invalid or missing user ID format in context locals for DocSearchService.")
+		return serpRes, fiber.NewError(fiber.StatusUnauthorized, "Invalid or missing user ID")
+	}
+
+	coheereapikey := os.Getenv("COHERE_API_KEY")
+	if coheereapikey == "" {
+		return serpRes, fmt.Errorf("missing COHERE_API_KEY")
+	}
+	co := cohereClient.NewClient(cohereClient.WithToken(coheereapikey))
+
+	nameSpaceName := userIdStr
+
+	fmt.Println("nameSpaceName: ", nameSpaceName)
 
 	geminiService := NewGeminiService()
 
@@ -139,10 +164,13 @@ func (ds *docSearchService) SearchDocuments(courseName, courseDescription, modul
 
 				fmt.Println("\nFile content:", content)
 
+				refId := uuid.NewString()
+
 				serpRes.Content = content
+				serpRes.RefId = refId
 
 				ref := entities.RefDataModel{
-					RefId:    uuid.NewString(),
+					RefId:    refId,
 					ModuleId: moduleId,
 					Title:    result.Title,
 					Link:     result.Link,
@@ -155,6 +183,8 @@ func (ds *docSearchService) SearchDocuments(courseName, courseDescription, modul
 					fmt.Println("Error inserting ref:", err)
 					continue
 				}
+
+				err = ds.PineconeRepo.UpsertVector(ref, co, ctx)
 
 				return serpRes, err
 			}
@@ -337,4 +367,16 @@ func GetHtmlElement(link string, ctx *fiber.Ctx) error {
 	fmt.Println("Extracted text content:", text)
 
 	return ctx.SendString(string(body))
+}
+
+func (ds *docSearchService) GetRefsByModuleId(moduleId string, ctx *fiber.Ctx) ([]entities.RefDataModel, error) {
+
+	var refs []entities.RefDataModel
+
+	refs, err := ds.refRepository.GetRefsByModuleId(moduleId)
+	if err != nil {
+		return nil, fmt.Errorf("failed to get refs by module ID: %w", err)
+	}
+
+	return refs, err
 }

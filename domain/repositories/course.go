@@ -5,7 +5,6 @@ import (
 	"database/sql"
 	"fmt"
 	"go-fiber-template/domain/entities"
-	
 )
 
 type courseRepository struct {
@@ -14,9 +13,9 @@ type courseRepository struct {
 
 type IcourseRepository interface {
 	InsertCourse(course entities.CourseDataModel) error
-	GetCoursesByUserID(userId string) ([]entities.CourseDataModel, error)
-	GetCourseByID(courseID string) (*entities.CourseDataModel, error)
-	DeleteCourse(courseID string) error
+	GetCoursesByUserId(userId string) ([]entities.CourseDataModel, error)
+	GetCourseById(courseId string) (*entities.CourseDataModel, error)
+	DeleteCourse(courseId string) error
 }
 
 func NewCourseRepository(db *sql.DB) IcourseRepository {
@@ -31,7 +30,7 @@ func (repo *courseRepository) InsertCourse(course entities.CourseDataModel) erro
 		id, title, description, userid, createat, updateat
 	) VALUES ($1, $2, $3, $4, $5, $6)`
 	_, err := repo.db.ExecContext(context.Background(), query,
-		course.CourseID,
+		course.CourseId,
 		course.Title,
 		course.Description,
 		course.UserId,
@@ -44,7 +43,7 @@ func (repo *courseRepository) InsertCourse(course entities.CourseDataModel) erro
 	return nil
 }
 
-func (repo *courseRepository) GetCoursesByUserID(userId string) ([]entities.CourseDataModel, error) {
+func (repo *courseRepository) GetCoursesByUserId(userId string) ([]entities.CourseDataModel, error) {
 	query := `
 		SELECT id, title, description, userid, createat, updateat
 		FROM courses
@@ -60,7 +59,7 @@ func (repo *courseRepository) GetCoursesByUserID(userId string) ([]entities.Cour
 	for rows.Next() {
 		var course entities.CourseDataModel
 		if err := rows.Scan(
-			&course.CourseID,
+			&course.CourseId,
 			&course.Title,
 			&course.Description,
 			&course.UserId,
@@ -79,45 +78,45 @@ func (repo *courseRepository) GetCoursesByUserID(userId string) ([]entities.Cour
 	return courses, nil
 }
 
-func (repo *courseRepository) GetCourseByID(courseID string) (*entities.CourseDataModel, error) {
-    query := `
+func (repo *courseRepository) GetCourseById(courseId string) (*entities.CourseDataModel, error) {
+	query := `
         SELECT id, title, description, confirmed, userid, createat, updateat
         FROM courses
         WHERE id = $1
     `
-    var course entities.CourseDataModel
+	var course entities.CourseDataModel
 
-    err := repo.db.QueryRowContext(context.Background(), query, courseID).Scan(
-        &course.CourseID,
-        &course.Title,
-        &course.Description,
-        &course.Confirmed,
-        &course.UserId,
-        &course.CreatedAt, // สแกนตรงเข้า time.Time
-        &course.UpdatedAt, // สแกนตรงเข้า time.Time
-    )
-    if err != nil {
-        return nil, fmt.Errorf("failed to get course by ID %s: %w", courseID, err)
-    }
+	err := repo.db.QueryRowContext(context.Background(), query, courseId).Scan(
+		&course.CourseId,
+		&course.Title,
+		&course.Description,
+		&course.Confirmed,
+		&course.UserId,
+		&course.CreatedAt, // สแกนตรงเข้า time.Time
+		&course.UpdatedAt, // สแกนตรงเข้า time.Time
+	)
+	if err != nil {
+		return nil, fmt.Errorf("failed to get course by ID %s: %w", courseId, err)
+	}
 
-    // ไม่จำเป็นต้องแปลง string เป็น time.Time แล้ว
-    return &course, nil
+	// ไม่จำเป็นต้องแปลง string เป็น time.Time แล้ว
+	return &course, nil
 }
 
 // courses_repo.go
-func (repo *courseRepository) DeleteCourse(courseID string) error {
-    if courseID == "" {
-        return fmt.Errorf("courseID is empty")
-    }
-    const q = `DELETE FROM courses WHERE id = $1`
-    result, err := repo.db.ExecContext(context.Background(), q, courseID)
-    if err != nil {
-        return fmt.Errorf("delete course failed: %w", err)
-    }
+func (repo *courseRepository) DeleteCourse(courseId string) error {
+	if courseId == "" {
+		return fmt.Errorf("courseId is empty")
+	}
+	const q = `DELETE FROM courses WHERE id = $1`
+	result, err := repo.db.ExecContext(context.Background(), q, courseId)
+	if err != nil {
+		return fmt.Errorf("delete course failed: %w", err)
+	}
 
-    if n, _ := result.RowsAffected(); n == 0 {
-        return nil
-    }
-    fmt.Println("Deleted course:", courseID)
-    return nil
+	if n, _ := result.RowsAffected(); n == 0 {
+		return nil
+	}
+	fmt.Println("Deleted course:", courseId)
+	return nil
 }

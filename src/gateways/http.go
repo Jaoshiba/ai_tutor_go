@@ -19,6 +19,7 @@ type HTTPGateway struct {
 	AuthService       auth.IAuthService
 	ChapterService    service.IChapterService
 	CourseService     service.ICourseService
+	DocSearchService  service.IDocSearchService
 }
 
 func NewHTTPGateway(
@@ -26,19 +27,19 @@ func NewHTTPGateway(
 	users service.IUsersService,
 	modules service.IModuleService,
 	exams service.IExamService,
-	googleAuth auth.IGoogleOAuth,
 	authService auth.IAuthService,
 	chapterService service.IChapterService,
 	courseService service.ICourseService,
+	docSearchService service.IDocSearchService,
 ) {
 	gateway := &HTTPGateway{
 		UserService:       users,
 		ModuleService:     modules,
 		ExamsService:      exams,
-		GoogleAuthService: googleAuth,
 		AuthService:       authService,
 		ChapterService:    chapterService,
 		CourseService:     courseService,
+		DocSearchService:  docSearchService,
 	}
 
 	GatewayAuth(*gateway, app)
@@ -47,7 +48,8 @@ func NewHTTPGateway(
 
 	GatewayModules(*gateway, app)
 	GatewayCourse(*gateway, app)
-	GatewayExams(*gateway, app)
+	GatewayRefs(*gateway, app)
+	GatewayAskChat(*gateway, app)
 	GatewayProtected(*gateway, app)
 
 }

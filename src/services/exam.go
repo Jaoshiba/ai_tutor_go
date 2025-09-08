@@ -42,6 +42,7 @@ func (es *ExamService) ExamGenerate(examRequest entities.ExamRequest) error {
 		PassScore:   (len(questions) * 70) / 100,
 		QuestionNum: len(questions),
 		Questions:   questions,
+		RefId:       examRequest.RefId,
 		CreatedAt:   time.Now(),
 		UpdatedAt:   time.Now(),
 	}
