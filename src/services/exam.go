@@ -72,4 +72,4 @@ func (es *ExamService) GetExamsByModuleID(moduleId string) ([]entities.ExamDataM
 
 // func (es *ExamService) GetExamsByCourseID(courseId string) ([]entities.ExamDataModel, error) {
 
-// } 
+// }

@@ -11,7 +11,7 @@ import (
 	"github.com/gofiber/fiber/v2"
 	"github.com/google/uuid"
 )
- 
+
 type ModuleService struct {
 	modulesRepository repo.IModuleRepository
 	ChapterServices   IChapterService
@@ -20,7 +20,7 @@ type ModuleService struct {
 }
 
 type IModuleService interface {
-	CreateModule(ctx *fiber.Ctx, moduleData entities.CourseGeminiResponse, courseTitle string, courseDescription string) error
+	CreateModule(ctx *fiber.Ctx, moduleData entities.CourseGeminiResponse, courseTitle string, courseDescription string, fromfile bool) error
 	GetModulesByCourseId(courseID string) ([]entities.ModuleDataModel, error)
 	DeleteModuleByCourseId(courseID string) error
 }
@@ -34,7 +34,7 @@ func NewModuleService(modulesRepository repo.IModuleRepository, chapterservice I
 	}
 }
 
-func (ms *ModuleService) CreateModule(ctx *fiber.Ctx, moduleData entities.CourseGeminiResponse, courseTitle string, courseDescription string) error {
+func (ms *ModuleService) CreateModule(ctx *fiber.Ctx, moduleData entities.CourseGeminiResponse, courseTitle string, courseDescription string, fromfile bool) error {
 	// Generate a new ModuleId early, as it's needed for both the module and its chapters.
 
 	for i, moduleData := range moduleData.Modules {
