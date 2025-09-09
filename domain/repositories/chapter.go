@@ -17,7 +17,7 @@ type IChapterRepository interface {
 	GetChaptersByModuleID(moduleID string) ([]entities.ChapterDataModel, error)
 	DeleteChapter(chapterID string) error
 	DeleteChapterByModuleID(moduleID string) error
-
+	GetChaptersByChapterId(chapterId string) (entities.ChapterDataModel, error)
 }
 
 func NewChapterRepository(db *sql.DB) IChapterRepository {
@@ -102,44 +102,68 @@ func (repo *chaptersRepository) GetChaptersByModuleID(moduleID string) ([]entiti
 
 // chapters_repo.go
 func (repo *chaptersRepository) DeleteChapterByModuleID(moduleID string) error {
-    if moduleID == "" {
-        return fmt.Errorf("moduleID is empty")
-    }
-    const q = `DELETE FROM chapters WHERE moduleid = $1`
-    result, err := repo.db.ExecContext(context.Background(), q, moduleID)
-    if err != nil {
-        return fmt.Errorf("delete chapters by module_id failed: %w", err)
-    }
-    // ไม่ต้อง error เมื่อ 0 แถว
-    if n, _ := result.RowsAffected(); n > 0 {
-        fmt.Printf("Deleted %d chapter(s) for module_id=%s\n", n, moduleID)
-    }
-    return nil
+	if moduleID == "" {
+		return fmt.Errorf("moduleID is empty")
+	}
+	const q = `DELETE FROM chapters WHERE moduleid = $1`
+	result, err := repo.db.ExecContext(context.Background(), q, moduleID)
+	if err != nil {
+		return fmt.Errorf("delete chapters by module_id failed: %w", err)
+	}
+	// ไม่ต้อง error เมื่อ 0 แถว
+	if n, _ := result.RowsAffected(); n > 0 {
+		fmt.Printf("Deleted %d chapter(s) for module_id=%s\n", n, moduleID)
+	}
+	return nil
 }
 
-
 func (repo *chaptersRepository) DeleteChapter(chapterID string) error {
-    fmt.Printf("DeleteChapter called for chapter with ID: %s\n", chapterID)
-    
-    query := `
+	fmt.Printf("DeleteChapter called for chapter with ID: %s\n", chapterID)
+
+	query := `
         DELETE FROM chapters
         WHERE chapterid = $1
     `
 
-    result, err := repo.db.ExecContext(context.Background(), query, chapterID)
-    if err != nil {
-        return fmt.Errorf("failed to delete chapter with ID %s: %w", chapterID, err)
-    }
+	result, err := repo.db.ExecContext(context.Background(), query, chapterID)
+	if err != nil {
+		return fmt.Errorf("failed to delete chapter with ID %s: %w", chapterID, err)
+	}
 
-    rowsAffected, err := result.RowsAffected()
-    if err != nil {
-        return fmt.Errorf("failed to get rows affected after deleting chapter: %w", err)
-    }
+	rowsAffected, err := result.RowsAffected()
+	if err != nil {
+		return fmt.Errorf("failed to get rows affected after deleting chapter: %w", err)
+	}
 
-    if rowsAffected == 0 {
-        return fmt.Errorf("no chapter found with ID %s to delete", chapterID)
-    }
-    
-    fmt.Printf("Successfully deleted %d row for chapter ID: %s\n", rowsAffected, chapterID)
-    return nil
+	if rowsAffected == 0 {
+		return fmt.Errorf("no chapter found with ID %s to delete", chapterID)
+	}
+
+	fmt.Printf("Successfully deleted %d row for chapter ID: %s\n", rowsAffected, chapterID)
+	return nil
+}
+
+func (repo *chaptersRepository) GetChaptersByChapterId(chapterId string) (entities.ChapterDataModel, error) {
+
+	var chapter entities.ChapterDataModel
+	query := `
+		SELECT chapterid, chaptername, userid, courseid, chaptercontent, createat, updateat, moduleid
+		FROM chapters
+		WHERE chapterid = $1
+	`
+
+	row := repo.db.QueryRowContext(context.Background(), query, chapterId)
+	err := row.Scan(
+		&chapter.ChapterId,
+		&chapter.ChapterName,
+		&chapter.UserID,
+		&chapter.CourseId,
+		&chapter.ChapterContent,
+		&chapter.CreateAt,
+	)
+	if err != nil {
+		return chapter, fmt.Errorf("failed to scan chapter row: %w", err)
+	}
+
+	return chapter, nil
 }

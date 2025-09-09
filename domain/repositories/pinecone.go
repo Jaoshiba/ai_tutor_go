@@ -18,7 +18,7 @@ type PineconeRepository struct {
 }
 
 type IPineconeRepository interface {
-	UpsertVector(chapter entities.RefDataModel, co *cohereClient.Client, ctx *fiber.Ctx) error
+	UpsertVector(chapter entities.ChapterDataModel, co *cohereClient.Client, ctx *fiber.Ctx) error
 }
 
 func NewPineconeRepository(pineconeIdxConn *pinecone.IndexConnection) IPineconeRepository {
@@ -27,7 +27,7 @@ func NewPineconeRepository(pineconeIdxConn *pinecone.IndexConnection) IPineconeR
 	}
 }
 
-func (pc *PineconeRepository) UpsertVector(ref entities.RefDataModel, co *cohereClient.Client, ctx *fiber.Ctx) error {
+func (pc *PineconeRepository) UpsertVector(chapter entities.ChapterDataModel, co *cohereClient.Client, ctx *fiber.Ctx) error {
 	fmt.Println("upsertVector call...")
 	// limit := uint32(100)
 	// namespaces, err := indexConn.ListNamespaces(ctx.Context(), &pinecone.ListNamespacesParams{
@@ -69,19 +69,17 @@ func (pc *PineconeRepository) UpsertVector(ref entities.RefDataModel, co *cohere
 
 	vectorId := uuid.NewString()
 	metadata, err := structpb.NewStruct(map[string]interface{}{
-		"refId":    ref.RefId,
-		"moduleId": ref.ModuleId,
-		"courseId": courseId,
-		"Title":    ref.Title,
-		"Link":     ref.Link,
-		"searchat": ref.SearchAt,
+		"chapterId":   chapter.ChapterId,
+		"moduleId":    chapter.ModuleId,
+		"courseId":    courseId,
+		"chapterName": chapter.ChapterName,
 	})
 	if err != nil {
 		fmt.Println("error create metadata: ", err)
 		return err
 	}
 
-	denseValue, err := EmbeddingText(co, ref.Content, ctx)
+	denseValue, err := EmbeddingText(co, chapter.ChapterContent, ctx)
 	if err != nil {
 		fmt.Println("error create denseValue: ", err)
 		return err

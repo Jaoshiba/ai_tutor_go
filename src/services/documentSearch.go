@@ -15,7 +15,6 @@ import (
 	"strings"
 	"time"
 
-	cohereClient "github.com/cohere-ai/cohere-go/v2/client"
 	"github.com/gofiber/fiber/v2"
 	"github.com/google/uuid"
 )
@@ -68,7 +67,7 @@ func (ds *docSearchService) SearchDocuments(courseName, courseDescription, modul
 	if coheereapikey == "" {
 		return serpRes, fmt.Errorf("missing COHERE_API_KEY")
 	}
-	co := cohereClient.NewClient(cohereClient.WithToken(coheereapikey))
+	// co := cohereClient.NewClient(cohereClient.WithToken(coheereapikey))
 
 	nameSpaceName := userIdStr
 
@@ -184,7 +183,7 @@ func (ds *docSearchService) SearchDocuments(courseName, courseDescription, modul
 					continue
 				}
 
-				err = ds.PineconeRepo.UpsertVector(ref, co, ctx)
+				// err = ds.PineconeRepo.UpsertVector(ref, co, ctx)
 
 				return serpRes, err
 			}

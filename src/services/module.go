@@ -100,18 +100,11 @@ func (ms *ModuleService) CreateModule(ctx *fiber.Ctx, courese entities.CourseGem
 				return err
 			}
 
-			examRequest := entities.ExamRequest{
-				ModuleId:    moduleId,
-				Content:     serpReturn.Content,
-				RefId:       serpReturn.RefId,
-				Difficulty:  "medium",
-				QuestionNum: 10,
-			}
-			err = ms.ExamService.ExamGenerate(examRequest)
-			if err != nil {
-				fmt.Printf("Error generating exam for module %s: %v\n", moduleId, err)
-				return err // Return the error if module insertion fails.
-			}
+			// err = ms.ExamService.ExamGenerate(examRequest)
+			// if err != nil {
+			// 	fmt.Printf("Error generating exam for module %s: %v\n", moduleId, err)
+			// 	return err // Return the error if module insertion fails.
+			// }
 
 			fmt.Println("All chapters processed for module", module) // This log should be after the loop.
 		}

@@ -1,40 +1,48 @@
 package services
 
 import (
-	"context"
 	"encoding/json"
 	"fmt"
 	"go-fiber-template/domain/entities"
+	repo "go-fiber-template/domain/repositories"
 	"os"
 
+	"time"
+
+	"github.com/gofiber/fiber/v2"
+	"github.com/google/uuid"
 	"google.golang.org/genai"
 )
 
 type QuestionService struct {
+	questionRepository repo.IQuestionRepository
 }
 
 type IQuestionService interface {
-	QuestionsCreate(content string, difficulty string, questionNum int) ([]interface{}, error)
+	QuestionsCreate(questionRequest entities.QuestionRequest, ctx *fiber.Ctx) error
 }
 
-func QuestionsCreate(content string, difficulty string, questionNum int) ([]interface{}, error) {
+func NewQuestionService(questionRepository repo.IQuestionRepository) IQuestionService {
+	return &QuestionService{
+		questionRepository: questionRepository,
+	}
+}
+
+func (qs *QuestionService) QuestionsCreate(questionRequest entities.QuestionRequest, ctx *fiber.Ctx) error {
 
 	fmt.Println("Questions Generate called...")
-	var questions []interface{}
 
 	gemini_api_key := (os.Getenv("GEMINI_API_KEY"))
 	if gemini_api_key == "" {
-		return questions, nil
+		return nil
 	}
 
-	ctx := context.Background()
-
-	client, err := genai.NewClient(ctx, &genai.ClientConfig{
+	client, err := genai.NewClient(ctx.Context(), &genai.ClientConfig{
 		APIKey:  gemini_api_key,
 		Backend: genai.BackendGeminiAPI,
 	})
 	if err != nil {
-		return questions, err
+		return err
 	}
 
 	promt := fmt.Sprintf(`
@@ -46,11 +54,11 @@ func QuestionsCreate(content string, difficulty string, questionNum int) ([]inte
 		คำถามจะต้องมีรูปแบบผสมผสานจากประเภทต่อไปนี้ พร้อมโครงสร้าง JSON ที่ถูกต้อง:
 
 		1.  **คำถามแบบเลือกตอบ (Multiple-Choice):**
-			-   โครงสร้าง: {"type": "multiple-choice", "question": "...", "options": ["...", "...", "...", "..."], "answer": "..."}
+			-   โครงสร้าง: {"type": "multiple-choice", "question": "...", "options": ["...", "...", "...", "..."], "answer": ["..."]}
 			-   แต่ละคำถามต้องมี 4 ตัวเลือกเสมอ
 
 		2.  **คำถามแบบเติมคำในช่องว่าง (Fill-in-the-Blank):**
-			-   โครงสร้าง: {"type": "fill-in-the-blank", "question": "...", "answer": "..."}
+			-   โครงสร้าง: {"type": "fill-in-the-blank", "question": "...", "answer": ["..."]}
 			-   ช่องว่างในคำถามต้องแสดงด้วยขีดเส้นใต้ (เช่น "______")
 
 		3.  **คำถามแบบเรียงลำดับ (Ordering/Sequencing):**
@@ -63,28 +71,28 @@ func QuestionsCreate(content string, difficulty string, questionNum int) ([]inte
 		---
 		%s
 		---`,
-		questionNum,
-		difficulty,
-		content)
+		questionRequest.QuestionNum,
+		questionRequest.Difficulty,
+		questionRequest.Content)
 
 	fmt.Println("Wait for Gemini to create your questions...")
-	fmt.Println("content: ", content)
+	fmt.Println("content: ", questionRequest.Content)
 
 	result, err := client.Models.GenerateContent(
-		ctx,
+		ctx.Context(),
 		"gemini-2.5-flash",
 		genai.Text(promt),
 		nil,
 	)
 	if err != nil {
 		fmt.Println("Error generating questions:", err)
-		return questions, err
+		return err
 	}
 	fmt.Println("Gemini response: ", result.Text())
 
 	if result.Text() == "" {
 		fmt.Println("Error generating questions: no content returned")
-		return questions, fmt.Errorf("no content returned from Gemini")
+		return fmt.Errorf("no content returned from Gemini")
 	}
 
 	fmt.Println("result from gemini: ", result.Text())
@@ -93,55 +101,78 @@ func QuestionsCreate(content string, difficulty string, questionNum int) ([]inte
 	fmt.Println("Questions from Gemini: ", questionsFromGemini)
 	if questionsFromGemini == "" {
 		fmt.Println("Error parsing questions from Gemini: no content returned")
-		return questions, fmt.Errorf("no questions generated from Gemini")
+		return fmt.Errorf("no questions generated from Gemini")
 	}
 
 	fmt.Println("result after remove json block: ", questionsFromGemini)
 
-	var rawQuestions []json.RawMessage
-	if err := json.Unmarshal([]byte(questionsFromGemini), &rawQuestions); err != nil {
-		fmt.Println("Error unmarshaling to raw messages:", err)
-		return questions, err
-	}
+	var questions []entities.QuestionFromGemini
 
-	for _, rawQ := range rawQuestions {
-		var baseQuestion struct {
-			Type string `json:"type"`
-		}
-		// อ่านเฉพาะ "type" เพื่อระบุประเภทคำถาม
-		if err := json.Unmarshal(rawQ, &baseQuestion); err != nil {
-			continue
-		}
-		fmt.Println("Base Question Type:", baseQuestion.Type)
+	err = json.Unmarshal([]byte(questionsFromGemini), &questions)
+	// var rawQuestions []json.RawMessage
+	// if err := json.Unmarshal([]byte(questionsFromGemini), &rawQuestions); err != nil {
+	// 	fmt.Println("Error unmarshaling to raw messages:", err)
+	// 	return err
+	// }
 
-		switch baseQuestion.Type {
-		case "multiple-choice":
-			var choiceQuestion entities.ChoiceOption
-			if err := json.Unmarshal(rawQ, &choiceQuestion); err != nil {
-				fmt.Println("Error unmarshaling multiple-choice question:", err)
-				continue
-			}
-			questions = append(questions, choiceQuestion)
-		case "fill-in-the-blank":
-			var fillInBlankQuestion entities.FillInBlank
-			if err := json.Unmarshal(rawQ, &fillInBlankQuestion); err != nil {
-				fmt.Println("Error unmarshaling fill-in-the-blank question:", err)
-				continue
-			}
-			questions = append(questions, fillInBlankQuestion)
-		case "ordering":
-			var orderingQuestion entities.Ordering
-			if err := json.Unmarshal(rawQ, &orderingQuestion); err != nil {
-				fmt.Println("Error unmarshaling ordering question:", err)
-				continue
-			}
-			questions = append(questions, orderingQuestion)
+	// for _, rawQ := range rawQuestions {
+	// 	var baseQuestion struct {
+	// 		Type string `json:"type"`
+	// 	}
+	// 	// อ่านเฉพาะ "type" เพื่อระบุประเภทคำถาม
+	// 	if err := json.Unmarshal(rawQ, &baseQuestion); err != nil {
+	// 		continue
+	// 	}
+	// 	fmt.Println("Base Question Type:", baseQuestion.Type)
+
+	// 	switch baseQuestion.Type {
+	// 	case "multiple-choice":
+	// 		var choiceQuestion entities.ChoiceOption
+	// 		if err := json.Unmarshal(rawQ, &choiceQuestion); err != nil {
+	// 			fmt.Println("Error unmarshaling multiple-choice question:", err)
+	// 			continue
+	// 		}
+	// 		questions = append(questions, choiceQuestion)
+	// 	case "fill-in-the-blank":
+	// 		var fillInBlankQuestion entities.FillInBlank
+	// 		if err := json.Unmarshal(rawQ, &fillInBlankQuestion); err != nil {
+	// 			fmt.Println("Error unmarshaling fill-in-the-blank question:", err)
+	// 			continue
+	// 		}
+	// 		questions = append(questions, fillInBlankQuestion)
+	// 	case "ordering":
+	// 		var orderingQuestion entities.Ordering
+	// 		if err := json.Unmarshal(rawQ, &orderingQuestion); err != nil {
+	// 			fmt.Println("Error unmarshaling ordering question:", err)
+	// 			continue
+	// 		}
+	// 		questions = append(questions, orderingQuestion)
+	// 	}
+	// }
+
+	for _, q := range questions {
+		fmt.Println("Generated Question:", q)
+		questionId := uuid.NewString()
+		err := qs.questionRepository.InsertQuestion(entities.QuestionDataModel{
+			QuestionId: questionId,
+			ExamId:     questionRequest.ExamId,
+			Type:       q.Type,
+			Question:   q.Question,
+			Optoions:   fmt.Sprintf("%v", q.Options),
+			Answer:     fmt.Sprintf("%v", q.Answer),
+			CreateAt:   time.Now(),
+			UpdatedAt:  time.Now(),
+		})
+		if err != nil {
+			fmt.Println("Error inserting question into database:", err)
+			return err
 		}
+
 	}
 
 	fmt.Println("Finished generating questions...")
 
 	fmt.Println("question", questions)
 
-	return questions, nil
+	return nil
 }

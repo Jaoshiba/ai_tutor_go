@@ -67,7 +67,7 @@ func main() {
 	pineconeRepo := repo.NewPineconeRepository(pineconeIdxConn)
 	examRepo := repo.NewExamRepository(postgresql)
 	refRepo := repo.NewRefRepository(postgresql)
-
+	questionrepo := repo.NewQuestionRepository(postgresql)
 	if userRepo == nil || fileRepo == nil || chapterRepo == nil || courseRepo == nil {
 		log.Fatalf("One or more repositories failed to initialize and are NIL.")
 	}
@@ -80,8 +80,9 @@ func main() {
 	svAuth := authService.NewAuthService(userRepo) // สร้าง AuthService
 	sv0 := sv.NewUsersService(userRepo)            // สร้าง UsersServic
 	geminiService := sv.NewGeminiService()
+	svQuestion := sv.NewQuestionService(questionrepo)
 
-	svExam := sv.NewExamService(examRepo)
+	svExam := sv.NewExamService(examRepo, chapterRepo, svQuestion)
 	svdocSearch := sv.NewDocSearchService(refRepo, pineconeRepo)
 	svChapter := sv.NewChapterServices(chapterRepo, pineconeRepo, geminiService, svExam)
 	sv1 := sv.NewModuleService(fileRepo, svChapter, svExam, svdocSearch)

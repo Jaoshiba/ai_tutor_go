@@ -33,13 +33,13 @@ func NewHTTPGateway(
 	docSearchService service.IDocSearchService,
 ) {
 	gateway := &HTTPGateway{
-		UserService:       users,
-		ModuleService:     modules,
-		ExamsService:      exams,
-		AuthService:       authService,
-		ChapterService:    chapterService,
-		CourseService:     courseService,
-		DocSearchService:  docSearchService,
+		UserService:      users,
+		ModuleService:    modules,
+		ExamsService:     exams,
+		AuthService:      authService,
+		ChapterService:   chapterService,
+		CourseService:    courseService,
+		DocSearchService: docSearchService,
 	}
 
 	GatewayAuth(*gateway, app)
@@ -48,6 +48,7 @@ func NewHTTPGateway(
 
 	GatewayModules(*gateway, app)
 	GatewayCourse(*gateway, app)
+	GatewayExam(*gateway, app)
 	GatewayRefs(*gateway, app)
 	GatewayAskChat(*gateway, app)
 	GatewayProtected(*gateway, app)
