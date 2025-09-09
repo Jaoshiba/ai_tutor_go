@@ -116,30 +116,64 @@ func (rs *courseService) RegenCourse(courseJsonBody entities.CourseRequestBody, 
 	return courses, nil
 }
 
-func (rs *courseService) CreateModulesFromFile(file *multipart.FileHeader, ctx *fiber.Ctx) (entities.CourseGeminiResponse, error) {
-	var courses entities.CourseGeminiResponse
+func (rs *courseService) CreateModulesFromFile(file *multipart.FileHeader, ctx *fiber.Ctx) ([]entities.GenModule, error) {
+	var modules []entities.GenModule
 	if file != nil {
 		var content string
 		fmt.Println("Extracting file content....")
 		docPath, err := SaveFileToDisk(file, ctx)
 		if err != nil {
 			fmt.Printf("Error saving file to disk: %v\n", err)
-			return courses, err
+			return modules, err
 		}
 
 		fileContent, err := ReadFileData(docPath, ctx)
 		content = fileContent
 		if err != nil {
 			fmt.Printf("Error processing file with FileService: %v\n", err)
-			return courses, err
+			return modules, err
 		}
 
 		fmt.Println("Content extracted from file:", content)
+
+		prompt := fmt.Sprintf(`คุณคือผู้เชี่ยวชาญด้านการสร้างเนื้อหาที่สามารถจัดการเนื้อหาที่ฉันให้มาได้อย่างมีประสิทธิภาพ โดยคุณมีข้อจำกัดที่ว่า **ต้องใช้เฉพาะเนื้อหาที่ฉันให้เท่านั้น** และ **ห้ามสร้างข้อมูลหรือเนื้อหาใหม่ขึ้นมาเอง**
+
+			หน้าที่ของคุณคือ:
+			1.  **แบ่งเนื้อหา** ที่ให้มาออกเป็นส่วนๆ
+			2.  สำหรับแต่ละส่วน ให้ **สร้าง object** ที่มีโครงสร้างดังต่อไปนี้:
+				
+					type GenModule struct {
+					Title       string 
+					Description string 
+					Content     string 
+				}
+			3.  **สร้างชื่อหัวข้อ (Title)** ที่น่าสนใจและสื่อสารเนื้อหาในส่วนนั้นๆ ได้อย่างชัดเจน
+			4.  **เขียนสรุปเนื้อหา (Description)** ที่กระชับและดึงดูดความสนใจผู้อ่านสำหรับส่วนนั้นๆ
+			5.  **ใส่เนื้อหาต้นฉบับทั้งหมดของส่วนนั้นๆ** ลงใน Content
+			6.  รวบรวม object ทั้งหมดให้อยู่ในรูป **array of objects** ในรูปแบบ JSON ที่ถูกต้อง
+
+		**เนื้อหา:**
+		%s
+		`, content)
+
+		modulesFromGemini, err := rs.GeminiService.GenerateContentFromPrompt(ctx.Context(), prompt)
+		if err != nil {
+			fmt.Println(err)
+			return modules, err
+		}
+
+		err = json.Unmarshal([]byte(modulesFromGemini), &modules)
+		if err != nil {
+			fmt.Println(err)
+			return modules, err
+		}
+
+		return modules, nil
+
 	} else {
-		return courses, fmt.Errorf("no file found")
+		return modules, fmt.Errorf("no file found")
 	}
 
-	return courses, nil
 }
 
 func (rs *courseService) CreateCourse(courserequest entities.CourseRequestBody, fromfile bool, file *multipart.FileHeader, ctx *fiber.Ctx) error {
@@ -196,7 +230,7 @@ func (rs *courseService) CreateCourse(courserequest entities.CourseRequestBody, 
 
 			courses := courserequest.Course
 
-			err = rs.ModuleService.CreateModule(ctx, courses, courserequest.Title, courserequest.Description, false)
+			err = rs.ModuleService.CreateModule(ctx, courses, courserequest.Title, courserequest.Description, fromfile)
 			if err != nil {
 				fmt.Println("error insert module", err)
 				return err
@@ -234,7 +268,6 @@ func (rs *courseService) CreateCourse(courserequest entities.CourseRequestBody, 
 		}
 
 	} else { //for file upload
-		var content string
 
 		courseId := uuid.NewString()
 		ctx.Locals("courseId", courseId)
@@ -260,32 +293,20 @@ func (rs *courseService) CreateCourse(courserequest entities.CourseRequestBody, 
 			return err
 		}
 
-		courses, err := rs.CreateModulesFromFile(file, ctx)
+		modules, err := rs.CreateModulesFromFile(file, ctx)
 		if err != nil {
 			return err
 		}
-		fmt.Println("courses : ", courses)
+		fmt.Println("courses : ", modules)
 
-		// for _, moduleData := range courses.Modules {
-		// 	// fmt.Println("Module : ", moduleData)
-		// 	moduleData.Content = content
-		// 	err = rs.ModuleService.CreateModule(ctx, &moduleData)
-		// 	if err != nil {
-		// 		return err
-		// 	}
-		// }
+		courses := entities.CourseGeminiResponse{
+			Purpose: "Course created from file upload",
+			Modules: modules,
+		}
 
-		for _, moduleData := range courses.Modules {
-			// fmt.Println("Module : ", moduleData)
-			moduleData.Content = content
-			courseGemini := entities.CourseGeminiResponse{
-				Purpose: courses.Purpose,
-				Modules: []entities.GenModule{moduleData},
-			}
-			err := rs.ModuleService.CreateModule(ctx, courseGemini, courseJsonBody.Title, courseJsonBody.Description, true)
-			if err != nil {
-				return err
-			}
+		err = rs.ModuleService.CreateModule(ctx, courses, courserequest.Title, courserequest.Description, fromfile)
+		if err != nil {
+			return err
 		}
 
 		//create module
@@ -298,22 +319,6 @@ func (rs *courseService) CreateCourse(courserequest entities.CourseRequestBody, 
 		// if err != nil {
 		// 	return err
 		// }
-
-		moduleData := entities.GenModule{
-			Title:       file.Filename,
-			Description: " ",
-			Content:     content,
-		}
-		courses = entities.CourseGeminiResponse{
-			Purpose: "Upload File",
-			Modules: []entities.GenModule{moduleData},
-		}
-		//create module
-
-		err = rs.ModuleService.CreateModule(ctx, courses, courseJsonBody.Title, courseJsonBody.Description)
-		if err != nil {
-			return err
-		}
 
 	}
 

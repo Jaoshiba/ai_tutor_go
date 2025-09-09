@@ -21,29 +21,25 @@ type ChapterServices struct {
 	ChapterRepository repositories.IChapterRepository
 	PineconeRepo      repositories.IPineconeRepository
 	GeminiService     IGeminiService
+	ExamService       IExamService
 }
 
 type IChapterService interface {
-	ChapterrizedText(ctx *fiber.Ctx, courseId string, moduleData entities.GenModule) error
+	ChapterrizedText(ctx *fiber.Ctx, moduleData entities.GenModule) error
 	GetChaptersByModuleID(moduleID string) ([]entities.ChapterDataModel, error)
 	DeleteChapterByModuleID(moduleID string) error
 }
 
-func NewChapterServices(chapterRepository repositories.IChapterRepository, pineconeRepo repositories.IPineconeRepository, GeminiService IGeminiService) IChapterService {
-	if chapterRepository == nil {
-		log.Fatal("❌ ChapterServices initialized with nil repository") // บรรทัดนี้คุณมีอยู่แล้ว
-	} else {
-		fmt.Println("✅ ChapterServices initialized with non-nil repository.")                   // เพิ่มบรรทัดนี้
-		fmt.Printf("ChapterRepository instance in NewChapterServices: %p\n", chapterRepository) // เพิ่มบรรทัดนี้
-	}
+func NewChapterServices(chapterRepository repositories.IChapterRepository, pineconeRepo repositories.IPineconeRepository, GeminiService IGeminiService, ExamService IExamService) IChapterService {
 	return &ChapterServices{
 		ChapterRepository: chapterRepository,
 		PineconeRepo:      pineconeRepo,
 		GeminiService:     GeminiService,
+		ExamService:       ExamService,
 	}
 }
 
-func (c *ChapterServices) ChapterrizedText(ctx *fiber.Ctx, courseId string, moduleData entities.GenModule) error {
+func (c *ChapterServices) ChapterrizedText(ctx *fiber.Ctx, moduleData entities.GenModule) error {
 
 	moduleTitle := moduleData.Title
 	moduleDescription := moduleData.Description
@@ -252,6 +248,8 @@ func (c *ChapterServices) ChapterrizedText(ctx *fiber.Ctx, courseId string, modu
 
 	fmt.Println("nameSpaceName: ", nameSpaceName)
 
+	courseId := ctx.Locals("courseID").(string)
+
 	for _, chapter := range response.Chapters {
 		ch := entities.ChapterDataModel{
 			ChapterId:      uuid.NewString(),
@@ -308,4 +306,3 @@ func (c *ChapterServices) DeleteChapterByModuleID(moduleID string) error {
 
 	return nil
 }
-

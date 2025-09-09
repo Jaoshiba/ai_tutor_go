@@ -77,13 +77,13 @@ func main() {
 	if jwtSecret == "" {
 		log.Fatal("JWT_SECRET_KEY is not set in .env")
 	}
-	svAuth := authService.NewAuthService(userRepo)            // สร้าง AuthService
-	sv0 := sv.NewUsersService(userRepo)                       // สร้าง UsersServic
+	svAuth := authService.NewAuthService(userRepo) // สร้าง AuthService
+	sv0 := sv.NewUsersService(userRepo)            // สร้าง UsersServic
 	geminiService := sv.NewGeminiService()
 
 	svExam := sv.NewExamService(examRepo)
 	svdocSearch := sv.NewDocSearchService(refRepo, pineconeRepo)
-	svChapter := sv.NewChapterServices(chapterRepo, pineconeRepo, geminiService)
+	svChapter := sv.NewChapterServices(chapterRepo, pineconeRepo, geminiService, svExam)
 	sv1 := sv.NewModuleService(fileRepo, svChapter, svExam, svdocSearch)
 	svCourse := sv.NewCourseService(courseRepo, sv1, geminiService, svChapter)
 
