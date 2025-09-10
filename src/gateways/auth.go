@@ -16,16 +16,13 @@ func (h *HTTPGateway) Login(ctx *fiber.Ctx) error {
 			Error:   "Invalid request format",
 		})
 	}
-
-	// 2. Basic Field Validation
 	if loginReq.Email == "" || loginReq.Password == "" {
 		return ctx.Status(fiber.StatusBadRequest).JSON(entities.LoginResponse{
 			Success: false,
 			Error:   "Email and password are required",
 		})
 	}
-
-	// 3. Call Auth Service
+	
 	response, err := h.AuthService.Login(loginReq.Email, loginReq.Password, ctx)
 	if err != nil {
 		// กรณีเกิด error ในการทำงานของระบบ
@@ -35,14 +32,47 @@ func (h *HTTPGateway) Login(ctx *fiber.Ctx) error {
 		})
 	}
 
-	// 4. Handle Service Response
 	if !response.Success {
 		// กรณีล็อกอินไม่สำเร็จ (credentials ไม่ถูกต้อง)
 		return ctx.Status(fiber.StatusUnauthorized).JSON(response)
 	}
 
-	// 5. Success Response
 	return ctx.Status(fiber.StatusOK).JSON(response)
 }
 
+func (h *HTTPGateway) EmailVerify(ctx *fiber.Ctx) error {
 
+	
+
+	return nil
+}
+
+func (h *HTTPGateway) ResetPassword(ctx *fiber.Ctx) error {
+
+	var req entities.ResetPasswordRequest
+
+	if err := ctx.BodyParser(&req); err != nil {
+        return ctx.Status(fiber.StatusBadRequest).JSON(fiber.Map{
+            "error": "Invalid request body",
+        })
+    }
+	email := req.Email
+	if email == "" {
+		return ctx.Status(fiber.StatusBadRequest).JSON(fiber.Map{
+			"error":"Email is require",
+		})
+	}
+
+
+	err := h.ResetPasswordService.CreateResetRequest(ctx, email)
+	if err!=nil {
+		return ctx.Status(fiber.StatusInternalServerError).JSON(fiber.Map{
+			"error":err.Error(),
+		})
+	}
+
+	return ctx.Status(fiber.StatusOK).JSON(fiber.Map{
+		"message":"Reset Email Send Successfully",
+	})
+	
+}

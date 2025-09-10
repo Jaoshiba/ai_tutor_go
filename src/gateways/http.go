@@ -20,6 +20,9 @@ type HTTPGateway struct {
 	ChapterService    service.IChapterService
 	CourseService     service.ICourseService
 	DocSearchService  service.IDocSearchService
+	// EmailService      service.IEmailService
+	ResetPasswordService service.IResetPasswordService
+	
 }
 
 func NewHTTPGateway(
@@ -31,26 +34,29 @@ func NewHTTPGateway(
 	chapterService service.IChapterService,
 	courseService service.ICourseService,
 	docSearchService service.IDocSearchService,
+	resetpassword service.IResetPasswordService,
+	
 ) {
 	gateway := &HTTPGateway{
-		UserService:       users,
-		ModuleService:     modules,
-		ExamsService:      exams,
-		AuthService:       authService,
-		ChapterService:    chapterService,
-		CourseService:     courseService,
-		DocSearchService:  docSearchService,
+		UserService:      users,
+		ModuleService:    modules,
+		ExamsService:     exams,
+		AuthService:      authService,
+		ChapterService:   chapterService,
+		CourseService:    courseService,
+		DocSearchService: docSearchService,
+		ResetPasswordService: resetpassword,
 	}
 
 	GatewayAuth(*gateway, app)
-	GatewayGoogleAuth(*gateway, app)
 	GatewayUsers(*gateway, app)
-
 	GatewayModules(*gateway, app)
 	GatewayCourse(*gateway, app)
 	GatewayRefs(*gateway, app)
 	GatewayAskChat(*gateway, app)
 	GatewayProtected(*gateway, app)
+
+	// GatewayEmail(*gateway, app)
 
 }
 
@@ -72,7 +78,6 @@ func (h *HTTPGateway) LogoutHandler(c *fiber.Ctx) error {
 // GetMeDataHandler (ไม่มีการเปลี่ยนแปลง)
 // (สมมติว่าคุณได้เพิ่ม User struct และ GetUserData ใน services/users.go แล้ว)
 func (h *HTTPGateway) GetMeDataHandler(c *fiber.Ctx) error {
-
 	jwtToken := c.Cookies("jwt")
 	if jwtToken == "" {
 		return c.Status(fiber.StatusUnauthorized).JSON(fiber.Map{

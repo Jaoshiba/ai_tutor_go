@@ -22,12 +22,12 @@ type IChapterRepository interface {
 
 func NewChapterRepository(db *sql.DB) IChapterRepository {
 	if db == nil {
-		log.Fatal("❌ NewChapterRepository got nil DB")
+		log.Fatal("NewChapterRepository got nil DB")
 	}
-	fmt.Println("✅ NewChapterRepository received DB:", db)
+	fmt.Println("NewChapterRepository received DB:", db)
 	return &chaptersRepository{
 		db: db,
-	}
+	} 
 }
 
 func (repo *chaptersRepository) InsertChapter(chapter entities.ChapterDataModel) error {

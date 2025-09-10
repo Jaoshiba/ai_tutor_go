@@ -17,6 +17,7 @@ type IUsersRepository interface {
 	FindAll() (*[]entities.UserDataModel, error)
 	FindByEmail(email string) (*entities.UserDataModel, error)
 	FindByUsername(username string) (*entities.UserDataModel, error)
+	GetUserInfo(email string) (*entities.UserInfoModel,error)
 }
 
 func NewUsersRepositoryPostgres(db *sql.DB) IUsersRepository {
@@ -91,6 +92,21 @@ func (repo *usersRepositoryPostgres) FindByEmail(email string) (*entities.UserDa
 			return nil, nil // ไม่พบผู้ใช้ ถือว่า OK
 		}
 		return nil, err // เกิด error จริง
+	}
+	return &user, nil
+}
+
+func (repo *usersRepositoryPostgres) GetUserInfo(email string) (*entities.UserInfoModel,error) {
+	query := `SELECT userid, username, email, gender, isemailverified, firstname, lastname, role, dob, createdat FROM users WHERE email = $1 LIMIT 1`
+	row := repo.db.QueryRowContext(context.Background(), query, email)
+
+	var user entities.UserInfoModel
+	err := row.Scan(&user.UserID, &user.Username, &user.Email, &user.Gender, &user.IsEmailVerified, &user.FirstName, &user.LastName, &user.Role, &user.DOB, &user.CreatedAt)
+	if err != nil {
+		if err == sql.ErrNoRows {
+			return nil, nil 
+		}
+		return nil, err 
 	}
 	return &user, nil
 }

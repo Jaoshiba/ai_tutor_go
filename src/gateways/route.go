@@ -14,25 +14,13 @@ func GatewayUsers(gateway HTTPGateway, app *fiber.App) {
 	api.Post("/signup", gateway.CreateUser) // เส้นทางสาธารณะ: สมัครสมาชิก
 }
 
-// GatewayModules สำหรับเส้นทางโมดูลที่ไม่ได้ต้องการการป้องกัน (หากมี)
-// func GatewayModules(gateway HTTPGateway, app *fiber.App) {
-// 	api := app.Group("/api/v1/modules")
-// 	// api.Post("/some_public_module_action", gateway.SomePublicModuleHandler) // ตัวอย่าง: หากมีเส้นทางโมดูลสาธารณะ
-// }
-
-// GatewayGoogleAuth สำหรับเส้นทาง Google OAuth (สาธารณะ)
-func GatewayGoogleAuth(gateway HTTPGateway, app *fiber.App) {
-	api := app.Group("/api/auth/google")
-	api.Get("/login", gateway.GoogleLoginHandler) // เส้นทางสาธารณะ: เริ่มต้นการล็อกอินด้วย Google
-	api.Get("/callback", gateway.GoogleCallback)  // เส้นทางสาธารณะ: Callback จาก Google OAuth
-}
-
 // GatewayAuth สำหรับเส้นทางที่เกี่ยวข้องกับการตรวจสอบสิทธิ์ (Login เป็นสาธารณะ, อื่นๆ จะถูกย้ายไป Protected)
 func GatewayAuth(gateway HTTPGateway, app *fiber.App) {
 	authAPI := app.Group("/api/auth")
 	authAPI.Post("/login", gateway.Login) // เส้นทางสาธารณะ: ล็อกอิน
 	authAPI.Get("/status/check", gateway.AuthService.CheckJWT)
-	// เส้นทาง Logout และ Check Status ถูกย้ายไปที่ GatewayProtected เนื่องจากต้องการการตรวจสอบสิทธิ์
+	authAPI.Post("/email/resetpassword", gateway.ResetPassword)
+	authAPI.Post("/email/verify", gateway.EmailVerify)
 }
 
 func GatewayCourse(gateway HTTPGateway, app *fiber.App) {
@@ -57,6 +45,11 @@ func GatewayRefs(gateway HTTPGateway, app *fiber.App) {
 func GatewayAskChat(gateway HTTPGateway, app *fiber.App) {
 	api := app.Group("/api/v1/ask")
 	api.Post("/ws/chat", websocket.New(gateway.AskChatWs))
+}
+
+func GatewayEmail(gateway HTTPGateway, app *fiber.App) {
+	// api := app.Group("/api/email")
+	// api.Post("/verify", gateway.SendVerifyEmail)
 }
 
 // GatewayProtected สำหรับเส้นทางทั้งหมดที่ต้องการการตรวจสอบสิทธิ์ (Protected Routes)

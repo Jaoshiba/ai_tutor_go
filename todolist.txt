@@ -1,0 +1,2 @@
+- ลบ reset password token เก่าออกเมื่อมีการส่งอันใหม่
+- ทำให้ reset password ใช้งานได้

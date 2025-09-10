@@ -67,6 +67,8 @@ func main() {
 	pineconeRepo := repo.NewPineconeRepository(pineconeIdxConn)
 	examRepo := repo.NewExamRepository(postgresql)
 	refRepo := repo.NewRefRepository(postgresql)
+	resetPasswordRepo := repo.NewResetPasswordRepository(postgresql)
+
 
 	if userRepo == nil || fileRepo == nil || chapterRepo == nil || courseRepo == nil {
 		log.Fatalf("One or more repositories failed to initialize and are NIL.")
@@ -86,12 +88,13 @@ func main() {
 	svChapter := sv.NewChapterServices(chapterRepo, pineconeRepo, geminiService)
 	sv1 := sv.NewModuleService(fileRepo, svChapter, svExam, svdocSearch)
 	svCourse := sv.NewCourseService(courseRepo, sv1, geminiService, svChapter)
+	svResetPassword := sv.NewResetPasswordService(resetPasswordRepo, userRepo)
 
 	// สร้าง Gateway และผูก Routes ทั้งหมด
 	// ต้องส่ง AuthService และ UserService เข้าไปใน NewHTTPGateway ด้วย
-	gw.NewHTTPGateway(app, sv0, sv1, svExam, svAuth, svChapter, svCourse, svdocSearch) // <--- ตรวจสอบพารามิเตอร์
+	gw.NewHTTPGateway(app, sv0, sv1, svExam, svAuth, svChapter, svCourse, svdocSearch, svResetPassword) 
 
-	// ให้บริการไฟล์ static (เช่น dashboard.html)
+	
 	app.Use("/dashboard", filesystem.New(filesystem.Config{
 		Root:       http.Dir("./static"),
 		PathPrefix: "dashboard.html",
