@@ -21,19 +21,21 @@ func NewQuestionRepository(db *sql.DB) IQuestionRepository {
 	}
 }
 
-func (db *questionRepository) InsertQuestion(question entities.QuestionDataModel) error {
+func (repo *questionRepository) InsertQuestion(question entities.QuestionDataModel) error {
 
 	fmt.Println("InsertQuestion called with question:", question)
 	query := `
 		INSERT INTO questions (
-			questionid, question, chapterid, corransid, createdat, updatedat
-		) VALUES ($1, $2, $3, $4, $5, $6)`
+			questionid, examid, type, question, options, answer, createdat, updatedat
+		) VALUES ($1, $2, $3, $4, $5, $6, $7, $8)`
 
-	_, err := db.db.ExecContext(context.Background(), query,
+	_, err := repo.db.ExecContext(context.Background(), query,
 		question.QuestionId,
+		question.ExamId,
+		question.Type,
 		question.Question,
-		question.ChapterId,
-		question.CorrAnsId,
+		question.Optoions,
+		question.Answer,
 		question.CreateAt,
 		question.UpdatedAt,
 	)
@@ -42,4 +44,3 @@ func (db *questionRepository) InsertQuestion(question entities.QuestionDataModel
 	}
 	return nil
 }
-

@@ -27,7 +27,7 @@ func NewCourseRepository(db *sql.DB) IcourseRepository {
 func (repo *courseRepository) InsertCourse(course entities.CourseDataModel) error {
 	query := `
 	INSERT INTO courses (
-		id, title, description, userid, createat, updateat
+		courseid, title, description, userid, createat, updateat
 	) VALUES ($1, $2, $3, $4, $5, $6)`
 	_, err := repo.db.ExecContext(context.Background(), query,
 		course.CourseId,
@@ -45,7 +45,7 @@ func (repo *courseRepository) InsertCourse(course entities.CourseDataModel) erro
 
 func (repo *courseRepository) GetCoursesByUserId(userId string) ([]entities.CourseDataModel, error) {
 	query := `
-		SELECT id, title, description, userid, createat, updateat
+		SELECT courseid, title, description, userid, createat, updateat
 		FROM courses
 		WHERE userid = $1
 	`
@@ -80,9 +80,9 @@ func (repo *courseRepository) GetCoursesByUserId(userId string) ([]entities.Cour
 
 func (repo *courseRepository) GetCourseById(courseId string) (*entities.CourseDataModel, error) {
 	query := `
-        SELECT id, title, description, confirmed, userid, createat, updateat
+        SELECT courseid, title, description, confirmed, userid, createat, updateat
         FROM courses
-        WHERE id = $1
+        WHERE courseid = $1
     `
 	var course entities.CourseDataModel
 

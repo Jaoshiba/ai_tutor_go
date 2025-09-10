@@ -6,52 +6,63 @@ import (
 	repo "go-fiber-template/domain/repositories"
 	"time"
 
+	"github.com/gofiber/fiber/v2"
 	"github.com/google/uuid"
 )
 
 type ExamService struct {
-	examRepository  repo.IExamRepository
-	QuestionService QuestionService
+	examRepository    repo.IExamRepository
+	QuestionService   IQuestionService
+	ChapterRepository repo.IChapterRepository
 }
 
 type IExamService interface {
-	ExamGenerate(examRequest entities.ExamRequest) error
+	ExamGenerate(examRequest entities.ExamRequest, ctx *fiber.Ctx) error
 	GetExamsByModuleID(moduleId string) ([]entities.ExamDataModel, error)
 }
 
-func NewExamService(examRepository repo.IExamRepository) IExamService {
+func NewExamService(examRepository repo.IExamRepository, chapterRepository repo.IChapterRepository, questionService IQuestionService) IExamService {
 	return &ExamService{
-		examRepository: examRepository,
+		examRepository:    examRepository,
+		ChapterRepository: chapterRepository,
+		QuestionService:   questionService,
 	}
 }
 
-func (es *ExamService) ExamGenerate(examRequest entities.ExamRequest) error {
-
-	content := examRequest.Content
-
-	questions, err := QuestionsCreate(content, examRequest.Difficulty, examRequest.QuestionNum)
-	if err != nil {
-		return err
-	}
-
-	fmt.Println("questions in exam: ", questions)
+func (es *ExamService) ExamGenerate(examRequest entities.ExamRequest, ctx *fiber.Ctx) error {
 
 	exam := entities.ExamDataModel{
 		ExamId:      uuid.NewString(),
-		ModuleId:    examRequest.ModuleId,
-		PassScore:   (len(questions) * 70) / 100,
-		QuestionNum: len(questions),
-		Questions:   questions,
-		RefId:       examRequest.RefId,
+		ChapterId:   examRequest.ChapterId,
+		PassScore:   (examRequest.QuestionNum * 70) / 100,
+		QuestionNum: examRequest.QuestionNum,
+		Difficulty:  examRequest.Difficulty,
 		CreatedAt:   time.Now(),
 		UpdatedAt:   time.Now(),
 	}
 	//save exam to database
-	err = es.examRepository.InsertExam(exam)
+	err := es.examRepository.InsertExam(exam)
 	if err != nil {
 		return err
 	}
 	fmt.Println("Exam saved to database finished: ", exam)
+
+	chapter, err := es.ChapterRepository.GetChaptersByChapterId(examRequest.ChapterId)
+	if err != nil {
+		return err
+	}
+
+	questionRequest := entities.QuestionRequest{
+		Content:     chapter.ChapterContent,
+		Difficulty:  examRequest.Difficulty,
+		QuestionNum: examRequest.QuestionNum,
+		ExamId:      exam.ExamId,
+	}
+
+	err = es.QuestionService.QuestionsCreate(questionRequest, ctx)
+	if err != nil {
+		return err
+	}
 
 	return nil
 }
@@ -72,4 +83,4 @@ func (es *ExamService) GetExamsByModuleID(moduleId string) ([]entities.ExamDataM
 
 // func (es *ExamService) GetExamsByCourseID(courseId string) ([]entities.ExamDataModel, error) {
 
-// } 
+// }

@@ -3,7 +3,6 @@ package repositories
 import (
 	"context"
 	"database/sql"
-	"encoding/json"
 	"fmt"
 	"go-fiber-template/domain/entities"
 )
@@ -27,24 +26,17 @@ func (er *examRepository) InsertExam(exam entities.ExamDataModel) error {
 
 	fmt.Println("InsertExam called with exam:", exam)
 
-	questionsJSON, err := json.Marshal(exam.Questions)
-	if err != nil {
-		fmt.Println("Error marshalling questions:", err)
-		return err
-	}
-
 	query := `
 		INSERT INTO exams (
-			examid, moduleid, passscore, questionnum, questions, refid, createdat, updatedat
-		) VALUES ($1, $2, $3, $4, $5, $6, $7, $8)`
+			examid, chapterid, passscore, questionnum, difficulty, createdat, updatedat
+		) VALUES ($1, $2, $3, $4, $5, $6, $7)`
 
-	_, err = er.db.ExecContext(context.Background(), query,
+	_, err := er.db.ExecContext(context.Background(), query,
 		exam.ExamId,
-		exam.ModuleId,
+		exam.ChapterId,
 		exam.PassScore,
 		exam.QuestionNum,
-		questionsJSON,
-		exam.RefId,
+		exam.Difficulty,
 		exam.CreatedAt,
 		exam.UpdatedAt,
 	)
@@ -56,7 +48,7 @@ func (er *examRepository) InsertExam(exam entities.ExamDataModel) error {
 
 func (er *examRepository) GetExamsByRefId(refId string) ([]entities.ExamDataModel, error) {
 
-	query := `SELECT examid, moduleid, passscore, questionnum, questions, refid, createdat, updatedat FROM exams WHERE refid = $1`
+	query := `SELECT examid, chapterid, passscore, questionnum, questions, difficulty, createdat, updatedat FROM exams WHERE refid = $1`
 	rows, err := er.db.QueryContext(context.Background(), query, refId)
 	if err != nil {
 		return nil, err
@@ -69,11 +61,10 @@ func (er *examRepository) GetExamsByRefId(refId string) ([]entities.ExamDataMode
 		var exam entities.ExamDataModel
 		if err := rows.Scan(
 			&exam.ExamId,
-			&exam.ModuleId,
+			&exam.ChapterId,
 			&exam.PassScore,
 			&exam.QuestionNum,
-			&exam.Questions,
-			&exam.RefId,
+			&exam.Difficulty,
 			&exam.CreatedAt,
 			&exam.UpdatedAt,
 		); err != nil {
@@ -88,7 +79,7 @@ func (er *examRepository) GetExamsByRefId(refId string) ([]entities.ExamDataMode
 
 // GetExamsByModuleID implements IExamRepository.
 func (er *examRepository) GetExamsByModuleID(moduleId string) ([]entities.ExamDataModel, error) {
-	query := `SELECT examid, moduleid, passscore, questionnum, questions, refid, createdat, updatedat FROM exams WHERE moduleid = $1`
+	query := `SELECT examid, chapterid, passscore, questionnum, difficulty, createdat, updatedat FROM exams WHERE moduleid = $1`
 	rows, err := er.db.QueryContext(context.Background(), query, moduleId)
 	if err != nil {
 		return nil, err
@@ -101,11 +92,10 @@ func (er *examRepository) GetExamsByModuleID(moduleId string) ([]entities.ExamDa
 		var exam entities.ExamDataModel
 		if err := rows.Scan(
 			&exam.ExamId,
-			&exam.ModuleId,
+			&exam.ChapterId,
 			&exam.PassScore,
 			&exam.QuestionNum,
-			&exam.Questions,
-			&exam.RefId,
+			&exam.Difficulty,
 			&exam.CreatedAt,
 			&exam.UpdatedAt,
 		); err != nil {

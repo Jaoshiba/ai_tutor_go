@@ -36,6 +36,11 @@ func GatewayModules(gateway HTTPGateway, app *fiber.App) {
 	api.Post("/upload", gateway.UploadFile)
 }
 
+func GatewayExam(gateway HTTPGateway, app *fiber.App) {
+	api := app.Group("/api/v1/exam")
+	api.Post("/generate", gateway.ExamGenerate)
+}
+
 func GatewayRefs(gateway HTTPGateway, app *fiber.App) {
 	api := app.Group("/api/v1/ref")
 
@@ -87,6 +92,8 @@ func GatewayProtected(gateway HTTPGateway, app *fiber.App) {
 	// protected.Post("/chapters", gateway.ChapterService.CreateChapter)
 	// protected.Get("/chapters", gateway.ChapterService.GetAllChapters)
 	// ... เพิ่ม routes อื่นๆ ที่ต้องการการป้องกัน
+
+	protected.Post("/exam/generate", gateway.ExamGenerate)
 
 	// Routes ที่เกี่ยวข้องกับการตรวจสอบสิทธิ์ที่ต้องการการป้องกัน (เช่น Logout, Check Status)
 	// เนื่องจากคุณต้องการให้ AuthService จัดการ CheckJWT, และ Logout ก็ควรต้องล็อกอินอยู่แล้ว

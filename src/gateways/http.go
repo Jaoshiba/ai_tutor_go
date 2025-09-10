@@ -52,6 +52,7 @@ func NewHTTPGateway(
 	GatewayUsers(*gateway, app)
 	GatewayModules(*gateway, app)
 	GatewayCourse(*gateway, app)
+	GatewayExam(*gateway, app)
 	GatewayRefs(*gateway, app)
 	GatewayAskChat(*gateway, app)
 	GatewayProtected(*gateway, app)

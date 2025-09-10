@@ -15,8 +15,8 @@ func (h *HTTPGateway) AskChatWs(wsconn *websocket.Conn) {
 		wsconn.Close()
 	}()
 
-	for {
-		// perform read question and answer that question
-	}
+	// for {
+	// 	// perform read question and answer that question
+	// }
 
 }

@@ -11,6 +11,7 @@ import (
 
 	"log"
 
+	cohereClient "github.com/cohere-ai/cohere-go/v2/client"
 	"github.com/gofiber/fiber/v2" // Import Fiber to use its context
 	"github.com/google/uuid"
 	"google.golang.org/genai"
@@ -21,29 +22,25 @@ type ChapterServices struct {
 	ChapterRepository repositories.IChapterRepository
 	PineconeRepo      repositories.IPineconeRepository
 	GeminiService     IGeminiService
+	ExamService       IExamService
 }
 
 type IChapterService interface {
-	ChapterrizedText(ctx *fiber.Ctx, courseId string, moduleData entities.GenModule) error
+	ChapterrizedText(ctx *fiber.Ctx, moduleData entities.GenModule) error
 	GetChaptersByModuleID(moduleID string) ([]entities.ChapterDataModel, error)
 	DeleteChapterByModuleID(moduleID string) error
 }
 
-func NewChapterServices(chapterRepository repositories.IChapterRepository, pineconeRepo repositories.IPineconeRepository, GeminiService IGeminiService) IChapterService {
-	if chapterRepository == nil {
-		log.Fatal("❌ ChapterServices initialized with nil repository") // บรรทัดนี้คุณมีอยู่แล้ว
-	} else {
-		fmt.Println("✅ ChapterServices initialized with non-nil repository.")                   // เพิ่มบรรทัดนี้
-		fmt.Printf("ChapterRepository instance in NewChapterServices: %p\n", chapterRepository) // เพิ่มบรรทัดนี้
-	}
+func NewChapterServices(chapterRepository repositories.IChapterRepository, pineconeRepo repositories.IPineconeRepository, GeminiService IGeminiService, ExamService IExamService) IChapterService {
 	return &ChapterServices{
 		ChapterRepository: chapterRepository,
 		PineconeRepo:      pineconeRepo,
 		GeminiService:     GeminiService,
+		ExamService:       ExamService,
 	}
 }
 
-func (c *ChapterServices) ChapterrizedText(ctx *fiber.Ctx, courseId string, moduleData entities.GenModule) error {
+func (c *ChapterServices) ChapterrizedText(ctx *fiber.Ctx, moduleData entities.GenModule) error {
 
 	moduleTitle := moduleData.Title
 	moduleDescription := moduleData.Description
@@ -246,23 +243,23 @@ func (c *ChapterServices) ChapterrizedText(ctx *fiber.Ctx, courseId string, modu
 	if coheereapikey == "" {
 		log.Fatal("COHERE_API_KEY is not set in .env")
 	}
-	// co := cohereClient.NewClient(cohereClient.WithToken(coheereapikey))
+	co := cohereClient.NewClient(cohereClient.WithToken(coheereapikey))
 
 	nameSpaceName := userIDStr
 
 	fmt.Println("nameSpaceName: ", nameSpaceName)
 
+	// courseId := ctx.Locals("courseID").(string)
+
 	for _, chapter := range response.Chapters {
 		ch := entities.ChapterDataModel{
 			ChapterId:      uuid.NewString(),
 			ChapterName:    chapter.ChapterName,
-			UserID:         userIDStr,
-			CourseId:       courseId,
 			ChapterContent: chapter.Content,
 			CreateAt:       time.Now(),
 			UpdatedAt:      time.Now(),
-			IsFinished:     false,
 			ModuleId:       moduleId,
+			Description: "",
 		}
 		fmt.Println("Inserting chapter:", ch.ChapterId)
 
@@ -273,14 +270,20 @@ func (c *ChapterServices) ChapterrizedText(ctx *fiber.Ctx, courseId string, modu
 			return err
 		}
 
-		// err = c.PineconeRepo.UpsertVector(ch, co, ctx, userIDStr)
-		// if err != nil {
-		// 	fmt.Println("Error inserting chapter:", err)
-		// 	return err
-		// }
+		err = c.PineconeRepo.UpsertVector(ch, co, ctx)
+		if err != nil {
+			fmt.Println("Error inserting chapter:", err)
+			return err
+		}
+
 	}
 
-	return nil
+	return ctx.Status(fiber.StatusOK).JSON(entities.ResponseModel{
+		Message: "Create chapter complete",
+		Data:    chaps,
+		Status:  fiber.StatusOK,
+	})
+
 }
 func (c *ChapterServices) GetChaptersByModuleID(moduleID string) ([]entities.ChapterDataModel, error) {
 	fmt.Println("im in chap service")
@@ -308,4 +311,3 @@ func (c *ChapterServices) DeleteChapterByModuleID(moduleID string) error {
 
 	return nil
 }
-

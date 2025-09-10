@@ -9,13 +9,12 @@ import (
 )
 
 func (h *HTTPGateway) CreateCourse(ctx *fiber.Ctx) error {
-	file, err := ctx.FormFile("file")
-	if err != nil {
-		fmt.Println("No file uploaded:", err)
-		file = nil // ป้องกัน panic ถ้าไม่มีไฟล์ส่งมา
-	}
 
 	jsonbody := ctx.FormValue("jsonbody")
+	file, err := ctx.FormFile("file")
+	if err != nil {
+		return ctx.Status(fiber.StatusUnprocessableEntity).JSON(entities.ResponseMessage{Message: "invalid file"})
+	}
 
 	fmt.Println("jsonbody: ", jsonbody)
 
@@ -26,19 +25,15 @@ func (h *HTTPGateway) CreateCourse(ctx *fiber.Ctx) error {
 		return ctx.Status(fiber.StatusUnprocessableEntity).JSON(entities.ResponseMessage{Message: "invalid json body"})
 	}
 
-	courseName := coursejsonBody.Title
-	fmt.Println(courseName)
-	description := coursejsonBody.Description
-	fmt.Println(description)
-	if courseName == "" {
+	if coursejsonBody.Title == "" {
 		return ctx.Status(fiber.StatusUnprocessableEntity).JSON(entities.ResponseMessage{Message: "invalid json body u missed course name"})
-	} else if description == "" {
+	} else if coursejsonBody.Description == "" {
 		return ctx.Status(fiber.StatusUnprocessableEntity).JSON(entities.ResponseMessage{Message: "invalid json body u missed description"})
 	}
 
 	fmt.Println("Before create in gateway")
 
-	err = h.CourseService.CreateCourse(coursejsonBody, file, true, ctx)
+	err = h.CourseService.CreateCourse(coursejsonBody, false, file, ctx)
 	if err != nil {
 		return ctx.Status(fiber.StatusBadRequest).JSON(entities.ResponseModel{
 			Message: "failed to create course on CreateCourse",

@@ -38,7 +38,7 @@ func main() {
 	// CORS Configuration
 	app.Use(cors.New(cors.Config{
 
-		AllowOrigins:     os.Getenv("FRONTEND_URL") + ", http://localhost:1818" + ", http://localhost:3000",
+		AllowOrigins:     os.Getenv("FRONTEND_URL") + ", http://localhost:1818" + ", http://localhost:3000" + ", https://ai-tutor-frontend-gamma.vercel.app/",
 		AllowHeaders:     "Origin, Content-Type, Accept, Authorization",
 		AllowMethods:     "GET,POST,HEAD,PUT,DELETE,PATCH",
 		AllowCredentials: true, // สำคัญมากสำหรับ Cookie
@@ -49,7 +49,6 @@ func main() {
 	if jwtSecret == "" {
 		log.Fatal("JWT_SECRET_KEY is not set in .env")
 	}
-	// สร้าง JWT Middleware
 
 	// Connect PostgreSQL
 	postgresql := ds.NewPostgresql()
@@ -68,8 +67,8 @@ func main() {
 	examRepo := repo.NewExamRepository(postgresql)
 	refRepo := repo.NewRefRepository(postgresql)
 	resetPasswordRepo := repo.NewResetPasswordRepository(postgresql)
-
-
+	
+	questionrepo := repo.NewQuestionRepository(postgresql)
 	if userRepo == nil || fileRepo == nil || chapterRepo == nil || courseRepo == nil {
 		log.Fatalf("One or more repositories failed to initialize and are NIL.")
 	}
@@ -79,13 +78,14 @@ func main() {
 	if jwtSecret == "" {
 		log.Fatal("JWT_SECRET_KEY is not set in .env")
 	}
-	svAuth := authService.NewAuthService(userRepo)            // สร้าง AuthService
-	sv0 := sv.NewUsersService(userRepo)                       // สร้าง UsersServic
+	svAuth := authService.NewAuthService(userRepo) // สร้าง AuthService
+	sv0 := sv.NewUsersService(userRepo)            // สร้าง UsersServic
 	geminiService := sv.NewGeminiService()
+	svQuestion := sv.NewQuestionService(questionrepo)
 
-	svExam := sv.NewExamService(examRepo)
+	svExam := sv.NewExamService(examRepo, chapterRepo, svQuestion)
 	svdocSearch := sv.NewDocSearchService(refRepo, pineconeRepo)
-	svChapter := sv.NewChapterServices(chapterRepo, pineconeRepo, geminiService)
+	svChapter := sv.NewChapterServices(chapterRepo, pineconeRepo, geminiService, svExam)
 	sv1 := sv.NewModuleService(fileRepo, svChapter, svExam, svdocSearch)
 	svCourse := sv.NewCourseService(courseRepo, sv1, geminiService, svChapter)
 	svResetPassword := sv.NewResetPasswordService(resetPasswordRepo, userRepo)

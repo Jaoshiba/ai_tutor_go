@@ -5,7 +5,7 @@ import (
 )
 
 type CourseDataModel struct {
-	CourseId    string    `json:"course_id" db:"id"`
+	CourseId    string    `json:"course_id" db:"courseid"`
 	Title       string    `json:"Title" db:"title"`
 	Description string    `json:"description" db:"description"`
 	Confirmed   bool      `json:"confirmed" db:"confirmed"`
@@ -15,9 +15,13 @@ type CourseDataModel struct {
 }
 
 type CourseRequestBody struct {
-	Title       string `json:"Title" db:"title"`
-	Description string `json:"Description" db:"description"`
-	Confirmed   bool   `json:"confirmed" db:"confirmed"`
+	Title       string               `json:"Title" db:"title"`
+	Description string               `json:"Description" db:"description"`
+	Confirmed   bool                 `json:"confirmed" db:"confirmed"`
+	Regen       bool                 `json:"regen" db:"regen"`
+	Addipromt   string               `json:"addipromt" db:"addipromt"`
+	Course      CourseGeminiResponse `json:"course" db:"course"`
+	IsFirtTime  bool                 `json:"isfirsttime" db:"isfirsttime"`
 }
 
 type CourseGeminiResponse struct {
