@@ -12,6 +12,8 @@ type CourseDataModel struct {
 	UserId      string    `json:"user_id" db:"userid"`
 	CreatedAt   time.Time `json:"created_at"`
 	UpdatedAt   time.Time `json:"updated_at"`
+	IsActive    bool      `json:"is_active" db:"isactive"`
+	Coverimage  string    `json:"coverimage" db:"coverimage"`
 }
 
 type CourseRequestBody struct {
@@ -36,17 +38,19 @@ type GenModule struct {
 }
 
 type ModuleDetail struct {
-	ModuleId    string          `json:"module_id"`
-	ModuleName  string          `json:"module_name"`
-	Description string          `json:"description"`
-	Chapters    []ChapterDetail `json:"chapters"`
+	ModuleId         string          `json:"module_id"`
+	ModuleName       string          `json:"module_name"`
+	Description      string          `json:"description"`
+	Chapters         []ChapterDetail `json:"chapters"`
+	TotalChapters    int             `json:"total_chapters"`
+	FinishedChapters int             `json:"finished_chapters"`
 	// คุณอาจจะเพิ่ม CreatedAt, UpdatedAt ถ้าต้องการแสดง
 }
 type ChapterDetail struct {
 	ChapterId      string `json:"chapter_id"`
 	ChapterName    string `json:"chapter_name"`
 	ChapterContent string `json:"chapter_content"`
-	IsFinished     bool   `json:"is_finished"`
+	IsPassed       bool   `json:"is_passed"`
 	// คุณอาจจะเพิ่ม CreatedAt, UpdatedAt ถ้าต้องการแสดง
 }
 type CourseDetailResponse struct {

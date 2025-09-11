@@ -35,8 +35,8 @@ func (repo *chaptersRepository) InsertChapter(chapter entities.ChapterDataModel)
 	fmt.Println("InsertChapter called with chapter:", chapter)
 	query := `
 	INSERT INTO chapters (
-		chapterid, chaptername, chaptercontent, createat, updateat, moduleid, description
-	) VALUES ($1, $2, $3, $4, $5, $6, $7)`
+		chapterid, chaptername, chaptercontent, createat, updateat, moduleid, description, index
+	) VALUES ($1, $2, $3, $4, $5, $6, $7, $8)`
 
 	_, err := repo.db.ExecContext(context.Background(), query,
 		chapter.ChapterId,
@@ -46,6 +46,7 @@ func (repo *chaptersRepository) InsertChapter(chapter entities.ChapterDataModel)
 		chapter.UpdatedAt,
 		chapter.ModuleId,
 		chapter.Description,
+		chapter.Index,
 	)
 	if err != nil {
 		fmt.Print(err)
@@ -57,7 +58,7 @@ func (repo *chaptersRepository) InsertChapter(chapter entities.ChapterDataModel)
 func (repo *chaptersRepository) GetChaptersByModuleID(moduleID string) ([]entities.ChapterDataModel, error) {
 	fmt.Println("im in repo")
 	query := `
-		SELECT chapterid, chaptername, chaptercontent, createat, updateat, moduleid, description
+		SELECT chapterid, chaptername, chaptercontent, createat, updateat, moduleid, description, index
 		FROM chapters
 		WHERE moduleid = $1
 		ORDER BY createat
@@ -79,6 +80,7 @@ func (repo *chaptersRepository) GetChaptersByModuleID(moduleID string) ([]entiti
 			&chapter.UpdatedAt,
 			&chapter.ModuleId,
 			&chapter.Description,
+			&chapter.Index,
 		); err != nil {
 			return nil, fmt.Errorf("failed to scan chapter row: %w", err)
 		}
@@ -137,7 +139,7 @@ func (repo *chaptersRepository) GetChaptersByChapterId(chapterId string) (entiti
 
 	var chapter entities.ChapterDataModel
 	query := `
-		SELECT chapterid, chaptername, chaptercontent, createat, updateat, moduleid, description
+		SELECT chapterid, chaptername, chaptercontent, createat, updateat, moduleid, description, index
 		FROM chapters
 		WHERE chapterid = $1
 	`
@@ -151,6 +153,7 @@ func (repo *chaptersRepository) GetChaptersByChapterId(chapterId string) (entiti
 		&chapter.UpdatedAt,
 		&chapter.ModuleId,
 		&chapter.Description,
+		&chapter.Index,
 	)
 	if err != nil {
 		return chapter, fmt.Errorf("failed to scan chapter row: %w", err)

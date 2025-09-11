@@ -16,10 +16,11 @@ import (
 )
 
 type courseService struct {
-	CourseRepo      repo.IcourseRepository
-	ModuleService   IModuleService
-	GeminiService   IGeminiService
-	ChapterServices IChapterService
+	CourseRepo           repo.IcourseRepository
+	ModuleService        IModuleService
+	GeminiService        IGeminiService
+	ChapterServices      IChapterService
+	LearningProgressRepo repo.ILearningProgressRepository
 }
 
 type ICourseService interface {
@@ -34,12 +35,14 @@ func NewCourseService(
 	moduleService IModuleService, // เพิ่มเข้ามา
 	geminiService IGeminiService, // เพิ่มเข้ามา
 	chapterService IChapterService,
+	learningprogressRepo repo.ILearningProgressRepository,
 ) ICourseService {
 	return &courseService{
-		CourseRepo:      courseRepo,
-		ModuleService:   moduleService, // กำหนดค่า
-		GeminiService:   geminiService, // กำหนดค่า
-		ChapterServices: chapterService,
+		CourseRepo:           courseRepo,
+		ModuleService:        moduleService, // กำหนดค่า
+		GeminiService:        geminiService, // กำหนดค่า
+		ChapterServices:      chapterService,
+		LearningProgressRepo: learningprogressRepo,
 	}
 }
 
@@ -328,6 +331,8 @@ func (rs *courseService) CreateCourse(courserequest entities.CourseRequestBody, 
 func (rs *courseService) GetCourseDetail(ctx *fiber.Ctx, courseId string) (*entities.CourseDetailResponse, error) {
 
 	fmt.Println("Hello im in GetCourseDetail")
+	userId := ctx.Locals("userID").(string)
+
 	courseData, err := rs.CourseRepo.GetCourseById(courseId)
 	if err != nil {
 		if err == sql.ErrNoRows {
@@ -337,46 +342,69 @@ func (rs *courseService) GetCourseDetail(ctx *fiber.Ctx, courseId string) (*enti
 	}
 	fmt.Println("after GetCourseById ")
 
-	courseDetail := &entities.CourseDetailResponse{
-		CourseId:    courseData.CourseId,
-		Title:       courseData.Title,
-		Description: courseData.Description,
-		Confirmed:   courseData.Confirmed,
-		Modules:     []entities.ModuleDetail{}, // Initialize empty slice
-	}
+	var chapterDetails []entities.ChapterDetail
+	var moduleDetails []entities.ModuleDetail
+	var courseDetail entities.CourseDetailResponse
 
-	modulesData, err := rs.ModuleService.GetModulesByCourseId(courseId)
-	fmt.Println("after GetModuleBycourseId ")
+	modulese, err := rs.ModuleService.GetModulesByCourseId(courseId)
 	if err != nil {
 		return nil, fmt.Errorf("failed to get modules for course %s: %w", courseId, err)
 	}
 
-	for _, moduleData := range modulesData {
+	for _, module := range modulese {
 
-		chaptersData, err := rs.ChapterServices.GetChaptersByModuleID(moduleData.ModuleId)
+		var totalChapter int = 0
+		passedChaptersId := make(map[string]bool)
+
+		chapters, err := rs.ChapterServices.GetChaptersByModuleID(module.ModuleId)
 		if err != nil {
-			return nil, fmt.Errorf("failed to get chapters for module %s: %w", moduleData.ModuleId, err)
+			return nil, fmt.Errorf("failed to get chapters for module %s: %w", module.ModuleId, err)
+		}
+		totalChapter += len(chapters)
+
+		passedChapter, err := rs.LearningProgressRepo.ListProgressByUser(userId)
+		if err != nil {
+			return nil, fmt.Errorf("failed to get learning progress for user %s: %w", userId, err)
 		}
 
-		var chapterDetails []entities.ChapterDetail
-		for _, chapter := range chaptersData {
+		for _, progress := range passedChapter {
+			if progress.ModuleID == module.ModuleId {
+				passedChaptersId[progress.ChapterID] = true
+			}
+		}
+
+		for _, chapter := range chapters {
+			if passedChaptersId[chapter.ChapterId] {
+				chapter.Ispassed = true
+			} else {
+				chapter.Ispassed = false
+			}
 			chapterDetails = append(chapterDetails, entities.ChapterDetail{
 				ChapterId:      chapter.ChapterId,
 				ChapterName:    chapter.ChapterName,
 				ChapterContent: chapter.ChapterContent,
+				IsPassed:       chapter.Ispassed,
 			})
 		}
-
-		courseDetail.Modules = append(courseDetail.Modules, entities.ModuleDetail{
-			ModuleId:    moduleData.ModuleId,
-			ModuleName:  moduleData.ModuleName,
-			Description: moduleData.Description,
-			Chapters:    chapterDetails,
+		moduleDetails = append(moduleDetails, entities.ModuleDetail{
+			ModuleId:         module.ModuleId,
+			ModuleName:       module.ModuleName,
+			Description:      module.Description,
+			Chapters:         chapterDetails,
+			TotalChapters:    totalChapter,
+			FinishedChapters: len(passedChaptersId),
 		})
-
 	}
 
-	return courseDetail, nil
+	courseDetail = entities.CourseDetailResponse{
+		CourseId:    courseData.CourseId,
+		Title:       courseData.Title,
+		Description: courseData.Description,
+		Confirmed:   courseData.Confirmed,
+		Modules:     moduleDetails,
+	}
+
+	return &courseDetail, nil
 }
 
 func (rs *courseService) DeleteCourse(ctx *fiber.Ctx, courseId string) error {

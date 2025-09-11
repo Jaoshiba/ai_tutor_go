@@ -11,7 +11,9 @@ type ChapterDataModel struct {
 	CreateAt       time.Time `json:"createAt" db:"createat"`
 	UpdatedAt      time.Time `json:"updatedAt" db:"updatedat"`
 	ModuleId       string    `json:"moduleid" db:"moduleid"`
-	Description       string    `json:"description" db:"description"`
+	Description    string    `json:"description" db:"description"`
+	Index          int       `json:"index" db:"index"`
+	Ispassed       bool      `json:"ispassed" db:"ispassed"`
 }
 
 type ResponseChapter struct {

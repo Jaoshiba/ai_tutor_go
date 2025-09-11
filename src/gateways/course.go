@@ -75,7 +75,6 @@ func (h *HTTPGateway) GetCourseDetail(c *fiber.Ctx) error {
 	if courseID == "" {
 		return fiber.NewError(fiber.StatusBadRequest, "Course ID is required")
 	}
-	fmt.Println("Hello im in gateway at start")
 
 	fmt.Printf("Attempting to get details for Course ID: %s\n", courseID)
 

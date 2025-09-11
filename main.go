@@ -67,7 +67,8 @@ func main() {
 	examRepo := repo.NewExamRepository(postgresql)
 	refRepo := repo.NewRefRepository(postgresql)
 	resetPasswordRepo := repo.NewResetPasswordRepository(postgresql)
-	
+	learningProgressRepo := repo.NewLearningProgressRepository(postgresql)
+
 	questionrepo := repo.NewQuestionRepository(postgresql)
 	if userRepo == nil || fileRepo == nil || chapterRepo == nil || courseRepo == nil {
 		log.Fatalf("One or more repositories failed to initialize and are NIL.")
@@ -87,14 +88,13 @@ func main() {
 	svdocSearch := sv.NewDocSearchService(refRepo, pineconeRepo)
 	svChapter := sv.NewChapterServices(chapterRepo, pineconeRepo, geminiService, svExam)
 	sv1 := sv.NewModuleService(fileRepo, svChapter, svExam, svdocSearch)
-	svCourse := sv.NewCourseService(courseRepo, sv1, geminiService, svChapter)
+	svCourse := sv.NewCourseService(courseRepo, sv1, geminiService, svChapter, learningProgressRepo)
 	svResetPassword := sv.NewResetPasswordService(resetPasswordRepo, userRepo)
 
 	// สร้าง Gateway และผูก Routes ทั้งหมด
 	// ต้องส่ง AuthService และ UserService เข้าไปใน NewHTTPGateway ด้วย
-	gw.NewHTTPGateway(app, sv0, sv1, svExam, svAuth, svChapter, svCourse, svdocSearch, svResetPassword) 
+	gw.NewHTTPGateway(app, sv0, sv1, svExam, svAuth, svChapter, svCourse, svdocSearch, svResetPassword)
 
-	
 	app.Use("/dashboard", filesystem.New(filesystem.Config{
 		Root:       http.Dir("./static"),
 		PathPrefix: "dashboard.html",
