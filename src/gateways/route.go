@@ -57,6 +57,12 @@ func GatewayEmail(gateway HTTPGateway, app *fiber.App) {
 	// api.Post("/verify", gateway.SendVerifyEmail)
 }
 
+func GatewayTest(gateway HTTPGateway, app *fiber.App) {
+	api := app.Group("/api/v1/test")
+	api.Get("/:courseId", gateway.TestGetCourseDetail)
+	api.Post("/course/create", gateway.TestCreateCourse)
+}
+
 // GatewayProtected สำหรับเส้นทางทั้งหมดที่ต้องการการตรวจสอบสิทธิ์ (Protected Routes)
 func GatewayProtected(gateway HTTPGateway, app *fiber.App) {
 	// สร้าง Group ของ routes ที่ต้องการการตรวจสอบสิทธิ์

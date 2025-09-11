@@ -38,8 +38,8 @@ type docSearchService struct {
 }
 
 type IDocSearchService interface {
-	SearchDocuments(courseName, courseDescription, moduleName, moduleDescription string, moduleId string, ctx *fiber.Ctx) (entities.SerpReturn, error)
-	GetRefsByModuleId(moduleId string, ctx *fiber.Ctx) ([]entities.RefDataModel, error)
+	SearchDocuments(courseName, courseDescription, moduleName, moduleDescription string, moduleId string, ctx *fiber.Ctx) (string, error)
+	GetRefsByModuleId(moduleId string, ctx *fiber.Ctx) ([]entities.SearchLinks, error)
 }
 
 func NewDocSearchService(ref repo.IRefInterface, pineconeRepo repo.IPineconeRepository) IDocSearchService {
@@ -49,23 +49,23 @@ func NewDocSearchService(ref repo.IRefInterface, pineconeRepo repo.IPineconeRepo
 	}
 }
 
-func (ds *docSearchService) SearchDocuments(courseName, courseDescription, moduleName, moduleDescription string, moduleId string, ctx *fiber.Ctx) (entities.SerpReturn, error) {
-	var serpRes entities.SerpReturn
+func (ds *docSearchService) SearchDocuments(courseName, courseDescription, moduleName, moduleDescription string, moduleId string, ctx *fiber.Ctx) (string, error) {
+	var allcontent string
 
 	userIdRaw := ctx.Locals("userID")
 	if userIdRaw == nil {
 		fmt.Println("Error: User ID not found in context locals for DocSearchService.")
-		return serpRes, fiber.NewError(fiber.StatusUnauthorized, "User ID not found in context")
+		return allcontent, fiber.NewError(fiber.StatusUnauthorized, "User ID not found in context")
 	}
 	userIdStr, ok := userIdRaw.(string)
 	if !ok || userIdStr == "" {
 		fmt.Println("Error: Invalid or missing user ID format in context locals for DocSearchService.")
-		return serpRes, fiber.NewError(fiber.StatusUnauthorized, "Invalid or missing user ID")
+		return allcontent, fiber.NewError(fiber.StatusUnauthorized, "Invalid or missing user ID")
 	}
 
 	coheereapikey := os.Getenv("COHERE_API_KEY")
 	if coheereapikey == "" {
-		return serpRes, fmt.Errorf("missing COHERE_API_KEY")
+		return allcontent, fmt.Errorf("missing COHERE_API_KEY")
 	}
 	// co := cohereClient.NewClient(cohereClient.WithToken(coheereapikey))
 
@@ -78,7 +78,7 @@ func (ds *docSearchService) SearchDocuments(courseName, courseDescription, modul
 	baseURL := "https://serpapi.com/search"
 	serpAPIKey := os.Getenv("SERPAPI_KEY")
 	if serpAPIKey == "" {
-		return serpRes, fmt.Errorf("missing SERPAPI_KEY")
+		return allcontent, fmt.Errorf("missing SERPAPI_KEY")
 	}
 
 	maxAttempts := 3
@@ -90,7 +90,7 @@ func (ds *docSearchService) SearchDocuments(courseName, courseDescription, modul
 
 		kws, err := geminiService.GenerateContentFromPrompt(context.Background(), searchPrompt)
 		if err != nil {
-			return serpRes, fmt.Errorf("error generating search keywords (attempt %d): %w", attempt, err)
+			return allcontent, fmt.Errorf("error generating search keywords (attempt %d): %w", attempt, err)
 		}
 		generatedKeywords = strings.TrimSpace(kws)
 		fmt.Println("Generated Search Query:", generatedKeywords)
@@ -109,15 +109,15 @@ func (ds *docSearchService) SearchDocuments(courseName, courseDescription, modul
 		fmt.Printf("[SearchDocuments] Attempt %d: request SerpAPI...\n", attempt)
 		body, status, err := doSerpAPISearch(fullURL)
 		if err != nil {
-			return serpRes, fmt.Errorf("could not make SerpAPI request (attempt %d): %w", attempt, err)
+			return allcontent, fmt.Errorf("could not make SerpAPI request (attempt %d): %w", attempt, err)
 		}
 		if status != http.StatusOK {
-			return serpRes, fmt.Errorf("SerpAPI returned status code %d (attempt %d): %s", status, attempt, string(body))
+			return allcontent, fmt.Errorf("SerpAPI returned status code %d (attempt %d): %s", status, attempt, string(body))
 		}
 
 		var serpAPIResponse entities.SerpAPIResponse
 		if err := json.Unmarshal(body, &serpAPIResponse); err != nil {
-			return serpRes, fmt.Errorf("could not parse JSON (attempt %d): %w", attempt, err)
+			return allcontent, fmt.Errorf("could not parse JSON (attempt %d): %w", attempt, err)
 		}
 
 		fmt.Println("SerpAPI Response:", serpAPIResponse.OrganicResults)
@@ -127,12 +127,13 @@ func (ds *docSearchService) SearchDocuments(courseName, courseDescription, modul
 			fmt.Println("Link:", result.Link)
 		}
 
-		serpRes.Source = serpAPIResponse.OrganicResults
-
 		if len(serpAPIResponse.OrganicResults) > 0 {
 			fmt.Printf("[SearchDocuments] Attempt %d: got %d results\n", attempt, len(serpAPIResponse.OrganicResults))
 
-			for _, result := range serpAPIResponse.OrganicResults {
+			for i, result := range serpAPIResponse.OrganicResults {
+				if i > 1 {
+					break
+				}
 				documentLink := result.Link
 				fmt.Println("Processing result:", documentLink)
 
@@ -163,21 +164,20 @@ func (ds *docSearchService) SearchDocuments(courseName, courseDescription, modul
 
 				fmt.Println("\nFile content:", content)
 
-				refId := uuid.NewString()
+				allcontent = allcontent + "\n" + content
 
-				serpRes.Content = content
-				serpRes.RefId = refId
+				linkId := uuid.NewString()
 
-				ref := entities.RefDataModel{
-					RefId:    refId,
-					ModuleId: moduleId,
+				searchlink := entities.SearchLinks{
+					LinkID:   linkId,
+					ModuleID: moduleId,
 					Title:    result.Title,
 					Link:     result.Link,
-					Content:  content,
-					SearchAt: time.Now(),
+					Snippet:  result.Snippet,
+					Searchat: time.Now(),
 				}
 
-				err = ds.refRepository.InsertRef(ref)
+				err = ds.refRepository.InsertRef(searchlink)
 				if err != nil {
 					fmt.Println("Error inserting ref:", err)
 					continue
@@ -185,20 +185,18 @@ func (ds *docSearchService) SearchDocuments(courseName, courseDescription, modul
 
 				// err = ds.PineconeRepo.UpsertVector(ref, co, ctx)
 
-				return serpRes, err
 			}
-			return serpRes, err
+			return allcontent, nil
 		}
 		fmt.Printf("[SearchDocuments] Attempt %d: empty results. Regenerating keywords...\n", attempt)
 	}
 
-	return serpRes, fmt.Errorf("no results found from SerpAPI after %d attempts", maxAttempts)
+	return allcontent, fmt.Errorf("no results found from SerpAPI after %d attempts", maxAttempts)
 }
 
 func rateSerpLink() {
 
 }
-
 func doSerpAPISearch(fullURL string) ([]byte, int, error) {
 	req, err := http.NewRequest("GET", fullURL, nil)
 	if err != nil {
@@ -368,9 +366,9 @@ func GetHtmlElement(link string, ctx *fiber.Ctx) error {
 	return ctx.SendString(string(body))
 }
 
-func (ds *docSearchService) GetRefsByModuleId(moduleId string, ctx *fiber.Ctx) ([]entities.RefDataModel, error) {
+func (ds *docSearchService) GetRefsByModuleId(moduleId string, ctx *fiber.Ctx) ([]entities.SearchLinks, error) {
 
-	var refs []entities.RefDataModel
+	var refs []entities.SearchLinks
 
 	refs, err := ds.refRepository.GetRefsByModuleId(moduleId)
 	if err != nil {

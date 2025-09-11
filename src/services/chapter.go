@@ -11,7 +11,6 @@ import (
 
 	"log"
 
-	cohereClient "github.com/cohere-ai/cohere-go/v2/client"
 	"github.com/gofiber/fiber/v2" // Import Fiber to use its context
 	"github.com/google/uuid"
 	"google.golang.org/genai"
@@ -45,6 +44,11 @@ func (c *ChapterServices) ChapterrizedText(ctx *fiber.Ctx, moduleData entities.G
 	moduleTitle := moduleData.Title
 	moduleDescription := moduleData.Description
 	moduleContent := moduleData.Content
+
+	fmt.Println("content to chapterize: ", moduleContent)
+	fmt.Println("after content to chapterize")
+
+	// return ctx.Status(fiber.StatusOK).JSON(entities.ResponseMessage{Message: "now in chapter"})
 
 	gemini_api_key := os.Getenv("GEMINI_API_KEY")
 	if gemini_api_key == "" {
@@ -232,8 +236,8 @@ func (c *ChapterServices) ChapterrizedText(ctx *fiber.Ctx, moduleData entities.G
 		return fiber.NewError(fiber.StatusUnauthorized, "Invalid or missing module ID in context")
 	}
 
-	userIDStr := uuid.NewString()
-	// userIDStr, ok := userIDRaw.(string)
+	// userIDStr := uuid.NewString()
+	userIDStr, ok := ctx.Locals("userID").(string)
 	if !ok || userIDStr == "" {
 		return fiber.NewError(fiber.StatusUnauthorized, "Invalid or missing user ID in context")
 	}
@@ -243,7 +247,7 @@ func (c *ChapterServices) ChapterrizedText(ctx *fiber.Ctx, moduleData entities.G
 	if coheereapikey == "" {
 		log.Fatal("COHERE_API_KEY is not set in .env")
 	}
-	co := cohereClient.NewClient(cohereClient.WithToken(coheereapikey))
+	// co := cohereClient.NewClient(cohereClient.WithToken(coheereapikey))
 
 	nameSpaceName := userIDStr
 
@@ -259,7 +263,7 @@ func (c *ChapterServices) ChapterrizedText(ctx *fiber.Ctx, moduleData entities.G
 			CreateAt:       time.Now(),
 			UpdatedAt:      time.Now(),
 			ModuleId:       moduleId,
-			Description: "",
+			Description:    "",
 		}
 		fmt.Println("Inserting chapter:", ch.ChapterId)
 
@@ -270,11 +274,11 @@ func (c *ChapterServices) ChapterrizedText(ctx *fiber.Ctx, moduleData entities.G
 			return err
 		}
 
-		err = c.PineconeRepo.UpsertVector(ch, co, ctx)
-		if err != nil {
-			fmt.Println("Error inserting chapter:", err)
-			return err
-		}
+		// err = c.PineconeRepo.UpsertVector(ch, co, ctx)
+		// if err != nil {
+		// 	fmt.Println("Error inserting chapter:", err)
+		// 	return err
+		// }
 
 	}
 
