@@ -31,8 +31,8 @@ func NewResetPasswordRepository(db *sql.DB) IResetPassword {
 
 func (repo *resetPasswordRepository) InsertNewResetPassword(ctx context.Context, data *entities.ResetPassword) error {
 	query := `
-		INSERT INTO reset_passwords (id, user_id, created_at, expires_at, token, is_reset)
-		VALUES ($1, $2, $3, $4, $5, $6)
+		INSERT INTO reset_passwords (id, user_id, created_at, expires_at, token, is_reset, is_available)
+		VALUES ($1, $2, $3, $4, $5, $6, $7)
 	`
 	_, err := repo.db.ExecContext(ctx, query,
 		data.Id,
@@ -51,7 +51,7 @@ func (repo *resetPasswordRepository) InsertNewResetPassword(ctx context.Context,
 
 func (repo *resetPasswordRepository) GetResetPasswordByToken(ctx context.Context, token string) (*entities.ResetPassword, error) {
 	query := `
-		SELECT id, user_id, created_at, expires_at, token, is_reset
+		SELECT id, user_id, created_at, expires_at, token, is_reset, is_available
 		FROM reset_passwords
 		WHERE token = $1
 	`
@@ -79,7 +79,8 @@ func (repo *resetPasswordRepository) GetResetPasswordByToken(ctx context.Context
 func (repo *resetPasswordRepository) UpdateResetPasswordStatus(ctx context.Context, id string, isReset bool) error {
 	query := `
 		UPDATE reset_passwords
-		SET is_reset = $1
+		SET is_reset = $1,
+			is_available = false
 		WHERE id = $2
 	`
 	_, err := repo.db.ExecContext(ctx, query, isReset, id)

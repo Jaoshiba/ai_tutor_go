@@ -3,6 +3,7 @@ package repositories
 import (
 	"context"
 	"database/sql"
+	// "fmt"
 	"go-fiber-template/domain/entities"
 	"log"
 )
@@ -99,7 +100,7 @@ func (repo *usersRepositoryPostgres) FindByEmail(email string) (*entities.UserDa
 func (repo *usersRepositoryPostgres) GetUserInfo(email string) (*entities.UserInfoModel,error) {
 	query := `SELECT userid, username, email, gender, isemailverified, firstname, lastname, role, dob, createdat FROM users WHERE email = $1 LIMIT 1`
 	row := repo.db.QueryRowContext(context.Background(), query, email)
-
+	
 	var user entities.UserInfoModel
 	err := row.Scan(&user.UserID, &user.Username, &user.Email, &user.Gender, &user.IsEmailVerified, &user.FirstName, &user.LastName, &user.Role, &user.DOB, &user.CreatedAt)
 	if err != nil {

@@ -21,6 +21,7 @@ func GatewayAuth(gateway HTTPGateway, app *fiber.App) {
 	authAPI.Get("/status/check", gateway.AuthService.CheckJWT)
 	authAPI.Post("/email/resetpassword", gateway.ResetPassword)
 	authAPI.Post("/email/verify", gateway.EmailVerify)
+	authAPI.Post("/email/resend/verify", gateway.ResendEmailVerification)
 }
 
 func GatewayCourse(gateway HTTPGateway, app *fiber.App) {

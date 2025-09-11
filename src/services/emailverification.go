@@ -16,6 +16,8 @@ import (
 // IEmailVerificationService defines the interface for the email verification service.
 type IEmailVerificationService interface {
 	CreateVerificationRequest(ctx *fiber.Ctx, email string) error
+	VerifyEmail(token string) error
+	ResendVerificationEmail(ctx *fiber.Ctx, email string) error
 }
 
 // EmailVerification is the service that handles email verification logic.
@@ -44,6 +46,7 @@ func (s *EmailVerification) CreateVerificationRequest(ctx *fiber.Ctx, email stri
 
 	// Fetch user information based on the provided email
 	user, err := s.UserRepo.GetUserInfo(email)
+	fmt.Println("got user info")
 	if err != nil {
 		return fmt.Errorf("error fetching user: %w", err)
 	}
@@ -59,23 +62,26 @@ func (s *EmailVerification) CreateVerificationRequest(ctx *fiber.Ctx, email stri
 
 	// Create the entity to store in the database
 	verificationReq := &entities.EmailVerificationModel{
-		Id:         uuid.NewString(),
-		UserId:     user.UserID.String(),
-		Email:      user.Email,
-		Token:      token,
-		CreatedAt:  time.Now(),
-		ExpiresAt:  time.Now().Add(24 * time.Hour),
-		IsVerify:   false,
+		Id:          uuid.NewString(),
+		UserId:      user.UserID.String(),
+		Email:       user.Email,
+		Token:       token,
+		CreatedAt:   time.Now(),
+		ExpiresAt:   time.Now().Add(24 * time.Hour),
+		IsVerify:    false,
+		IsAvailable: true,
 	}
 
 	// Save the verification request to the database
 	err = s.VerificationRepo.InsertNewEmailVerify(context.Background(), verificationReq)
 	if err != nil {
-		return fmt.Errorf("failed to save verification request: %w", err)
-	}
-
+    
+    log.Printf("[EmailVerification] insert failed: %+v", err)
+    return fmt.Errorf("failed to save verification request: %w", err)
+}
+	fmt.Println("inserted")
 	// Construct the verification link
-	verificationLink := fmt.Sprintf(os.Getenv("FRONTEND_URL")+"/verify?token=%s", token)
+	verificationLink := fmt.Sprintf(os.Getenv("FRONTEND_URL")+"/verifyemail?token=%s", token)
 
 	// Create the simple HTML email body
 	emailBody := fmt.Sprintf(`
@@ -108,6 +114,59 @@ func (s *EmailVerification) CreateVerificationRequest(ctx *fiber.Ctx, email stri
 	if err != nil {
 		fmt.Println("failed to send verification email")
 	}
+	fmt.Println("email sent")
 
 	return nil
+}
+
+func (s *EmailVerification) VerifyEmail(token string) error {
+	if token == "" {
+		return fmt.Errorf("no token")
+	}
+	data, err := s.VerificationRepo.GetEmailVerificationByToken(context.Background(), token)
+	if err != nil {
+		fmt.Println(err)
+		return fmt.Errorf("error get reset data")
+	}
+	if data == nil {
+		return fmt.Errorf("no token match")
+	}
+	if !data.IsAvailable || time.Now().After(data.ExpiresAt) {
+		return fmt.Errorf("this token is unavailable")
+	}
+
+	data.IsAvailable = false
+	data.IsVerify = true
+
+	err = s.VerificationRepo.UpdateEmailVerification(context.Background(), data)
+	if err != nil {
+		fmt.Println("Error to update")
+		return fmt.Errorf("error to update")
+	}
+
+	return nil
+}
+
+func (s *EmailVerification) ResendVerificationEmail(ctx *fiber.Ctx, email string) error {
+	fmt.Println("resending email")
+	if s.UserRepo == nil || s.VerificationRepo == nil {
+		return fmt.Errorf("email verification service not wired correctly (nil repo)")
+	}
+
+	if email == "" {
+		fmt.Println("email not found")
+		return fmt.Errorf("email not found")
+	}
+	user, err := s.UserRepo.GetUserInfo(email)
+	fmt.Print("im here")
+	if err != nil {
+		return fmt.Errorf("error fetching user: %w", err)
+	}
+	if user == nil {
+		return fmt.Errorf("user of this email does not exist")
+	}
+	if err := s.VerificationRepo.DeactivateAllByEmail(context.Background(), email); err != nil {
+		return fmt.Errorf("failed to deactivate previous requests: %w", err)
+	}
+	return s.CreateVerificationRequest(ctx, email)
 }

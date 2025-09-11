@@ -6,6 +6,7 @@ import (
 	"fmt" // เพิ่ม import สำหรับ fmt
 	"go-fiber-template/domain/entities"
 	repo "go-fiber-template/domain/repositories"
+	"go-fiber-template/src/services"
 	"go-fiber-template/src/services/utils"
 	"os"
 	"strings" // เพิ่ม import สำหรับ strings
@@ -33,18 +34,20 @@ type IAuthService interface {
 }
 
 type authService struct {
-	jwtSecret      string
-	userRepository repo.IUsersRepository
+	jwtSecret                string
+	userRepository           repo.IUsersRepository
+	EmailVerificationService services.IEmailVerificationService
 }
 
-func NewAuthService(userRepo repo.IUsersRepository) IAuthService {
+func NewAuthService(userRepo repo.IUsersRepository, emailService services.IEmailVerificationService) IAuthService {
 	secret := os.Getenv("JWT_SECRET_KEY")
 	if secret == "" {
 		log.Fatal("JWT_SECRET_KEY is not set in .env")
 	}
 	return &authService{
-		jwtSecret:      secret,
-		userRepository: userRepo,
+		jwtSecret:                secret,
+		userRepository:           userRepo,
+		EmailVerificationService: emailService,
 	}
 }
 
@@ -150,6 +153,16 @@ func (s *authService) Login(email, password string, ctx *fiber.Ctx) (entities.Lo
 		}, nil
 	}
 
+	if !user.IsEmailVerified {
+		fmt.Println("unverify email")
+		if err := s.EmailVerificationService.ResendVerificationEmail(ctx, user.Email); err != nil {
+			// >>> อย่ากลืน error ให้ log ออกมาเลย
+			log.Printf("[Login] ResendVerificationEmail error: %+v\n", err)
+			return entities.LoginResponse{Success: false, Error: "Please verify your email (failed to send email)"}, nil
+		}
+		return entities.LoginResponse{Success: false, Error: "Please verify your email first. A verification email has been sent."}, nil
+	}
+
 	token, err := s.GenerateJWT(user.UserID.String(), user.Email)
 	if err != nil {
 		return entities.LoginResponse{
@@ -162,11 +175,11 @@ func (s *authService) Login(email, password string, ctx *fiber.Ctx) (entities.Lo
 
 	ctx.Cookie(&fiber.Cookie{
 		Name:     "jwt",
-		Value:    token,                    // JWT ที่ generate มา
+		Value:    token,                          // JWT ที่ generate มา
 		Expires:  time.Now().Add(time.Hour * 24), // อายุ 1 วัน (แล้วแต่กำหนด)
 		HTTPOnly: true,                           // ป้องกัน JS access, ปลอดภัยขึ้น
-		Secure:   false,                           // ใช้เฉพาะ HTTPS
-		SameSite: "None",                          // หรือ "Strict" / "None" ตาม use-case
+		Secure:   false,                          // ใช้เฉพาะ HTTPS
+		SameSite: "None",                         // หรือ "Strict" / "None" ตาม use-case
 	})
 
 	respData := map[string]interface{}{
@@ -206,7 +219,6 @@ func (s *authService) AuthMiddleware() fiber.Handler {
 		}
 
 		fmt.Println("welcome : ", claims.Email)
-
 
 		c.Locals("user", claims) // คุณสามารถเก็บ claims โดยตรงได้
 		c.Locals("userID", claims.UserID)
