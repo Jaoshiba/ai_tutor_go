@@ -90,6 +90,7 @@ func (repo *courseRepository) GetCourseById(courseId string) (*entities.CourseDa
 		&course.CourseId,
 		&course.Title,
 		&course.Description,
+		&course.Confirmed,
 		&course.UserId,
 		&course.CreatedAt, // สแกนตรงเข้า time.Time
 		&course.UpdatedAt, // สแกนตรงเข้า time.Time
