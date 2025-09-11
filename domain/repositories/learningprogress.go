@@ -29,7 +29,7 @@ func NewLearningProgressRepository(db *sql.DB) ILearningProgressRepository {
 // CREATE
 func (r *learningProgressRepository) CreateProgress(progress entities.LearningProgressDataModel) error {
     query := `
-        INSERT INTO learningprogress (processid, userid, moduleid, chapterid, createdat)
+        INSERT INTO learningprogresses (processid, userid, moduleid, chapterid, createdat)
         VALUES ($1, $2, $3, $4, $5)
     `
     _, err := r.db.ExecContext(context.Background(), query,
@@ -49,7 +49,7 @@ func (r *learningProgressRepository) CreateProgress(progress entities.LearningPr
 func (r *learningProgressRepository) GetProgressByID(processID string) (*entities.LearningProgressDataModel, error) {
     query := `
         SELECT processid, userid, moduleid, chapterid, createdat
-        FROM learningprogress
+        FROM learningprogresses
         WHERE processid=$1
     `
     p := &entities.LearningProgressDataModel{}
@@ -72,7 +72,7 @@ func (r *learningProgressRepository) GetProgressByID(processID string) (*entitie
 // UPDATE
 func (r *learningProgressRepository) UpdateProgress(progress entities.LearningProgressDataModel) error {
     query := `
-        UPDATE learningprogress
+        UPDATE learningprogresses
         SET userid=$1, moduleid=$2, chapterid=$3, createdat=$4
         WHERE processid=$5
     `
@@ -92,7 +92,7 @@ func (r *learningProgressRepository) UpdateProgress(progress entities.LearningPr
 // DELETE
 func (r *learningProgressRepository) DeleteProgress(processID string) error {
     query := `
-        DELETE FROM learningprogress
+        DELETE FROM learningprogresses
         WHERE processid=$1
     `
     _, err := r.db.ExecContext(context.Background(), query, processID)
@@ -106,7 +106,7 @@ func (r *learningProgressRepository) DeleteProgress(processID string) error {
 func (r *learningProgressRepository) ListProgressByUser(userID string) ([]entities.LearningProgressDataModel, error) {
     query := `
         SELECT processid, userid, moduleid, chapterid, createdat
-        FROM learningprogress
+        FROM learningprogresses
         WHERE userid=$1
         ORDER BY createdat DESC
     `
@@ -131,7 +131,7 @@ func (r *learningProgressRepository) ListProgressByUser(userID string) ([]entiti
 func (r *learningProgressRepository) ListProgressByModule(moduleID string) ([]entities.LearningProgressDataModel, error) {
     query := `
         SELECT processid, userid, moduleid, chapterid, createdat
-        FROM learningprogress
+        FROM learningprogresses
         WHERE moduleid=$1
         ORDER BY createdat DESC
     `

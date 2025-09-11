@@ -205,8 +205,9 @@ func (s *authService) AuthMiddleware() fiber.Handler {
 			})
 		}
 
-		// Store user claims in Fiber context for subsequent handlers
-		// เก็บ user claims ไว้ใน Fiber context สำหรับ handler ถัดไป
+		fmt.Println("welcome : ", claims.Email)
+
+
 		c.Locals("user", claims) // คุณสามารถเก็บ claims โดยตรงได้
 		c.Locals("userID", claims.UserID)
 		c.Locals("userEmail", claims.Email)

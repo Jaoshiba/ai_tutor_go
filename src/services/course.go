@@ -373,7 +373,11 @@ func (rs *courseService) CreateCourse(courserequest entities.CourseRequestBody, 
 func (rs *courseService) GetCourseDetail(ctx *fiber.Ctx, courseId string) (*entities.CourseDetailResponse, error) {
 
 	fmt.Println("Hello im in GetCourseDetail")
-	userId := ctx.Locals("userID").(string)
+	userIdRaw := ctx.Locals("userID")
+	userId, ok := userIdRaw.(string)
+	if !ok {
+		fmt.Println("No user id")
+	}
 
 	courseData, err := rs.CourseRepo.GetCourseById(courseId)
 	if err != nil {
