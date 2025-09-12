@@ -33,12 +33,19 @@ func (h *HTTPGateway) TestCreateCourse(ctx *fiber.Ctx) error {
 	if err != nil {
 		return ctx.Status(fiber.StatusBadRequest).JSON(entities.ResponseModel{
 			Message: "failed to create course on CreateCourse",
+			Data:    err.Error(),
 		})
 	}
 
-	return ctx.Status(fiber.StatusOK).JSON(entities.ResponseModel{
-		Message: "Completed create Course from your promts",
-		Data:    courses})
+	coursejsonBody.IsFirtTime = false
+	coursejsonBody.Course = courses
+
+	fmt.Println("After create in gateway: ", coursejsonBody)
+
+	return ctx.Status(fiber.StatusOK).JSON(fiber.Map{
+		"message": "Completed create Course from your promts",
+		"data":    coursejsonBody,
+	})
 }
 
 func (h *HTTPGateway) TestGetCourseByUser(c *fiber.Ctx) error {

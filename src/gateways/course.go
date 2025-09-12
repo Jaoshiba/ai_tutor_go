@@ -31,16 +31,14 @@ func (h *HTTPGateway) CreateCourse(ctx *fiber.Ctx) error {
 		})
 	}
 
-	if coursejsonBody.IsFirtTime {
-		coursejsonBody.IsFirtTime = false
-	}
-
 	coursejsonBody.IsFirtTime = false
 	coursejsonBody.Course = courses
 
-	return ctx.Status(fiber.StatusOK).JSON(entities.ResponseModel{
-		Message: "Completed create Course from your promts",
-		Data:    coursejsonBody,
+	fmt.Println("After create in gateway: ", coursejsonBody)
+
+	return ctx.Status(fiber.StatusOK).JSON(fiber.Map{
+		"message": "Completed create Course from your promts",
+		"data":    coursejsonBody,
 	})
 }
 
