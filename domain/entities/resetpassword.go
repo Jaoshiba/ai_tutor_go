@@ -11,6 +11,7 @@ type ResetPassword struct {
 	ExpiresAt time.Time `json:"expires_at" db:"expires_at"`
 	Token string `json:"token" db:"token"`
 	IsReset bool `json:"is_reset" db:"is_reset"`
+	IsAvailable bool `json:"is_available" db:"is_available"`
 }
 
 type ResetPasswordRequest struct {

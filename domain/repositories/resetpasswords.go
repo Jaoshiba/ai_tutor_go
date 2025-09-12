@@ -14,6 +14,7 @@ type IResetPassword interface {
 	GetResetPasswordByToken(ctx context.Context, token string) (*entities.ResetPassword, error)
 	UpdateResetPasswordStatus(ctx context.Context, id string, isReset bool) error
 	DeleteResetPassword(ctx context.Context, id string) error
+	DeactivateAllByUserID(ctx context.Context, userID string) error
 }
 
 type resetPasswordRepository struct {
@@ -31,8 +32,8 @@ func NewResetPasswordRepository(db *sql.DB) IResetPassword {
 
 func (repo *resetPasswordRepository) InsertNewResetPassword(ctx context.Context, data *entities.ResetPassword) error {
 	query := `
-		INSERT INTO reset_passwords (id, user_id, created_at, expires_at, token, is_reset)
-		VALUES ($1, $2, $3, $4, $5, $6)
+		INSERT INTO reset_passwords (id, user_id, created_at, expires_at, token, is_reset, is_available)
+		VALUES ($1, $2, $3, $4, $5, $6, $7)
 	`
 	_, err := repo.db.ExecContext(ctx, query,
 		data.Id,
@@ -41,6 +42,7 @@ func (repo *resetPasswordRepository) InsertNewResetPassword(ctx context.Context,
 		data.ExpiresAt,
 		data.Token,
 		data.IsReset,
+		data.IsAvailable,
 	)
 
 	if err != nil {
@@ -51,7 +53,7 @@ func (repo *resetPasswordRepository) InsertNewResetPassword(ctx context.Context,
 
 func (repo *resetPasswordRepository) GetResetPasswordByToken(ctx context.Context, token string) (*entities.ResetPassword, error) {
 	query := `
-		SELECT id, user_id, created_at, expires_at, token, is_reset
+		SELECT id, user_id, created_at, expires_at, token, is_reset, is_available
 		FROM reset_passwords
 		WHERE token = $1
 	`
@@ -65,6 +67,7 @@ func (repo *resetPasswordRepository) GetResetPasswordByToken(ctx context.Context
 		&data.ExpiresAt,
 		&data.Token,
 		&data.IsReset,
+		&data.IsAvailable,
 	)
 
 	if err != nil {
@@ -79,7 +82,8 @@ func (repo *resetPasswordRepository) GetResetPasswordByToken(ctx context.Context
 func (repo *resetPasswordRepository) UpdateResetPasswordStatus(ctx context.Context, id string, isReset bool) error {
 	query := `
 		UPDATE reset_passwords
-		SET is_reset = $1
+		SET is_reset = $1,
+			is_available = false
 		WHERE id = $2
 	`
 	_, err := repo.db.ExecContext(ctx, query, isReset, id)
@@ -97,6 +101,19 @@ func (repo *resetPasswordRepository) DeleteResetPassword(ctx context.Context, id
 	_, err := repo.db.ExecContext(ctx, query, id)
 	if err != nil {
 		return fmt.Errorf("failed to delete reset password record: %w", err)
+	}
+	return nil
+}
+
+func (repo *resetPasswordRepository) DeactivateAllByUserID(ctx context.Context, userID string) error {
+	query := `
+		UPDATE reset_passwords
+		SET is_available = false
+		WHERE user_id = $1 AND is_available = true
+	`
+	_, err := repo.db.ExecContext(ctx, query, userID)
+	if err != nil {
+		return fmt.Errorf("failed to deactivate all reset password records for user_id=%s: %w", userID, err)
 	}
 	return nil
 }

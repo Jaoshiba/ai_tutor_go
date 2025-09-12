@@ -22,6 +22,8 @@ type HTTPGateway struct {
 	DocSearchService  service.IDocSearchService
 	// EmailService      service.IEmailService
 	ResetPasswordService service.IResetPasswordService
+	EmailVerificationSerivce service.IEmailVerificationService
+	
 }
 
 func NewHTTPGateway(
@@ -34,7 +36,7 @@ func NewHTTPGateway(
 	courseService service.ICourseService,
 	docSearchService service.IDocSearchService,
 	resetpassword service.IResetPasswordService,
-
+	emailVerificationservice service.IEmailVerificationService,
 ) {
 	gateway := &HTTPGateway{
 		UserService:          users,
@@ -45,6 +47,7 @@ func NewHTTPGateway(
 		CourseService:        courseService,
 		DocSearchService:     docSearchService,
 		ResetPasswordService: resetpassword,
+		EmailVerificationSerivce: emailVerificationservice,
 	}
 
 	GatewayAuth(*gateway, app)

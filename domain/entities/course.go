@@ -17,8 +17,8 @@ type CourseDataModel struct {
 }
 
 type CourseRequestBody struct {
-	Title       string               `json:"Title" db:"title"`
-	Description string               `json:"Description" db:"description"`
+	Title       string               `json:"title" db:"title"`
+	Description string               `json:"description" db:"description"`
 	Confirmed   bool                 `json:"confirmed" db:"confirmed"`
 	Regen       bool                 `json:"regen" db:"regen"`
 	Addipromt   string               `json:"addipromt" db:"addipromt"`
@@ -30,7 +30,7 @@ type CourseGeminiResponse struct {
 	Purpose string      `json:"purpose"`
 	Modules []GenModule `json:"modules"`
 }
-
+ 
 type GenModule struct {
 	Title       string `json:"title"`
 	Description string `json:"description"`

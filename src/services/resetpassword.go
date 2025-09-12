@@ -25,7 +25,7 @@ type ResetPassword struct {
 
 type IResetPasswordService interface {
 	CreateResetRequest(ctx *fiber.Ctx, email string) error
-	CheckResetRequest(ctx *fiber.Ctx) error
+	ResetPassword(ctx *fiber.Ctx, token, newpassword string) error
 }
 
 func NewResetPasswordService(resetpasswordRepository repositories.IResetPassword, userRepository repositories.IUsersRepository) IResetPasswordService {
@@ -71,6 +71,7 @@ func (r *ResetPassword) CreateResetRequest(ctx *fiber.Ctx, email string) error {
 		CreatedAt: time.Now(),
 		ExpiresAt: time.Now().Add(24 * time.Hour),
 		IsReset:   false,
+		IsAvailable: true,
 	}
 
 	// เก็บลง DB
@@ -117,7 +118,55 @@ func (r *ResetPassword) CreateResetRequest(ctx *fiber.Ctx, email string) error {
 	return nil
 }
 
-func (r *ResetPassword) CheckResetRequest(ctx *fiber.Ctx) error {
+func (r *ResetPassword) ResetPassword(ctx *fiber.Ctx, token, newpassword string) error {
+	// 1) ดึงข้อมูล token
+	rec, err := r.ResetPasswordRepo.GetResetPasswordByToken(context.Background(), token)
+	if err != nil {
+		return fmt.Errorf("failed to get reset token: %w", err)
+	}
+	if rec == nil {
+		return fmt.Errorf("invalid reset token")
+	}
+
+	// 2) ตรวจสถานะ token
+	now := time.Now()
+	if rec.IsReset {
+		return fmt.Errorf("this reset token has already been used")
+	}
+	if !rec.IsAvailable {
+		return fmt.Errorf("this reset token is not available")
+	}
+	if now.After(rec.ExpiresAt) {
+		return fmt.Errorf("this reset token has expired")
+	}
+
+	// 3) แฮชรหัสผ่านใหม่
+	hashed, err := HashPassword(newpassword)
+	if err != nil {
+		return fmt.Errorf("failed to hash new password: %w", err)
+	}
+
+	// 4) แปลง user_id เป็น uuid.UUID
+	// userUUID, err := uuid.Parse(rec.UserId)
+	if err != nil {
+		return fmt.Errorf("invalid user id format in reset record: %w", err)
+	}
+
+	// 5) อัปเดตรหัสผ่านผู้ใช้
+	if err := r.UserRepo.UpdateUserPassword(rec.UserId, hashed); err != nil {
+		return fmt.Errorf("failed to update user password: %w", err)
+	}
+
+	// 6) ปิด token นี้ว่าใช้งานแล้ว (is_reset=true, is_available=false)
+	if err := r.ResetPasswordRepo.UpdateResetPasswordStatus(context.Background(), rec.Id, true); err != nil {
+		return fmt.Errorf("failed to mark reset token as used: %w", err)
+	}
+
+	// 7) ปิด token อื่นๆ ของผู้ใช้นี้ทั้งหมดเพื่อความปลอดภัย (กันนำอันเก่ามาใช้ซ้ำ)
+	if err := r.ResetPasswordRepo.DeactivateAllByUserID(context.Background(), rec.UserId); err != nil {
+		// ไม่ถึงกับ fail flow reset ทั้งหมด แต่ log ไว้
+		fmt.Println("warning: failed to deactivate other reset tokens:", err)
+	}
 
 	return nil
 }

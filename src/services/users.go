@@ -17,6 +17,8 @@ type usersService struct {
 type IUsersService interface {
 	GetAllUsers() (*[]entities.UserDataModel, error)
 	InsertNewUser(data entities.UserDataModel) error
+	CheckByEmail(email string) error
+	GetUserPublicProfile(userId string) (*entities.UserInfoModel, error)
 }
 
 func NewUsersService(repo0 repositories.IUsersRepository) IUsersService {
@@ -95,4 +97,31 @@ func (sv *usersService) CheckUserExistBy(field string, value string) error {
 	}
 
 	return nil
+}
+func (sv *usersService) UpdateUserProfile(req entities.UpdateUserProfileRequest) error {
+	return sv.UsersRepository.UpdateUserProfile(req)
+}
+
+func (sv *usersService) GetUserPublicProfile(userId string) (*entities.UserInfoModel, error) {
+    user, err := sv.UsersRepository.GetUserById(userId)
+    if err != nil {
+        return nil, err
+    }
+    if user == nil {
+        return nil, errors.New("user not found")
+    }
+    // map UserDataModel -> UserInfoModel
+    return &entities.UserInfoModel{
+        UserID:          user.UserID,
+        Username:        user.Username,
+        FirstName:       user.FirstName,
+        LastName:        user.LastName,
+        Email:           user.Email,
+        Gender:          user.Gender,
+        Role:            user.Role,
+        DOB:             user.DOB,
+        CreatedAt:       user.CreatedAt,
+        UpdatedAt:       user.UpdatedAt,
+        IsEmailVerified: user.IsEmailVerified,
+    }, nil
 }

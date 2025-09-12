@@ -19,8 +19,10 @@ func GatewayAuth(gateway HTTPGateway, app *fiber.App) {
 	authAPI := app.Group("/api/auth")
 	authAPI.Post("/login", gateway.Login) // เส้นทางสาธารณะ: ล็อกอิน
 	authAPI.Get("/status/check", gateway.AuthService.CheckJWT)
+	authAPI.Post("/email/createresetpassword", gateway.ResetPasswordRequest)
 	authAPI.Post("/email/resetpassword", gateway.ResetPassword)
 	authAPI.Post("/email/verify", gateway.EmailVerify)
+	authAPI.Post("/email/resend/verify", gateway.ResendEmailVerification)
 }
 
 func GatewayCourse(gateway HTTPGateway, app *fiber.App) {
@@ -77,7 +79,9 @@ func GatewayProtected(gateway HTTPGateway, app *fiber.App) {
 
 	// Routes สำหรับ Users (ที่ต้องการการป้องกัน)
 	protected.Get("/users", gateway.GetAllUserData)      // ดึงข้อมูลผู้ใช้ทั้งหมด (ต้องล็อกอิน)
-	protected.Get("/users/me", gateway.GetMeDataHandler) // Endpoint สำหรับดึงข้อมูลผู้ใช้ที่ล็อกอินอยู่ (ต้องล็อกอิน)
+	protected.Get("/users/me", gateway.GetMeDataHandler) 
+	protected.Get("/profile", gateway.GetUserProfileById)
+	protected.Get("/profile/edit", gateway.GetUserProfileById)
 	// protected.Get("/users/:id", gateway.GetUserByID)     // ถ้ามี: ดึงข้อมูลผู้ใช้ตาม ID (ต้องล็อกอิน)
 	// protected.Put("/users/:id", gateway.UpdateUser)      // ถ้ามี: อัปเดตข้อมูลผู้ใช้ (ต้องล็อกอิน)
 	// protected.Delete("/users/:id", gateway.DeleteUser)   // ถ้ามี: ลบผู้ใช้ (ต้องล็อกอิน)

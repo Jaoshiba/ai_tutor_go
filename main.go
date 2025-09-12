@@ -68,6 +68,7 @@ func main() {
 	refRepo := repo.NewRefRepository(postgresql)
 	resetPasswordRepo := repo.NewResetPasswordRepository(postgresql)
 	learningProgressRepo := repo.NewLearningProgressRepository(postgresql)
+	emailVerificationRepo := repo.NewEmailVerificationRepository(postgresql)
 
 	questionrepo := repo.NewQuestionRepository(postgresql)
 	if userRepo == nil || fileRepo == nil || chapterRepo == nil || courseRepo == nil {
@@ -79,7 +80,8 @@ func main() {
 	if jwtSecret == "" {
 		log.Fatal("JWT_SECRET_KEY is not set in .env")
 	}
-	svAuth := authService.NewAuthService(userRepo) // สร้าง AuthService
+	svEmailVerification := sv.NewEmailVerificationService(emailVerificationRepo, userRepo)
+	svAuth := authService.NewAuthService(userRepo, svEmailVerification) // สร้าง AuthService
 	sv0 := sv.NewUsersService(userRepo)            // สร้าง UsersServic
 	geminiService := sv.NewGeminiService()
 	svQuestion := sv.NewQuestionService(questionrepo)
@@ -90,10 +92,11 @@ func main() {
 	sv1 := sv.NewModuleService(fileRepo, svChapter, svExam, svdocSearch)
 	svCourse := sv.NewCourseService(courseRepo, sv1, geminiService, svChapter, learningProgressRepo)
 	svResetPassword := sv.NewResetPasswordService(resetPasswordRepo, userRepo)
+	
 
 	// สร้าง Gateway และผูก Routes ทั้งหมด
 	// ต้องส่ง AuthService และ UserService เข้าไปใน NewHTTPGateway ด้วย
-	gw.NewHTTPGateway(app, sv0, sv1, svExam, svAuth, svChapter, svCourse, svdocSearch, svResetPassword)
+	gw.NewHTTPGateway(app, sv0, sv1, svExam, svAuth, svChapter, svCourse, svdocSearch, svResetPassword, svEmailVerification)
 
 	app.Use("/dashboard", filesystem.New(filesystem.Config{
 		Root:       http.Dir("./static"),
