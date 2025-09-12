@@ -1,28 +1,17 @@
 package gateways
 
 import (
-	"encoding/json"
 	"fmt"
 	"go-fiber-template/domain/entities"
-	"mime/multipart"
 
 	"github.com/gofiber/fiber/v2"
 )
 
 func (h *HTTPGateway) CreateCourse(ctx *fiber.Ctx) error {
 
-	jsonbody := ctx.FormValue("jsonbody")
-	// file, err := ctx.FormFile("file")
-	// if err != nil {
-	// 	return ctx.Status(fiber.StatusUnprocessableEntity).JSON(entities.ResponseMessage{Message: "invalid file"})
-	// }
-	var file *multipart.FileHeader = nil
-	fmt.Println("jsonbody: ", jsonbody)
-
 	var coursejsonBody entities.CourseRequestBody
 
-	err := json.Unmarshal([]byte(jsonbody), &coursejsonBody)
-	if err != nil {
+	if err := ctx.BodyParser(&coursejsonBody); err != nil {
 		return ctx.Status(fiber.StatusUnprocessableEntity).JSON(entities.ResponseMessage{Message: "invalid json body"})
 	}
 
@@ -34,7 +23,7 @@ func (h *HTTPGateway) CreateCourse(ctx *fiber.Ctx) error {
 
 	fmt.Println("Before create in gateway")
 
-	courses, err := h.CourseService.CreateCourse(coursejsonBody, false, file, ctx)
+	courses, err := h.CourseService.CreateCourse(coursejsonBody, ctx)
 	if err != nil {
 		return ctx.Status(fiber.StatusBadRequest).JSON(entities.ResponseModel{
 			Message: "failed to create course on CreateCourse",
@@ -42,15 +31,16 @@ func (h *HTTPGateway) CreateCourse(ctx *fiber.Ctx) error {
 		})
 	}
 
-	datareturn := map[string]interface{}{
-		"confirmed":   coursejsonBody.Confirmed,
-		"isfirsttime": coursejsonBody.IsFirtTime,
-		"courses":     courses,
+	if coursejsonBody.IsFirtTime {
+		coursejsonBody.IsFirtTime = false
 	}
+
+	coursejsonBody.IsFirtTime = false
+	coursejsonBody.Course = courses
 
 	return ctx.Status(fiber.StatusOK).JSON(entities.ResponseModel{
 		Message: "Completed create Course from your promts",
-		Data:    datareturn,
+		Data:    coursejsonBody,
 	})
 }
 

@@ -24,7 +24,7 @@ type courseService struct {
 }
 
 type ICourseService interface {
-	CreateCourse(courserequest entities.CourseRequestBody, fromfile bool, file *multipart.FileHeader, ctx *fiber.Ctx) (entities.CourseGeminiResponse, error) //add userId ด้วย
+	CreateCourse(courserequest entities.CourseRequestBody, ctx *fiber.Ctx) (entities.CourseGeminiResponse, error) //add userId ด้วย
 	GetCourses(ctx *fiber.Ctx) ([]entities.CourseDataModel, error)
 	GetCourseDetail(ctx *fiber.Ctx, courseId string) (*entities.CourseDetailResponse, error)
 	DeleteCourse(ctx *fiber.Ctx, courseId string) error
@@ -219,7 +219,7 @@ func (rs *courseService) CreateModulesFromFile(file *multipart.FileHeader, ctx *
 
 }
 
-func (rs *courseService) CreateCourse(courserequest entities.CourseRequestBody, fromfile bool, file *multipart.FileHeader, ctx *fiber.Ctx) (entities.CourseGeminiResponse, error) {
+func (rs *courseService) CreateCourse(courserequest entities.CourseRequestBody, ctx *fiber.Ctx) (entities.CourseGeminiResponse, error) {
 
 	var courses entities.CourseGeminiResponse
 	fmt.Println("Im here")
@@ -227,104 +227,23 @@ func (rs *courseService) CreateCourse(courserequest entities.CourseRequestBody, 
 	fmt.Println("Extracting file content....")
 
 	var content string
-	if !fromfile {
-		// if file != nil {
-		// 	fmt.Println("Extracting file content....")
-		// 	docPath, err := SaveFileToDisk(file, ctx)
-		// 	if err != nil {
-		// 		fmt.Printf("Error saving file to disk: %v\n", err)
-		// 		return err
-		// 	}
-		// 	fileContent, err := ReadFileData(docPath, ctx)
-		// 	content = fileContent
-		// 	if err != nil {
-		// 		fmt.Printf("Error processing file with FileService: %v\n", err)
-		// 		return err
-		// 	}
-		// } else {
-		// 	fmt.Println("No file uploaded, skipping file processing")
-		// 	content = ""
-		// 	content = ""
-		// }
-		if courserequest.Confirmed {
+	if courserequest.Confirmed {
 
-			fmt.Println("confirmed")
-
-			courseId := uuid.NewString()
-			ctx.Locals("courseID", courseId)
-			userId := ctx.Locals("userID").(string)
-
-			course := entities.CourseDataModel{
-				CourseId:    courseId,
-				Title:       courserequest.Title,
-				Description: courserequest.Description,
-				Confirmed:   courserequest.Confirmed,
-				UserId:      userId,
-				CreatedAt:   time.Now(),
-				UpdatedAt:   time.Now(),
-			}
-
-			err := rs.CourseRepo.InsertCourse(course)
-			if err != nil {
-				fmt.Println("error insert course")
-				fmt.Println(err)
-				return courses, err
-			}
-
-			courses := courserequest.Course
-
-			err = rs.ModuleService.CreateModule(ctx, courses, courserequest.Title, courserequest.Description, fromfile)
-			if err != nil {
-				fmt.Println("error insert module", err)
-				return courses, err
-			}
-
-			fmt.Println("content : ", content)
-		} else {
-			if courserequest.IsFirtTime {
-				fmt.Println("is first time")
-				courses, err := rs.genCourse(courserequest, ctx.Context())
-				if err != nil {
-					fmt.Println(err)
-					return courses, err
-				}
-
-				return courses, nil
-
-			} else {
-				if courserequest.Regen {
-					fmt.Println("Regen courses")
-					courses, err := rs.RegenCourse(courserequest, ctx.Context())
-					if err != nil {
-						fmt.Println(err)
-						return courses, err
-					}
-					fmt.Println("courses from regen : ", courses)
-
-					return courses, nil
-				}
-			}
-
-		}
-
-	} else { //for file upload
+		fmt.Println("confirmed")
 
 		courseId := uuid.NewString()
-		ctx.Locals("courseId", courseId)
-
+		ctx.Locals("courseID", courseId)
 		userId := ctx.Locals("userID").(string)
 
 		course := entities.CourseDataModel{
 			CourseId:    courseId,
 			Title:       courserequest.Title,
-			Description: "",
-			Confirmed:   true,
+			Description: courserequest.Description,
+			Confirmed:   courserequest.Confirmed,
 			UserId:      userId,
 			CreatedAt:   time.Now(),
 			UpdatedAt:   time.Now(),
 		}
-
-		fmt.Println(course)
 
 		err := rs.CourseRepo.InsertCourse(course)
 		if err != nil {
@@ -333,34 +252,42 @@ func (rs *courseService) CreateCourse(courserequest entities.CourseRequestBody, 
 			return courses, err
 		}
 
-		modules, err := rs.CreateModulesFromFile(file, ctx)
-		if err != nil {
-			return courses, err
-		}
-		fmt.Println("courses : ", modules)
+		courses := courserequest.Course
 
-		courses := entities.CourseGeminiResponse{
-			Purpose: "Course created from file upload",
-			Modules: modules,
-		}
-
-		err = rs.ModuleService.CreateModule(ctx, courses, courserequest.Title, courserequest.Description, fromfile)
+		err = rs.ModuleService.CreateModule(ctx, courses, courserequest.Title, courserequest.Description)
 		if err != nil {
+			fmt.Println("error insert module", err)
 			return courses, err
 		}
 
-		//create module
-		// moduleData := entities.GenModule{
-		// 	Title:       file.Filename,
-		// 	Description: " ",
-		// 	Content:     content,
-		// }
-		// err = rs.ModuleService.CreateModule(ctx, &moduleData)
-		// if err != nil {
-		// 	return err
-		// }
+		fmt.Println("content : ", content)
+	} else {
+		if courserequest.IsFirtTime {
+			fmt.Println("is first time")
+			courses, err := rs.genCourse(courserequest, ctx.Context())
+			if err != nil {
+				fmt.Println(err)
+				return courses, err
+			}
+
+			return courses, nil
+
+		} else {
+			if courserequest.Regen {
+				fmt.Println("Regen courses")
+				courses, err := rs.RegenCourse(courserequest, ctx.Context())
+				if err != nil {
+					fmt.Println(err)
+					return courses, err
+				}
+				fmt.Println("courses from regen : ", courses)
+
+				return courses, nil
+			}
+		}
 
 	}
+
 
 	return courses, nil
 }

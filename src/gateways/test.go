@@ -1,7 +1,6 @@
 package gateways
 
 import (
-	"encoding/json"
 	"fmt"
 	"go-fiber-template/domain/entities"
 
@@ -13,18 +12,12 @@ func (h *HTTPGateway) TestCreateCourse(ctx *fiber.Ctx) error {
 
 	fmt.Println("TestCreateCourse called")
 
-	jsonbody := ctx.FormValue("jsonbody")
-	file, _ := ctx.FormFile("file")
-
 	userID := uuid.NewString()
 	ctx.Locals("userID", userID)
 
-	fmt.Println("jsonbody: ", jsonbody)
-
 	var coursejsonBody entities.CourseRequestBody
 
-	err := json.Unmarshal([]byte(jsonbody), &coursejsonBody)
-	if err != nil {
+	if err := ctx.BodyParser(&coursejsonBody); err != nil {
 		return ctx.Status(fiber.StatusUnprocessableEntity).JSON(entities.ResponseMessage{Message: "invalid json body"})
 	}
 
@@ -36,7 +29,7 @@ func (h *HTTPGateway) TestCreateCourse(ctx *fiber.Ctx) error {
 
 	fmt.Println("Before create in gateway")
 
-	courses, err := h.CourseService.CreateCourse(coursejsonBody, false, file, ctx)
+	courses, err := h.CourseService.CreateCourse(coursejsonBody, ctx)
 	if err != nil {
 		return ctx.Status(fiber.StatusBadRequest).JSON(entities.ResponseModel{
 			Message: "failed to create course on CreateCourse",
