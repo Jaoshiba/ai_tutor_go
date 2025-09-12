@@ -82,17 +82,16 @@ func main() {
 	}
 	svEmailVerification := sv.NewEmailVerificationService(emailVerificationRepo, userRepo)
 	svAuth := authService.NewAuthService(userRepo, svEmailVerification) // สร้าง AuthService
-	sv0 := sv.NewUsersService(userRepo)            // สร้าง UsersServic
+	sv0 := sv.NewUsersService(userRepo)                                 // สร้าง UsersServic
 	geminiService := sv.NewGeminiService()
 	svQuestion := sv.NewQuestionService(questionrepo)
 
 	svExam := sv.NewExamService(examRepo, chapterRepo, svQuestion)
 	svdocSearch := sv.NewDocSearchService(refRepo, pineconeRepo)
 	svChapter := sv.NewChapterServices(chapterRepo, pineconeRepo, geminiService, svExam)
-	sv1 := sv.NewModuleService(fileRepo, svChapter, svExam, svdocSearch)
+	sv1 := sv.NewModuleService(fileRepo, svChapter, svExam, svdocSearch, geminiService)
 	svCourse := sv.NewCourseService(courseRepo, sv1, geminiService, svChapter, learningProgressRepo)
 	svResetPassword := sv.NewResetPasswordService(resetPasswordRepo, userRepo)
-	
 
 	// สร้าง Gateway และผูก Routes ทั้งหมด
 	// ต้องส่ง AuthService และ UserService เข้าไปใน NewHTTPGateway ด้วย

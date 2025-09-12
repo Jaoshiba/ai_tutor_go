@@ -17,27 +17,56 @@ type ModuleService struct {
 	ChapterServices   IChapterService
 	ExamService       IExamService
 	docSearchService  IDocSearchService
+	GeminiService     IGeminiService
 }
 
 type IModuleService interface {
 	CreateModule(ctx *fiber.Ctx, moduleData entities.CourseGeminiResponse, courseTitle string, courseDescription string) error
 	GetModulesByCourseId(courseID string) ([]entities.ModuleDataModel, error)
 	DeleteModuleByCourseId(courseID string) error
+	CreateNewContent(oldcontent string, ctx *fiber.Ctx) (string, error)
 }
 
-func NewModuleService(modulesRepository repo.IModuleRepository, chapterservice IChapterService, examService IExamService, docSearchService IDocSearchService) IModuleService {
+func NewModuleService(modulesRepository repo.IModuleRepository, chapterservice IChapterService, examService IExamService, docSearchService IDocSearchService, geminiService IGeminiService) IModuleService {
 	return &ModuleService{
 		modulesRepository: modulesRepository,
 		ChapterServices:   chapterservice,
 		ExamService:       examService,
 		docSearchService:  docSearchService,
+		GeminiService:     geminiService,
 	}
+}
+
+func (ms *ModuleService) CreateNewContent(oldcontent string, ctx *fiber.Ctx) (string, error) {
+
+	promt := fmt.Sprintf(`คุณคืออาจารย์ผู้เชี่ยวชาญด้านการสอน  
+		หน้าที่ของคุณคือการสร้างเนื้อหาใหม่จากข้อมูลอ้างอิงที่ให้ไป  
+		ซึ่งเนื้อหามีที่มาหลายแหล่ง คุณต้องปฏิบัติดังนี้:
+
+		- ห้ามคัดลอกข้อความมาโดยตรง ต้องเขียนใหม่ทั้งหมด  
+		- สังเคราะห์ข้อมูลจากหลายแหล่งให้ออกมาเป็นเนื้อหาที่เป็นระบบเดียวกัน  
+		- ใช้ภาษาที่เข้าใจง่าย ชัดเจน และเป็นมิตร  
+		- เน้นความถูกต้อง กระชับ และเหมาะสมสำหรับใช้สอน  
+		- สามารถอธิบายเสริมเพิ่มเติมเพื่อทำให้ผู้เรียนเข้าใจได้ดีขึ้น  
+
+		เนื้อหาอ้างอิง:  
+		%s
+
+		กรุณาสร้างเนื้อหาใหม่โดยอิงจากข้อมูลด้านบน`, oldcontent)
+
+	newcontent, err := ms.GeminiService.GenerateContentFromPrompt(ctx.Context(), promt)
+	if err != nil {
+		return "", err
+	}
+	fmt.Println("new content: ", newcontent)
+
+	return newcontent, nil
 }
 
 func (ms *ModuleService) CreateModule(ctx *fiber.Ctx, courese entities.CourseGeminiResponse, courseTitle string, courseDescription string) error {
 	// Generate a new ModuleId early, as it's needed for both the module and its chapters.
 
- //from coursename & description
+	//from coursename & description
 	for i, moduleData := range courese.Modules {
 		// fmt.Println("Module : ", courese)
 		moduleId := uuid.NewString()
@@ -53,7 +82,12 @@ func (ms *ModuleService) CreateModule(ctx *fiber.Ctx, courese entities.CourseGem
 
 		fmt.Printf("Module %d content: %s\n", i+1, content)
 
-		moduleData.Content = content
+		newContent, err := ms.CreateNewContent(content, ctx)
+		if err != nil {
+			return err
+		}
+
+		moduleData.Content = newContent
 		userIdStr := ctx.Locals("userID").(string)
 
 		fmt.Println("ModuleService: User ID is:", userIdStr)

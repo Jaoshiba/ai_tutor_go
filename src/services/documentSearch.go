@@ -95,7 +95,7 @@ func (ds *docSearchService) SearchDocuments(courseName, courseDescription, modul
 		generatedKeywords = strings.TrimSpace(kws)
 		fmt.Println("Generated Search Query:", generatedKeywords)
 
-		generatedKeywords := fmt.Sprintf("สอน %s %s ใน %s -site:youtube.com -site:facebook.com", moduleName, moduleDescription, courseName)
+		// generatedKeywords := fmt.Sprintf("สอน %s %s ใน %s -site:youtube.com -site:facebook.com", moduleName, moduleDescription, courseName)
 
 		params := url.Values{}
 		params.Add("q", generatedKeywords)
