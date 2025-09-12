@@ -30,7 +30,7 @@ type CourseGeminiResponse struct {
 	Purpose string      `json:"purpose"`
 	Modules []GenModule `json:"modules"`
 }
-
+ 
 type GenModule struct {
 	Title       string `json:"title"`
 	Description string `json:"description"`
