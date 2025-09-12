@@ -24,7 +24,7 @@ type courseService struct {
 }
 
 type ICourseService interface {
-	CreateCourse(courserequest entities.CourseRequestBody, fromfile bool, file *multipart.FileHeader, ctx *fiber.Ctx) error //add userId ด้วย
+	CreateCourse(courserequest entities.CourseRequestBody, fromfile bool, file *multipart.FileHeader, ctx *fiber.Ctx) (entities.CourseGeminiResponse, error) //add userId ด้วย
 	GetCourses(ctx *fiber.Ctx) ([]entities.CourseDataModel, error)
 	GetCourseDetail(ctx *fiber.Ctx, courseId string) (*entities.CourseDetailResponse, error)
 	DeleteCourse(ctx *fiber.Ctx, courseId string) error
@@ -219,8 +219,9 @@ func (rs *courseService) CreateModulesFromFile(file *multipart.FileHeader, ctx *
 
 }
 
-func (rs *courseService) CreateCourse(courserequest entities.CourseRequestBody, fromfile bool, file *multipart.FileHeader, ctx *fiber.Ctx) error {
+func (rs *courseService) CreateCourse(courserequest entities.CourseRequestBody, fromfile bool, file *multipart.FileHeader, ctx *fiber.Ctx) (entities.CourseGeminiResponse, error) {
 
+	var courses entities.CourseGeminiResponse
 	fmt.Println("Im here")
 
 	fmt.Println("Extracting file content....")
@@ -267,7 +268,7 @@ func (rs *courseService) CreateCourse(courserequest entities.CourseRequestBody, 
 			if err != nil {
 				fmt.Println("error insert course")
 				fmt.Println(err)
-				return err
+				return courses, err
 			}
 
 			courses := courserequest.Course
@@ -275,7 +276,7 @@ func (rs *courseService) CreateCourse(courserequest entities.CourseRequestBody, 
 			err = rs.ModuleService.CreateModule(ctx, courses, courserequest.Title, courserequest.Description, fromfile)
 			if err != nil {
 				fmt.Println("error insert module", err)
-				return err
+				return courses, err
 			}
 
 			fmt.Println("content : ", content)
@@ -285,13 +286,10 @@ func (rs *courseService) CreateCourse(courserequest entities.CourseRequestBody, 
 				courses, err := rs.genCourse(courserequest, ctx.Context())
 				if err != nil {
 					fmt.Println(err)
-					return err
+					return courses, err
 				}
 
-				return ctx.Status(fiber.StatusOK).JSON(entities.ResponseModel{
-					Message: "Completed create Course from your promts",
-					Data:    courses,
-				})
+				return courses, nil
 
 			} else {
 				if courserequest.Regen {
@@ -299,14 +297,11 @@ func (rs *courseService) CreateCourse(courserequest entities.CourseRequestBody, 
 					courses, err := rs.RegenCourse(courserequest, ctx.Context())
 					if err != nil {
 						fmt.Println(err)
-						return err
+						return courses, err
 					}
 					fmt.Println("courses from regen : ", courses)
 
-					return ctx.Status(fiber.StatusOK).JSON(entities.ResponseModel{
-						Message: "Completed create Course from your promts",
-						Data:    courses,
-					})
+					return courses, nil
 				}
 			}
 
@@ -335,12 +330,12 @@ func (rs *courseService) CreateCourse(courserequest entities.CourseRequestBody, 
 		if err != nil {
 			fmt.Println("error insert course")
 			fmt.Println(err)
-			return err
+			return courses, err
 		}
 
 		modules, err := rs.CreateModulesFromFile(file, ctx)
 		if err != nil {
-			return err
+			return courses, err
 		}
 		fmt.Println("courses : ", modules)
 
@@ -351,7 +346,7 @@ func (rs *courseService) CreateCourse(courserequest entities.CourseRequestBody, 
 
 		err = rs.ModuleService.CreateModule(ctx, courses, courserequest.Title, courserequest.Description, fromfile)
 		if err != nil {
-			return err
+			return courses, err
 		}
 
 		//create module
@@ -367,7 +362,7 @@ func (rs *courseService) CreateCourse(courserequest entities.CourseRequestBody, 
 
 	}
 
-	return nil
+	return courses, nil
 }
 
 func (rs *courseService) GetCourseDetail(ctx *fiber.Ctx, courseId string) (*entities.CourseDetailResponse, error) {

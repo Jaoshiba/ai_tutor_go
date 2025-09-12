@@ -36,14 +36,16 @@ func (h *HTTPGateway) TestCreateCourse(ctx *fiber.Ctx) error {
 
 	fmt.Println("Before create in gateway")
 
-	err = h.CourseService.CreateCourse(coursejsonBody, false, file, ctx)
+	courses, err := h.CourseService.CreateCourse(coursejsonBody, false, file, ctx)
 	if err != nil {
 		return ctx.Status(fiber.StatusBadRequest).JSON(entities.ResponseModel{
 			Message: "failed to create course on CreateCourse",
 		})
 	}
 
-	return ctx.Status(fiber.StatusOK).JSON(entities.ResponseModel{Message: "Completed create Course from your promts"})
+	return ctx.Status(fiber.StatusOK).JSON(entities.ResponseModel{
+		Message: "Completed create Course from your promts",
+		Data:    courses})
 }
 
 func (h *HTTPGateway) TestGetCourseByUser(c *fiber.Ctx) error {
