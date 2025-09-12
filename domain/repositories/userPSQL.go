@@ -40,7 +40,7 @@ func (repo *usersRepositoryPostgres) InsertUser(data entities.UserDataModel) err
 		INSERT INTO users (
 			userid, username, firstname, lastname,
 			email, gender, role, dob,
-			password, createdat, updateat
+			password, createdat, updatedat
 		)
 		VALUES ($1,$2,$3,$4,$5,$6,$7,$8,$9,$10,$11)
 	`
