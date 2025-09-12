@@ -1,0 +1,487 @@
+<!doctype html>
+<html lang="th">
+
+<head>
+    <script>
+    //@ts-check
+    /**
+     * @param {ErrorEvent|PromiseRejectionEvent} event
+     */
+    function mtErrorHandler(event) {
+        /** @type {Error|null} */
+        let error = (function() {
+            if (event instanceof ErrorEvent) {
+                return event.error;
+            } else if (event instanceof PromiseRejectionEvent) {
+                return event.reason;
+            } else {
+                return null;
+            }
+        })();
+        if (error) {
+            let logData = {
+                //@ts-ignore
+                csrfToken: __DATA__.csrfToken,
+                type: event.type,
+                url: window.location.href,
+                fileName: event instanceof ErrorEvent ? event.filename : "None",
+                name: error.name,
+                message: error.message,
+                stack: error.stack,
+                eventName: event.constructor.name
+            };
+            let formData = new FormData();
+            for (let [k, v] of Object.entries(logData)) {
+                formData.append(k, v);
+            }
+            fetch("/api/browser_logs/log", {
+                method: "POST",
+                body: formData
+            });
+        }
+    }
+    window.addEventListener("error", mtErrorHandler);
+    window.addEventListener("unhandledrejection", mtErrorHandler);
+</script>
+    <script data-ad-client="ca-pub-9075045589988569" async src="https://pagead2.googlesyndication.com/pagead/js/adsbygoogle.js"></script>            <!-- Global site tag (gtag.js) - Google Analytics -->
+        <script async src="https://www.googletagmanager.com/gtag/js?id=UA-67374301-1"></script>
+        <script>
+            window.dataLayer = window.dataLayer || [];
+
+            function gtag() {
+                dataLayer.push(arguments);
+            }
+            gtag('js', new Date());
+
+            gtag('config', 'UA-67374301-1');
+        </script>
+        <meta charset="utf-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+    <title>ตัวแปรและประเภทข้อมูล (Variables and Data Types) ในภาษา Python - MarcusCode</title><link rel="canonical" href="https://marcuscode.com/lang/python/variables-and-types"><link rel="icon" href="https://marcuscode.com/static/images/m.png"><script id="__DATA__" type="application/json">{"baseUrl":"https:\/\/marcuscode.com\/","statBaseUrl":"https:\/\/statistics.mateocode.com\/marcuscode\/","csrfToken":"24ebc8582b9b3347117c9cfc35a2aeeb","recaptchaV3SiteKey":"6LfyBMkZAAAAAJqiKABhTIVeX4IMP6R8XNIrO2Ba","loggedIn":false,"post":{"id":"165","token":"ea0f0b8e1722d7705c0d7310cc1c7175"},"pageview":{"itemType":1,"itemId":"165","token":"82f161331898898948041f3702e1be22"}}</script><link href="https://marcuscode.com/static/bootstrap-5.3.1-dist/css/bootstrap.min.css?v=20" rel="stylesheet"><link href="https://marcuscode.com/static/css/main.css?v=20" rel="stylesheet"><link href="https://marcuscode.com/static/prism/prism.css?v=20" rel="stylesheet"><script src="https://marcuscode.com/static/bootstrap-5.3.1-dist/js/bootstrap.bundle.min.js?v=20"></script><script src="https://marcuscode.com/static/ci4_modules/js/main.52f214bb1cb397c3e982.js?v=20"></script><script src="https://marcuscode.com/static/js/dist/main.bundle.js?v=20"></script></head>
+
+<body>
+    <div id="root">
+        <header>
+            <nav class="navbar navbar-dark navbar-expand-lg py-0">
+    <div class="container">
+        <a class="navbar-brand" href="https://marcuscode.com/">Home</a>
+        <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#navbarSupportedContent" aria-controls="navbarSupportedContent" aria-expanded="false" aria-label="Toggle navigation">
+            <span class="navbar-toggler-icon"></span>
+        </button>
+        <div class="collapse navbar-collapse" id="navbarSupportedContent">
+            <ul class="navbar-nav me-auto mb-2 mb-lg-0"><li class="nav-item dropdown"><a class="nav-link dropdown-toggle" href="#" role="button" data-bs-toggle="dropdown" aria-expanded="false">Languages</a><ul class="dropdown-menu" aria-labelledby="navbarDropdown"><li><a class="dropdown-item" href="https://marcuscode.com/lang/cpp">ภาษา C++</a></li><li><a class="dropdown-item" href="https://marcuscode.com/lang/c">ภาษา C</a></li><li><a class="dropdown-item" href="https://marcuscode.com/lang/csharp">ภาษา C#</a></li><li><a class="dropdown-item" href="https://marcuscode.com/lang/java">ภาษา Java</a></li><li><a class="dropdown-item" href="https://marcuscode.com/lang/visual-basic">ภาษา Visual Basic</a></li><li><a class="dropdown-item" href="https://marcuscode.com/lang/php">ภาษา PHP</a></li><li><a class="dropdown-item" href="https://marcuscode.com/lang/python">ภาษา Python</a></li><li><a class="dropdown-item" href="https://marcuscode.com/lang/ruby">ภาษา Ruby</a></li><li><a class="dropdown-item" href="https://marcuscode.com/lang/javascript">ภาษา JavaScript</a></li><li><a class="dropdown-item" href="https://marcuscode.com/lang/typescript">ภาษา TypeScript</a></li></ul></li><li class="nav-item dropdown"><a class="nav-link dropdown-toggle" href="#" role="button" data-bs-toggle="dropdown" aria-expanded="false">Tutorials</a><ul class="dropdown-menu" aria-labelledby="navbarDropdown"><li><a class="dropdown-item" href="https://marcuscode.com/tutorials/nodejs">บทเรียน Node.js</a></li></ul></li></ul><ul class="navbar-nav mw-auto"><li class="nav-item"><a class="nav-link" href="https://marcuscode.com/about">เกี่ยวกับ</a></li><li class="nav-item"><a class="nav-link" href="https://marcuscode.com/privacy">ความเป็นส่วนตัว</a></li></ul>        </div>
+    </div>
+</nav>
+        </header>
+<main class="container"><div class="row">
+<div class="col-md-8">
+    <div class="main-content">
+
+        <nav class="bg-light rounded mb-3 px-3" aria-label="breadcrumb" style="padding-top: .75rem; padding-bottom: .75rem;"><ol class="breadcrumb mb-0"><li class="breadcrumb-item"><a href="https://marcuscode.com/">Home</a></li><li class="breadcrumb-item"><a href="https://marcuscode.com/lang/python">ภาษา Python</a></li><li class="breadcrumb-item active" aria-current="page">ตัวแปรและประเภทข้อมูล</li></ol></nav>
+        <div class="my-3">
+    <!-- marcuscode - top banner -->
+    <ins class="adsbygoogle" style="display:block" data-ad-client="ca-pub-9075045589988569" data-ad-slot="6274526205" data-ad-format="auto" data-full-width-responsive="true"></ins>
+    <script>
+        (adsbygoogle = window.adsbygoogle || []).push({});
+    </script>
+</div>
+
+        <article class="article-container mb-4">
+            <h1>ตัวแปรและประเภทข้อมูล</h1>
+
+            <section>
+                <div class="text-body-secondary cleafix mb-3">
+                    <span>15 March 2017</span>
+                                    </div>
+            </section>
+
+            <p>ในบทนี้ คุณจะได้เรียนรู้เกี่ยวกับตัวแปรและประข้อมูลในภาษา Python เราจะพูดถึงการประกาศตัวแปรและการนำตัวแปรไปใช้งานในโปรแกรม และเราจะอธิบายถึงข้อมูลประเภทต่างๆ ที่เป็นประเภทข้อมูลพื้นฐาน (Primitive data type) ในภาษา Python และรวมทั้งฟังก์ชันสำหรับการใช้งานกับตัวแปร</p>
+
+<h2>ตัวแปร</h2>
+
+<p>ตัวแปร (Variable) คือชื่อหรือเครื่องหมายที่กำหนดขึ้นสำหรับใช้อ้างถึงค่าที่เก็บในหน่วยความจำ ตัวแปรจะมีชื่อ (Identifier) สำหรับใช้ในการอ้างถึงข้อมูลของมัน ในการเขียนโปรแกรม ค่าของตัวแปรสามารถที่จะกำหนดได้ใน run-time หรือเปลี่ยนแปลงอยู่ตลอดเวลาในขณะที่โปรแกรมทำงาน (Executing)</p>
+
+<p>ในการเขียนโปรแกรมคอมพิวเตอร์นั้น ตัวแปรจะแตกต่างจากตัวแปรในทางคณิตศาสตร์ ค่าของตัวแปรนั้นไม่จำเป็นต้องประกอบไปด้วยสูตรหรือสมการที่สมบูรณ์เหมือนกับในคณิตศาสตร์ ในคอมพิวเตอร์ ตัวแปรนั้นอาจจะมีการทำงานซ้ำๆ เช่น การกำหนดค่าในที่หนึ่ง และนำไปใช้อีกที่หนึ่งในโปรแกรม และนอกจากนี้ยังสามารถกำหนดค่าใหม่ให้กับตัวแปรได้ตลอดเวลา ต่อไปเป็นตัวอย่างของการประกาศตัวแปรในภาษา Python</p>
+
+<pre><code class="language-python">a = 3
+b = 4.92
+c = "marcuscode.com"
+c = 10.5
+</code></pre>
+
+<p>ในตัวอย่าง เราได้ทำการประกาศ 3 ตัวแปร ในการประกาศตัวแปรในภาษา Python คุณไม่จำเป็นต้องระบุประเภทของตัวแปรในตอนที่ประกาศเหมือนในภาษา C ในตัวแปร <code>a</code> มีค่าเป็น <code>3</code> และมีประเภทเป็น Integer ตัวแปร <code>b</code> มีค่าเป็น <code>4.92</code> และมีประเภทเป็น Float และตัวแปร <code>c</code> มีค่าเป็น <code>"marcuscode.com"</code> และเป็นประเภท String ภายหลังเราได้เปลี่ยนค่าของตัวแปร <code>c</code> เป็น <code>10.5</code> และตัวแปรกลายเป็นประเภท Float แทน</p>
+
+<pre><code class="language-python">a, b = 1, 2
+x = y = z = 10
+print("a = " , a)
+print("b = " , b)
+print("x = " , x)
+print("y = " , y)
+print("z = " , z)
+</code></pre>
+
+<p>ในภาษา Python นั้นสนับสนุนการกำหนดค่าให้กับตัวแปรหลายค่าในคำสั่งเดียว ในตัวอย่าง เป็นการกำหนดค่า <code>1</code> และ <code>2</code> กับตัวแปร <code>a</code> และ <code>b</code> ตามลำดับ และในคำสั่งต่อมาเป็นการกำหนดค่า <code>10</code> ให้กับตัวแปร <code>x</code> <code>y</code> และ <code>z</code> ซึ่งทำให้การเขียนโปรแกรมสะดวกและรวดเร็วมากขึ้น</p>
+
+<pre class="code-result"><code class="language-result">a =  1
+b =  2
+x =  10
+y =  10
+z =  10
+</code></pre>
+
+<p>นี่เป็นผลลัพธ์การทำงานของโปรแกรม</p>
+
+<p>ต่อไปจะเป็นการพูดถึงประเภทข้อมูลชนิดต่างๆ ที่ภาษา Python สนับสนุน ซึ่งจะมีอยู่สามประเภทใหญ่ๆ คือ ข้อมูลแบบตัวเลข นั้นจะแบ่งย่อยออกเป็น Integer และ Float ข้อมูลประเภท String และข้อมูลแบบลำดับ เช่น List และ Tuple ประเภทข้อมูลทั้งหมดนี้เป็น Built-in type ในภาษา Python</p>
+
+<h2>Numbers</h2>
+
+<p>ในภาษา Python นั้นสนับสนุนข้อมูลแบบตัวเลข ซึ่งข้อมูลประเภทนี้จะแบ่งออกเป็น Integer Float Decimal และ Complex อย่างไรก็ตามเราจะเน้นย้ำใน Integer ซึ่งเป็นการเก็บข้อมูลแบบจำนวนเต็ม และ Float เป็นข้อมูลแบบจำนวนจริง สำหรับประเภทแบบ Decimal นั้นแตกต่างไปจาก Float คือสามารถเก็บความละเอียดของจุดทศนิยมได้มากกว่า นอกจากนี้ Python ยังสนับสนุนตัวเลขในรูปแบบ Complex ที่แสดงในแบบ <em>a +bj</em> ต่อไปเป็นตัวอย่างในการประกาศและใช้งานตัวแปรแบบตัวเลขในภาษา Python</p>
+
+<pre><code class="language-python"># Integer
+a = 7
+b = 3
+c = a + b
+d = a / b
+
+print ("a = %d" % a)
+print ("b = %d" % b)
+print ("c = %d" % c)
+print ("d = ", d)
+</code></pre>
+
+<p>ในตัวอย่าง เป็นการประกาศและใช้งานตัวแปรประเภท Integer เราได้ทำการประกาศตัวแปรและกำหนดค่าให้กับ <code>a</code> และ <code>b</code> ในการแสดงผลในรูปแบบของ String format กับฟังก์ชัน <code>print()</code> นั้นจะใช้ specifier เป็น <code>%d</code> เราสามารถกำหนดค่าให้กับตัวแปรได้โดย Literal หรือ Expression</p>
+
+<p>สิ่งหนึ่งที่น่าสังเกตในการหารตัวเลขในภาษา Python การหารตัวเลขนั้นจะได้ค่าเป็น Float เสมอ ถึงแม้ตัวเลขทั้งสองจะเป็น Integer ก็ตาม เช่นในตัวแปร <code>d</code> ซึ่งแตกต่างจากภาษา C ที่เมื่อตัวเลขทั้งสองเป็นแบบ Integer จะได้ผลลัพธ์เป็น Integer</p>
+
+<pre class="code-result"><code class="language-result">a = 7
+b = 3
+c = 10
+d =  2.3333333333333335
+</code></pre>
+
+<p>นี่เป็นผลลัพธ์การทำงานของโปรแกรม</p>
+
+<pre><code class="language-python"># Floating point number
+speed = 34.12
+pi = 22 / 7
+height = 2.31E5
+length = 1.3E-3
+
+print ("speed = %f" % speed)
+print ("pi = %f" % pi)
+print ("height = %f" % height)
+print ("length = %f" % length)
+print (pi)
+</code></pre>
+
+<p>ต่อไปเป็นการประกาศและใช้งานตัวแปรประเภท Float หรือตัวเลขที่มีจุดทศนิยม ในการกำหนดค่าให้กับตัวแปรนั้น เมื่อคุณกำหนดตัวเลขมีจุดมันจะเป็นประเภท Float อัตโนมัติ เราสามารถกำหนดค่าโดยตรงหรือในรูปแบบของ Expression ได้ และนอกจากนี้ ในภาษา Python ยังสามารถกำหนดในรูปแบบสัญกรณ์วิทยาศาสตร์ได้เหมือนในตัวแปร <code>height</code> ซึ่งหมายถึง <em>2.31 x 10 ^ 5</em> และในตัวแปร <code>length</code> ซึ่งหมายถึง <em>1.3 x 10 ^ -3</em></p>
+
+<pre class="code-result"><code class="language-result">speed = 34.120000
+pi = 3.142857
+height = 231000.000000
+length = 0.001300
+3.142857142857143
+</code></pre>
+
+<p>นี่เป็นผลลัพธ์การทำงานของโปรแกรม ซึ่งในการแสดงผลของข้อมูลประเภท Float กับการจัดรูปแบบของตัวเลขนั้นจะใช้ <code>%f</code> และสำหรับการดูค่าเต็มของตัวเลขจริงๆ นั้นเราจะแสดงค่าของตัวเลขผ่านฟังก์ชัน <code>print</code> โดยตรง เหมือนในคำสั่งแสดงผลค่าของ <code>pi</code> ในบรรทัดสุดท้าย</p>
+
+<h2>Strings</h2>
+
+<p>Strings เป็นประเภทข้อมูลที่สำคัญและใช้งานทั่วไปในการเขียนโปรแกรม ในภาษาเขียนโปรแกรมส่วนมากแล้วจะมีประเภทข้อมูลแบบ String และในภาษา Python เช่นกัน String เป็นลำดับของตัวอักษรหลายตัวเรียงต่อกัน ซึ่งในภาษา Python นั้น String จะอยู่ในเครื่องหมาย Double quote หรือ Single quote เท่านั้น นอกจากนี้ในภาษา Python ยังมีฟังก์ชันในการจัดการกับ String มากมาย ซึ่งเราจะพูดอีกครั้งในบทของ String ในบทนี้มาทำความรู้จักกับ String เบื้องต้นกันก่อน</p>
+
+<pre><code class="language-python">name = "Mateo"
+country = "Ukrain"
+language = 'Python'
+interest = 'Mountain Everest'
+</code></pre>
+
+<p>ในตัวอย่าง เป็นการประกาศตัวแปรประเภท String สองตัวแปรแรกเป็นการประโดยการใช้ Double quote และสองตัวแปรต่อมาเป็นการใช้ Single quote ซึ่งคุณสามารถใช้แบบไหนก็ได้ แต่มีสิ่งที่แตกต่างกันเล็กน้อยคือเกี่ยวกับการกำหนดตัวอักษรพิเศษหรือเรียกว่า Escape character</p>
+
+<pre><code class="language-python">sentent1 = "What's your name?"
+sentent2 = 'I\'m Mateo.'
+sentent3 = "He said \"I would learn Python first\"."
+sentent4 = 'His teach replied "Oh well!"'
+print (sentent1)
+print (sentent2)
+print (sentent3)
+print (sentent4)
+</code></pre>
+
+<p>ในตัวอย่าง เป็นสิ่งที่แตกต่างของการประกาศ String ทั้งสองแบบกับ Escape character ตัวอักษร <code>'</code> และ <code>"</code> นั้นเป็น Escape character ดังนั้นในการใช้งานตัวอักษรเหล่านี้ เราจะต้องทำการใส่เครื่องหมาย <code>\</code> ลงไปข้างหน้าเสมอ แต่ในภาษา Python เมื่อคุณใช้ Double quote ในการประกาศ String คุณไม่ต้องทำการ Escape character สำหรับ Single quote และในทางกลับกัน อย่างไรก็ตามเราจะพูดอีกครั้งในบทของ String</p>
+
+<pre class="code-result"><code class="language-result">What's your name?
+I'm Mateo.
+He said "I would learn Python first".
+His teach replied "Oh well!"
+</code></pre>
+
+<p>นี่เป็นผลลัพธ์การทำงานของโปรแกรมในการใช้งาน Escape character ในภาษา Python</p>
+
+<pre><code class="language-python">site = "marcuscode" + ".com"
+tutorial = "Python" " Language"
+print(site)
+print(tutorial)
+</code></pre>
+
+<p>การทำงานอย่างหนึ่งที่สำคัญเกี่ยวกับ String ก็คือการเชื่อมต่อ String ซึ่งเป็นการนำ String ตั้งแต่สองอันขึ้นไปมาต่อกัน ในภาษา Python คุณสามารถต่อ String ได้โดยการใช้เครื่องหมาย <code>+</code> หรือคั่นด้วยช่องว่างหรือบรรทัดใหม่เหมือนในตัวอย่างข้างบน</p>
+
+<pre class="code-result"><code class="language-result">marcuscode.com
+Python Language
+</code></pre>
+
+<p>นี่เป็นผลลัพธ์การทำงานของโปรแกรม</p>
+
+<p>อย่างไรก็ตาม นี่เป็นการแนะนำเกี่ยวกับ String ในเบื้องต้นเท่านั้น เพราะว่า String นั้นมีเนื้อหาเป็นจำนวนมาก คุณจะได้เรียนรู้เกี่ยวกับ String อย่างละเอียด อีกครั้งในบทของ String</p>
+
+<div class="my-3">
+    <!-- marcuscode - middle banner -->
+    <ins class="adsbygoogle"
+        style="display:block"
+        data-ad-client="ca-pub-9075045589988569"
+        data-ad-slot="9605104032"
+        data-ad-format="auto"
+        data-full-width-responsive="true"></ins>
+    <script>
+        (adsbygoogle = window.adsbygoogle || []).push({});
+    </script>
+</div>
+<h2>Lists</h2>
+
+<p>Lists เป็นประเภทข้อมูลที่เก็บข้อมูลแบบเป็นชุดและลำดับ กล่าวคือมันสามารถเก็บข้อมูลได้หลายค่าในตัวแปรเดียว และมี Index สำหรับเข้าถึงข้อมูล ในภาษา Python นั้น List จะเป็นเหมือนอาเรย์ในภาษา C มันสามารถเก็บข้อมูลได้หลายตัวและยังสามารถเป็นประเภทข้อมูลที่แตกต่างกันได้อีกด้วย มาดูการประกาศและใช้งาน List ในเบื้องต้น</p>
+
+<pre><code class="language-python"># Declare lists
+numbers = [1, 2, 4, 6, 8, 19]
+names = ["Mateo", "Danny", "James", "Thomas", "Luke"]
+mixed = [-2, 5, 84.2, "Mountain", "Python"]
+
+# Display lists
+print(numbers)
+print(names)
+print(mixed)
+
+# Display lists using the for loops
+for n in numbers:
+    print(n, end=" ")
+print()
+
+for n in names:
+    print(n, end=" ")
+print()
+
+for n in mixed:
+    print(n, end=" ")
+print()
+</code></pre>
+
+<p>ในตัวอย่าง เราได้ทำการประกาศ 3 Lists โดยตัวแปรแรกนั้นเป็น List ของตัวเลข และตัวแปรที่สองเป็น List  ของ String และตัวแปรสุดท้ายเป็น List แบบรวมกันของประเภทข้อมูล เราใช้ฟังก์ชัน <code>print()</code> ในการแสดงผลข้อมูลใน List และใช้คำสั่ง For loop ในการอ่านค่าในลิสต์และนำมาแสดงผลเช่นกัน</p>
+
+<pre class="code-result"><code class="language-result">[1, 2, 4, 6, 8, 19]
+['Mateo', 'Danny', 'James', 'Thomas', 'Luke']
+[-2, 5, 84.2, 'Mountain', 'Python']
+1 2 4 6 8 19 
+Mateo Danny James Thomas Luke 
+-2 5 84.2 Mountain Python 
+</code></pre>
+
+<p>นี่เป็นผลการทำงานของโปรแกรม</p>
+
+<pre><code class="language-python">languages = ["C", "C++", "Java", "Python", "PHP"]
+
+print("Index at 0 = ", languages[0])
+print("Index at 3 = ", languages[3])
+languages[0] = "Scalar"
+print("Index at 0 = ", languages[0])
+</code></pre>
+
+<p>Lists นั้นทำงานกับ Index ดังนั้นเราสามารถเข้าถึงข้อมูลของ List โดยการใช้ Index ของมันได้ ในตัวอย่างเป็นการเข้าถึงข้อมูลภายใน Index ซึ่ง Index ของ List นั้นจะเริ่มจาก 0 ไปจนถึงจำนวนทั้งหมดของมันลบด้วย 1  ในตัวอย่างเราได้แสดงผลข้อมูลของสอง List ในตำแหน่งแรกและในตำแหน่งที่ 4 ด้วย Index 0 และ 3 ตามลำดับ หลังจากนั้นเราเปลี่ยนค่าของ List ที่ตำแหน่งแรกเป็น <code>"Scalar"</code></p>
+
+<pre class="code-result"><code class="language-result">Index 0 =  C
+Index 3 =  Python
+Index 0 =  Scalar
+</code></pre>
+
+<p>นี่เป็นผลลัพธ์การทำงานของโปรแกรม ซึ่งคุณได้ทำความรู้จักกับ List ในเบื้องต้น คุณจะได้เรียนรู้เกี่ยวกับ List ในภาษา Python อย่างละเอียดอีกครั้งในบทของ List ซึ่งเราจะพูดเกี่ยวกับการดำเนินการและการใช้ฟังก์ชันของ List นอกจากนี้ Python ยังมีประเภทข้อมูลแบบ Tuple และ Dictionary ซึ่งมีรูปแบบการเก็บข้อมูลคล้ายกับ List จึงคุณจะได้เรียนในบทต่อไป</p>
+
+<h2>ฟังก์ชันที่ใช้กับตัวแปร</h2>
+
+<p>ในภาษา Python นั้นมีฟังก์ชันที่สร้างมาเพื่อให้ใช้งานกับตัวแปร เช่น ฟังก์ชันสำหรับหาขนาดของตัวแปร ฟังก์ชันในการหาประเภทของตัวแปร ฟังก์ชันลบตัวแปรออกไปจากหน่วยความจำ และฟังก์ชันในการตรวจสอบว่าตัวแปรมีอยู่หรือไม่ ซึ่งในบางครั้งการเขียนโปรแกรมก็จำเป็นที่คุณอาจจะต้องมีการตรวจสอบสิ่งเหล่านี้ในขณะที่โปรแกรมทำงาน นี่เป็นตัวอย่างการใช้งาน</p>
+
+<pre><code class="language-python">import sys
+
+a = 8
+b = 13.4
+c = "Python"
+d = [1, 2, 3, 4]
+
+print("Size of a = ", sys.getsizeof(a))
+print("Type of a = ", type(a))
+
+print("Size of b = ", sys.getsizeof(b))
+print("Type of b = ", type(b))
+
+print("Size of c = ", sys.getsizeof(c))
+print("Type of c = ", type(c))
+
+print("Size of d = ", sys.getsizeof(d))
+print("Type of d = ", type(d))
+
+del a
+del b, c, d
+
+if "a" in locals():
+    print("a is exist")
+else:
+    print("a is not exist")
+</code></pre>
+
+<p>ในตัวอย่าง เราได้ประกาศตัวแปรประเภทต่างๆ เราได้ฟังก์ชัน <code>getsizeof()</code> สำหรับหาขนาดของตัวแปรที่มีหน่วยเป็น Byte และฟังก์ชัน <code>type()</code> สำหรับดูประเภทของตัวแปรว่าอยู่ในคลาสไหน ฟังก์ชัน <code>del()</code> สำหรับยกเลิกหรือลบการประกาศตัวแปรออกไปจากหน่วยความจำ และสุดท้ายเป็นการตรวจสอบว่าตัวแปรถูกประกาศแล้วหรือยังในฟังก์ชัน <code>locals()</code> สำหรับตรวจสอบตัวแปรในโมดูลปัจจุบัน หรือ <code>globals()</code> สำหรับตรวจสอบตัวแปรในโปรแกรมทั้งหมด</p>
+
+<pre class="code-result"><code class="language-result">Size of a =  14
+Type of a =  &lt;class 'int'&gt;
+Size of b =  16
+Type of b =  &lt;class 'float'&gt;
+Size of c =  31
+Type of c =  &lt;class 'str'&gt;
+Size of d =  52
+Type of d =  &lt;class 'list'&gt;
+a is not exist
+</code></pre>
+
+<p>นี่เป็นผลลัพธ์การทำงานของโปรแกรมในการใช้ฟังก์ชันที่จำเป็นกับตัวแปร</p>
+
+<p>ในบทนี้ คุณได้เรียนรู้เกี่ยวกับตัวแปรและประเภทข้อมูลในภาษา Python เราได้พูดถึงการประกาศและการใช้งานตัวแปร รวมถึงข้อมูลประเภทต่างๆ ในภาษา Python เช่น ตัวเลข String และ List และนอกจากนี้เรายังแนะนำให้คุณรู้จักกับฟังก์ชันที่มีความจำเป็นในการทำงานกับตัวแปร</p>
+
+                    </article>
+
+            <div class="mb-3">
+        <div class="card" style="max-width: 300px;">
+            <img src="https://marcuscode.com/static/images/544796724_2734196576782846_5942380153575772549_n.jpg" class="card-img-top" alt="เข้าร่วมกลุ่ม">
+            <div class="card-body">
+                <p>แนะนำกลุ่มหางานโปรแกรมเมอร์ในประเทศไทย</p>                <a target="_blank" rel="nofollow" href="https://marcuscode.com/l.php?url=https%3A%2F%2Fwww.facebook.com%2Fgroups%2F1246036123962627&hash=4a916ca99016edd4ffaf27d206f32cfd" class="btn btn-primary btn-facebook-group">
+                    เข้าร่วมกลุ่ม                </a>
+            </div>
+        </div>
+    </div>
+
+        <div class="my-3">
+    <!-- marcuscode - bottom banner -->
+    <ins class="adsbygoogle" style="display:block" data-ad-client="ca-pub-9075045589988569" data-ad-slot="9750736781" data-ad-format="auto" data-full-width-responsive="true"></ins>
+    <script>
+        (adsbygoogle = window.adsbygoogle || []).push({});
+    </script>
+</div>
+
+        <section>
+    <style>
+        .fb_iframe_widget span {
+            vertical-align: baseline !important;
+        }
+    </style>
+
+    <div class="mb-3 p-3 pb-2 bg-light rounded">
+        <div class="fb-share-button me-2" data-href="https://marcuscode.com/lang/python/variables-and-types" data-layout="button_count" data-size="small"></div>
+
+        <a href="https://marcuscode.com/lang/python/variables-and-types" class="twitter-share-button" data-lang="en">Tweet</a>
+        <script async src="https://platform.twitter.com/widgets.js" charset="utf-8"></script>
+    </div>
+</section>
+
+        <section>
+    <div id="feedbackContainer" class="mb-3 p-3 bg-light rounded">
+        <span class="me-3">บทความนี้เป็นประโยชน์หรือไม่?</span><a href="#" class="me-2">Yes</a>&middot;<a href="#" class="ms-2">No</a>    </div>
+</section>
+
+                <nav>
+            <a class="btn btn-outline-primary btn-lg rounded-pill" href="https://marcuscode.com/lang/python/program-struct" style="margin-right: .75rem;">ก่อนหน้า</a><a class="btn btn-outline-primary btn-lg rounded-pill" href="https://marcuscode.com/lang/python/input-output" style="margin-right: .75rem;">ถัดไป</a>        </nav>
+    </div>
+</div>
+
+<div class="col-md-3 ms-auto">
+
+    <style>
+.gsc-control-cse {
+    padding-left: 0!important;
+    padding-right: 0!important;
+}
+</style>
+
+<div class="mb-3">
+    <h4>ค้นหา</h4>
+
+    <div>
+        <script>
+            (function() {
+                var cx = '010648001011502858830:eg8nrcmlhra';
+                var gcse = document.createElement('script');
+                gcse.type = 'text/javascript';
+                gcse.async = true;
+                gcse.src = 'https://cse.google.com/cse.js?cx=' + cx;
+                var s = document.getElementsByTagName('script')[0];
+                s.parentNode.insertBefore(gcse, s);
+            })();
+        </script>
+        <gcse:search></gcse:search>
+    </div>
+</div>
+
+    <div class="p-3 mb-4 bg-light rounded">
+    <h4>เกี่ยวกับ</h4><p class="mb-0">MarcusCode เป็นเว็บไซต์สอนเขียนโปรแกรมที่ให้คุณสามารถเรียนการเขียนโปรแกรมคอมพิวเตอร์ โดยบทเรียนนั้นเป็นเนื้อหาพื้นฐานและเข้าใจง่าย และที่สำคัญมันฟรี</p></div>
+
+    <div class="my-3">
+    <!-- marcuscode - sidebar -->
+    <ins class="adsbygoogle" style="display:block" data-ad-client="ca-pub-9075045589988569" data-ad-slot="2335281195" data-ad-format="auto" data-full-width-responsive="true"></ins>
+    <script>
+        (adsbygoogle = window.adsbygoogle || []).push({});
+    </script>
+</div>
+
+    <div class="p-3 mb-4 bg-light rounded">
+    <h4>บทความล่าสุด</h4>
+
+    <ul class="list-unstyled mb-0">
+        <li class="mb-1"><a href="https://marcuscode.com/tutorials/nodejs/deleting-files">การลบไฟล์ใน Node.js</a></li><li class="mb-1"><a href="https://marcuscode.com/tutorials/nodejs/renaming-and-moving-files">การเปลี่ยนชื่อไฟล์และย้ายไฟล์ใน Node.js</a></li><li class="mb-1"><a href="https://marcuscode.com/tutorials/nodejs/copying-files">การคัดลอกไฟล์ใน Node.js</a></li><li class="mb-1"><a href="https://marcuscode.com/2023/04/how-to-generate-self-signed-certificate">การสร้าง Self-signed certificate สำหรับรันเว็บไซต์บน Node.js และ Express.js</a></li><li class="mb-1"><a href="https://marcuscode.com/2022/12/matrix-multiplication-in-c">การเขียนโปรแกรมคูณเมทริกซ์ ในภาษา C</a></li><li class="mb-1"><a href="https://marcuscode.com/2022/12/matrix-subtraction-in-c">การเขียนโปรแกรมลบเมทริกซ์ ในภาษา C</a></li><li class="mb-1"><a href="https://marcuscode.com/2022/12/matrix-addition-in-c">การเขียนโปรแกรมบวกเมทริกซ์ ในภาษา C</a></li><li class="mb-1"><a href="https://marcuscode.com/2022/09/old-number-and-even-number">การเขียนโปรแกรมตรวจสอบเลขคู่และคี่ ในภาษา C, C++ และ Python</a></li>    </ul>
+</div>
+
+    
+    <div class="px-3 py-2 mb-4">
+    <h4>เนื้อหา</h4>
+
+    <ul class="list-unstyled mb-0">
+        <li class="mb-1"><a href="https://marcuscode.com/lang/python/introduction">แนะนำภาษา Python</a></li><li class="mb-1"><a href="https://marcuscode.com/lang/python/installing-python">การติดตั้งภาษา Python</a></li><li class="mb-1"><a href="https://marcuscode.com/lang/python/program-struct">โครงสร้างของภาษา Python</a></li><li class="mb-1"><a href="https://marcuscode.com/lang/python/variables-and-types">ตัวแปรและประเภทข้อมูล</a></li><li class="mb-1"><a href="https://marcuscode.com/lang/python/input-output">การรับค่าและการแสดงผล</a></li><li class="mb-1"><a href="https://marcuscode.com/lang/python/operators">ตัวดำเนินการ</a></li><li class="mb-1"><a href="https://marcuscode.com/lang/python/selection-statements">คำสั่งเลือกเงื่อนไข</a></li><li class="mb-1"><a href="https://marcuscode.com/lang/python/loop-statements">คำสั่งวนซ้ำ</a></li><li class="mb-1"><a href="https://marcuscode.com/lang/python/functions">ฟังก์ชัน</a></li><li class="mb-1"><a href="https://marcuscode.com/lang/python/string">String</a></li><li class="mb-1"><a href="https://marcuscode.com/lang/python/string-methods">String methods</a></li><li class="mb-1"><a href="https://marcuscode.com/lang/python/lists">Lists</a></li><li class="mb-1"><a href="https://marcuscode.com/lang/python/list-methods">List methods</a></li><li class="mb-1"><a href="https://marcuscode.com/lang/python/tuples">Tuples</a></li><li class="mb-1"><a href="https://marcuscode.com/lang/python/dictionary">Dictionary</a></li><li class="mb-1"><a href="https://marcuscode.com/lang/python/set">Set</a></li><li class="mb-1"><a href="https://marcuscode.com/lang/python/type-conversions">Type conversions</a></li><li class="mb-1"><a href="https://marcuscode.com/lang/python/modules">Modules</a></li><li class="mb-1"><a href="https://marcuscode.com/lang/python/files">Input/output with files</a></li><li class="mb-1"><a href="https://marcuscode.com/lang/python/exceptions">Exceptions</a></li><li class="mb-1"><a href="https://marcuscode.com/lang/python/lambda-functions">Lambda function</a></li><li class="mb-1"><a href="https://marcuscode.com/lang/python/object-oriented-programming">การเขียนโปรแกรมเชิงวัตถุ</a></li><li class="mb-1"><a href="https://marcuscode.com/lang/python/classes-and-objects">คลาสและออบเจ็ค</a></li><li class="mb-1"><a href="https://marcuscode.com/lang/python/inheritance">Inheritance</a></li><li class="mb-1"><a href="https://marcuscode.com/lang/python/threads">Threads</a></li><li class="mb-1"><a href="https://marcuscode.com/lang/python/date-and-time">วันที่และเวลา</a></li>    </ul>
+</div>
+
+    <div class="mb-4">
+    <h4>Community</h4>
+
+    <div class="fb-page" data-href="https://www.facebook.com/marcuscode3/" data-tabs="" data-width="" data-height="" data-small-header="false" data-adapt-container-width="true" data-hide-cover="false" data-show-facepile="false">
+        <blockquote cite="https://www.facebook.com/marcuscode3/" class="fb-xfbml-parse-ignore"><a href="https://www.facebook.com/marcuscode3/">MarcusCode</a></blockquote>
+    </div>
+
+</div>
+
+    <div class="my-3">
+    <!-- marcuscode - sidebar -->
+    <ins class="adsbygoogle" style="display:block" data-ad-client="ca-pub-9075045589988569" data-ad-slot="2335281195" data-ad-format="auto" data-full-width-responsive="true"></ins>
+    <script>
+        (adsbygoogle = window.adsbygoogle || []).push({});
+    </script>
+</div>
+
+</div>
+
+</div></main><footer class="blog-footer">
+    <div class="container text-center">
+        <p>&copy; 2025 MarcusCode &nbsp;&middot;&nbsp; Last updated 12 September 2025</p>        <ul class="footer-menu">
+            <li><a href="https://marcuscode.com/about">เกี่ยวกับ</a></li><li><a href="https://marcuscode.com/privacy">ความเป็นส่วนตัว</a></li><li><a href="https://marcuscode.com/terms">เงื่อนไข</a></li><li><a href="https://marcuscode.com/contact">ติดต่อเรา</a></li>        </ul>
+    </div>
+</footer>
+
+</div>
+
+<div id="fb-root"></div>
+<script async defer crossorigin="anonymous" src="https://connect.facebook.net/en_GB/sdk.js#xfbml=1&version=v11.0&appId=2020457848186602&autoLogAppEvents=1" nonce="vz5mkwHN"></script>
+
+
+</body>
+
+<script>'undefined'=== typeof _trfq || (window._trfq = []);'undefined'=== typeof _trfd && (window._trfd=[]),_trfd.push({'tccl.baseHost':'secureserver.net'},{'ap':'cpsh-oh'},{'server':'sg2plzcpnl509617'},{'dcenter':'sg2'},{'cp_id':'10440610'},{'cp_cl':'8'}) // Monitoring performance to make your website faster. If you want to opt-out, please contact web hosting support.</script><script src='https://img1.wsimg.com/traffic-assets/js/tccl.min.js'></script></html>

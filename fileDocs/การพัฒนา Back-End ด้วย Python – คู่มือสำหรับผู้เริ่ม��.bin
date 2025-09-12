@@ -217,8 +217,8 @@ j=d.createElement(s),dl=l!='dataLayer'?'&l='+l:'';j.async=true;j.src=
 		"image": {
 			"@type": "ImageObject",
 			"url": "https://cdn.hashnode.com/res/hashnode/image/upload/v1723152184433/Kh2F8p0oh.jpeg",
-			"width": 1024,
-			"height": 1024
+			"width": 600,
+			"height": 400
 		}
 	}
 }</script>
@@ -268,7 +268,7 @@ j=d.createElement(s),dl=l!='dataLayer'?'&l='+l:'';j.async=true;j.src=
        <h1 class="post-full-title" data-test-label="post-full-title">Python Back-End Development – Handbook for Beginners</h1>
       </header>
       <div class="post-full-author-header" data-test-label="author-header-no-bio">
-       <section class="author-card" data-test-label="author-card"><img srcset="https://translate.google.com/website?sl=en&amp;tl=th&amp;hl=th&amp;client=srp&amp;u=https://cdn.hashnode.com/res/hashnode/image/upload/v1723152184433/Kh2F8p0oh.jpeg 60w" sizes="60px" src="https://cdn.hashnode.com/res/hashnode/image/upload/v1723152184433/Kh2F8p0oh.jpeg" class="author-profile-image" alt="Vahe Aslanyan" width="1024" height="1024" onerror="this.style.display='none'" data-test-label="profile-image">
+       <section class="author-card" data-test-label="author-card"><img srcset="https://translate.google.com/website?sl=en&amp;tl=th&amp;hl=th&amp;client=srp&amp;u=https://cdn.hashnode.com/res/hashnode/image/upload/v1723152184433/Kh2F8p0oh.jpeg 60w" sizes="60px" src="https://cdn.hashnode.com/res/hashnode/image/upload/v1723152184433/Kh2F8p0oh.jpeg" class="author-profile-image" alt="Vahe Aslanyan" width="600" height="400" onerror="this.style.display='none'" data-test-label="profile-image">
         <section class="author-card-content author-card-content-no-bio"><span class="author-card-name"> <a href="https://www-freecodecamp-org.translate.goog/news/author/vaheaslanyan/?_x_tr_sl=en&amp;_x_tr_tl=th&amp;_x_tr_hl=th&amp;_x_tr_pto=tc" data-test-label="profile-link"> Vahe Aslanyan </a> </span>
         </section>
        </section>
@@ -1500,7 +1500,7 @@ key = retrieve_key()
        </div>
        <hr>
        <div class="post-full-author-header" data-test-label="author-header-with-bio">
-        <section class="author-card" data-test-label="author-card"><img srcset="https://translate.google.com/website?sl=en&amp;tl=th&amp;hl=th&amp;client=srp&amp;u=https://cdn.hashnode.com/res/hashnode/image/upload/v1723152184433/Kh2F8p0oh.jpeg 60w" sizes="60px" src="https://cdn.hashnode.com/res/hashnode/image/upload/v1723152184433/Kh2F8p0oh.jpeg" class="author-profile-image" alt="Vahe Aslanyan" width="1024" height="1024" onerror="this.style.display='none'" loading="lazy" data-test-label="profile-image">
+        <section class="author-card" data-test-label="author-card"><img srcset="https://translate.google.com/website?sl=en&amp;tl=th&amp;hl=th&amp;client=srp&amp;u=https://cdn.hashnode.com/res/hashnode/image/upload/v1723152184433/Kh2F8p0oh.jpeg 60w" sizes="60px" src="https://cdn.hashnode.com/res/hashnode/image/upload/v1723152184433/Kh2F8p0oh.jpeg" class="author-profile-image" alt="Vahe Aslanyan" width="600" height="400" onerror="this.style.display='none'" loading="lazy" data-test-label="profile-image">
          <section class="author-card-content "><span class="author-card-name"> <a href="https://www-freecodecamp-org.translate.goog/news/author/vaheaslanyan/?_x_tr_sl=en&amp;_x_tr_tl=th&amp;_x_tr_hl=th&amp;_x_tr_pto=tc" data-test-label="profile-link"> Vahe Aslanyan </a> </span>
           <p data-test-label="default-bio">Read <a href="https://www-freecodecamp-org.translate.goog/news/author/vaheaslanyan/?_x_tr_sl=en&amp;_x_tr_tl=th&amp;_x_tr_hl=th&amp;_x_tr_pto=tc">more posts</a>.</p>
          </section>
@@ -1789,7 +1789,7 @@ _.na();
 
         c._cest = gtConstEvalStartTime;
         gtConstEvalStartTime = undefined; // hide this eval start time constant
-  c._cl='th'; c._cuc='gtElInit'; c._cef='\x5b0,1,0\x5d'; c._cac='wt_srp'; c._cam='lib'; c._cenv='prod'; c._cll='INFO'; c._ctkk='488227.1916821227'; const h='translate.googleapis.com'; const oph='translate-pa.googleapis.com'; const s='https'+'://'; c._pah=h; c._pas=s; const b=s+'translate.googleapis.com'; const staticPath = '/translate_static/'; c._pci=b+staticPath+'img/te_ctrl3.gif'; c._pmi=b+staticPath+'img/mini_google.png'; c._pbi=b+staticPath+'img/te_bk.gif'; c._pli=b+staticPath+'img/loading.gif'; c._ps='https:\/\/www.gstatic.com\/_\/translate_http\/_\/ss\/k\x3dtranslate_http.tr.-q5RMtA6wjE.L.X.O\/am\x3dgMA\/d\x3d0\/rs\x3dAN8SPfqtQ_D_EH9SdWnMTx6DoLO-0hN4Hw\/m\x3del_main_css'; c._plla=oph+'\/v1\/supportedLanguages'; c._puh='translate.google.com';c._cnal={};_loadCss(c._ps); _loadJs('https:\/\/translate.googleapis.com\/_\/translate_http\/_\/js\/k\x3dtranslate_http.tr.th.d8Aip2TmILY.O\/am\x3dAAAE\/d\x3d1\/exm\x3del_conf\/ed\x3d1\/rs\x3dAN8SPfpPD8Yea5-7PrqcHhw1TyX1zJo7Iw\/m\x3del_main');_exportMessages(); _exportVersion('TE_20250910');
+  c._cl='th'; c._cuc='gtElInit'; c._cef='\x5b0,1,0\x5d'; c._cac='wt_srp'; c._cam='lib'; c._cenv='prod'; c._cll='INFO'; c._ctkk='488248.1252479365'; const h='translate.googleapis.com'; const oph='translate-pa.googleapis.com'; const s='https'+'://'; c._pah=h; c._pas=s; const b=s+'translate.googleapis.com'; const staticPath = '/translate_static/'; c._pci=b+staticPath+'img/te_ctrl3.gif'; c._pmi=b+staticPath+'img/mini_google.png'; c._pbi=b+staticPath+'img/te_bk.gif'; c._pli=b+staticPath+'img/loading.gif'; c._ps='https:\/\/www.gstatic.com\/_\/translate_http\/_\/ss\/k\x3dtranslate_http.tr.-q5RMtA6wjE.L.X.O\/am\x3dgMA\/d\x3d0\/rs\x3dAN8SPfqtQ_D_EH9SdWnMTx6DoLO-0hN4Hw\/m\x3del_main_css'; c._plla=oph+'\/v1\/supportedLanguages'; c._puh='translate.google.com';c._cnal={};_loadCss(c._ps); _loadJs('https:\/\/translate.googleapis.com\/_\/translate_http\/_\/js\/k\x3dtranslate_http.tr.th.d8Aip2TmILY.O\/am\x3dAAAE\/d\x3d1\/exm\x3del_conf\/ed\x3d1\/rs\x3dAN8SPfpPD8Yea5-7PrqcHhw1TyX1zJo7Iw\/m\x3del_main');_exportMessages(); _exportVersion('TE_20250910');
         })();
       })();
   </script>
