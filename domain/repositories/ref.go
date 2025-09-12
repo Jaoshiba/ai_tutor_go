@@ -12,8 +12,8 @@ type refRepository struct {
 }
 
 type IRefInterface interface {
-	InsertRef(ref entities.RefDataModel) error
-	GetRefsByModuleId(moduleId string) ([]entities.RefDataModel, error)
+	InsertRef(ref entities.SearchLinks) error
+	GetRefsByModuleId(moduleId string) ([]entities.SearchLinks, error)
 }
 
 func NewRefRepository(db *sql.DB) IRefInterface {
@@ -22,22 +22,22 @@ func NewRefRepository(db *sql.DB) IRefInterface {
 	}
 }
 
-func (rr *refRepository) InsertRef(ref entities.RefDataModel) error {
+func (rr *refRepository) InsertRef(ref entities.SearchLinks) error {
 
 	fmt.Println("InsertRef called with ref:", ref)
 
 	query := `
 		INSERT INTO moduleref (
-			refid, moduleid, title, link, content, searchat
+			linkid, moduleid, title, link, snipppet, searchat
 		) VALUES ($1, $2, $3, $4, $5, $6)`
 
 	_, err := rr.db.ExecContext(context.Background(), query,
-		ref.RefId,
-		ref.ModuleId,
+		ref.LinkID,
+		ref.ModuleID,
 		ref.Title,
 		ref.Link,
-		ref.Content,
-		ref.SearchAt,
+		ref.Snippet,
+		ref.Searchat,
 	)
 	if err != nil {
 		return err
@@ -45,7 +45,7 @@ func (rr *refRepository) InsertRef(ref entities.RefDataModel) error {
 	return nil
 }
 
-func (rr *refRepository) GetRefsByModuleId(moduleId string) ([]entities.RefDataModel, error) {
+func (rr *refRepository) GetRefsByModuleId(moduleId string) ([]entities.SearchLinks, error) {
 	query := `
 		SELECT refid, moduleid, title, link, content, searchat
 		FROM moduleref
@@ -57,16 +57,16 @@ func (rr *refRepository) GetRefsByModuleId(moduleId string) ([]entities.RefDataM
 	}
 	defer rows.Close()
 
-	var refs []entities.RefDataModel
+	var refs []entities.SearchLinks
 	for rows.Next() {
-		var ref entities.RefDataModel
+		var ref entities.SearchLinks
 		if err := rows.Scan(
-			&ref.RefId,
-			&ref.ModuleId,
+			&ref.LinkID,
+			&ref.ModuleID,
 			&ref.Title,
 			&ref.Link,
-			&ref.Content,
-			&ref.SearchAt,
+			&ref.Snippet,
+			&ref.Searchat,
 		); err != nil {
 			return nil, err
 		}

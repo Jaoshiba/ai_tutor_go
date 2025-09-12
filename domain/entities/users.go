@@ -35,11 +35,13 @@ type UserInfoModel struct {
 }
 
 type UpdateUserProfileRequest struct {
-	UserID    uuid.UUID `json:"userid"`           // ใช้เป็น key หลัก
-	FirstName string    `json:"firstname"`
-	LastName  string    `json:"lastname"`
-	Gender    string    `json:"gender"`
-	DOB       string    `json:"dob"`
+	UserID    uuid.UUID    `json:"userid" bson:"userid,omitempty"`
+	Username  string    `json:"username" bson:"username,omitempty"`
+	FirstName string    `json:"firstname" bson:"firstname,omitempty"`
+	LastName  string    `json:"lastname" bson:"lastname,omitempty"`
+	Gender    string    `json:"gender" bson:"gender,omitempty"`
+	DOB       string `json:"dob" bson:"dob,omitempty"`
+	IsEmailVerified bool `json:"isemailverified" bson:"isemailverified,omitempty"`
 }
 
 // ใช้สำหรับอัปเดตรหัสผ่าน (ส่งเข้ามาเป็น "รหัสผ่านที่แฮชแล้ว")

@@ -59,6 +59,12 @@ func GatewayEmail(gateway HTTPGateway, app *fiber.App) {
 	// api.Post("/verify", gateway.SendVerifyEmail)
 }
 
+func GatewayTest(gateway HTTPGateway, app *fiber.App) {
+	api := app.Group("/api/v1/test")
+	api.Get("/:courseId", gateway.TestGetCourseDetail)
+	api.Post("/course/create", gateway.TestCreateCourse)
+}
+
 // GatewayProtected สำหรับเส้นทางทั้งหมดที่ต้องการการตรวจสอบสิทธิ์ (Protected Routes)
 func GatewayProtected(gateway HTTPGateway, app *fiber.App) {
 	// สร้าง Group ของ routes ที่ต้องการการตรวจสอบสิทธิ์
@@ -73,7 +79,9 @@ func GatewayProtected(gateway HTTPGateway, app *fiber.App) {
 
 	// Routes สำหรับ Users (ที่ต้องการการป้องกัน)
 	protected.Get("/users", gateway.GetAllUserData)      // ดึงข้อมูลผู้ใช้ทั้งหมด (ต้องล็อกอิน)
-	protected.Get("/users/me", gateway.GetMeDataHandler) // Endpoint สำหรับดึงข้อมูลผู้ใช้ที่ล็อกอินอยู่ (ต้องล็อกอิน)
+	protected.Get("/users/me", gateway.GetMeDataHandler) 
+	protected.Get("/profile", gateway.GetUserProfileById)
+	protected.Get("/profile/edit", gateway.GetUserProfileById)
 	// protected.Get("/users/:id", gateway.GetUserByID)     // ถ้ามี: ดึงข้อมูลผู้ใช้ตาม ID (ต้องล็อกอิน)
 	// protected.Put("/users/:id", gateway.UpdateUser)      // ถ้ามี: อัปเดตข้อมูลผู้ใช้ (ต้องล็อกอิน)
 	// protected.Delete("/users/:id", gateway.DeleteUser)   // ถ้ามี: ลบผู้ใช้ (ต้องล็อกอิน)

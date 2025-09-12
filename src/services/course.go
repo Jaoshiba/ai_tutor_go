@@ -24,7 +24,7 @@ type courseService struct {
 }
 
 type ICourseService interface {
-	CreateCourse(courserequest entities.CourseRequestBody, fromfile bool, file *multipart.FileHeader, ctx *fiber.Ctx) error //add userId ด้วย
+	CreateCourse(courserequest entities.CourseRequestBody, fromfile bool, file *multipart.FileHeader, ctx *fiber.Ctx) (entities.CourseGeminiResponse, error) //add userId ด้วย
 	GetCourses(ctx *fiber.Ctx) ([]entities.CourseDataModel, error)
 	GetCourseDetail(ctx *fiber.Ctx, courseId string) (*entities.CourseDetailResponse, error)
 	DeleteCourse(ctx *fiber.Ctx, courseId string) error
@@ -116,6 +116,46 @@ func (rs *courseService) genCourse(courseJsonBody entities.CourseRequestBody, ct
 func (rs *courseService) RegenCourse(courseJsonBody entities.CourseRequestBody, ctx context.Context) (entities.CourseGeminiResponse, error) {
 	var courses entities.CourseGeminiResponse
 
+	promt := fmt.Sprintf(`คุณเป็นนักออกแบบหลักสูตรที่มีความเชี่ยวชาญ ได้รับมอบหมายให้สร้างโครงสร้างหลักสูตรใหม่ โดยใช้ข้อมูลที่ให้มาทั้งหมดเพื่อปรับปรุงโครงสร้างเดิมให้ดียิ่งขึ้น
+
+		**ข้อมูลที่มี:**
+		1.  **ชื่อหลักสูตร (Course Name):** "%s"
+		2.  **คำอธิบายหลักสูตร (Course Description):** "%s"
+		3.  **โครงสร้างหลักสูตรเดิม (Old Course Structure):**
+			%s
+		4.  **ความต้องการเพิ่มเติมของผู้ใช้ (User Additional Prompt):** "%s"
+
+		**คำแนะนำสำหรับคุณ:**
+		* **วิเคราะห์**โครงสร้างหลักสูตรเดิมและข้อเสนอแนะเพิ่มเติมจากผู้ใช้
+		* สร้างโครงสร้างหลักสูตรใหม่ที่ **สอดคล้องกับชื่อและคำอธิบายหลักสูตร** โดยใช้ข้อมูลจาก "userAdditionalPrompt" เป็นแนวทางในการปรับปรุงจุดที่ผู้ใช้ไม่พึงพอใจในโครงสร้างเก่า
+		* จัดลำดับเนื้อหาในโมดูลให้เป็นไปตามหลักการเรียนรู้จากพื้นฐานไปสู่ขั้นสูง
+		* จัดรูปแบบผลลัพธ์เป็นโครงสร้าง **JSON** ดังตัวอย่าง:
+			{
+			"purpose": "จุดมุ่งหมายของการเรียนรู้",
+			"modules": [
+				{
+				"title": "Module Title 1",
+				"description": "Description for Module 1"
+				},
+				{
+				"title": "Module Title 2",
+				"description": "Description for Module 2"
+				}
+			]
+			}
+		* สร้างผลลัพธ์ในภาษาไทยเป็นหลัก`, courseJsonBody.Title, courseJsonBody.Description, courseJsonBody.Course, courseJsonBody.Addipromt)
+
+	modulesFromGemini, err := rs.GeminiService.GenerateContentFromPrompt(ctx, promt)
+	if err != nil {
+		return courses, err
+	}
+
+	err = json.Unmarshal([]byte(modulesFromGemini), &courses)
+	if err != nil {
+		fmt.Println(err)
+		return courses, err
+	}
+
 	return courses, nil
 }
 
@@ -179,8 +219,9 @@ func (rs *courseService) CreateModulesFromFile(file *multipart.FileHeader, ctx *
 
 }
 
-func (rs *courseService) CreateCourse(courserequest entities.CourseRequestBody, fromfile bool, file *multipart.FileHeader, ctx *fiber.Ctx) error {
+func (rs *courseService) CreateCourse(courserequest entities.CourseRequestBody, fromfile bool, file *multipart.FileHeader, ctx *fiber.Ctx) (entities.CourseGeminiResponse, error) {
 
+	var courses entities.CourseGeminiResponse
 	fmt.Println("Im here")
 
 	fmt.Println("Extracting file content....")
@@ -207,11 +248,10 @@ func (rs *courseService) CreateCourse(courserequest entities.CourseRequestBody, 
 		// }
 		if courserequest.Confirmed {
 
+			fmt.Println("confirmed")
+
 			courseId := uuid.NewString()
-			if courseId == "" {
-				fmt.Println("NUll coursei")
-			}
-			ctx.Locals("courseId", courseId)
+			ctx.Locals("courseID", courseId)
 			userId := ctx.Locals("userID").(string)
 
 			course := entities.CourseDataModel{
@@ -228,7 +268,7 @@ func (rs *courseService) CreateCourse(courserequest entities.CourseRequestBody, 
 			if err != nil {
 				fmt.Println("error insert course")
 				fmt.Println(err)
-				return err
+				return courses, err
 			}
 
 			courses := courserequest.Course
@@ -236,35 +276,32 @@ func (rs *courseService) CreateCourse(courserequest entities.CourseRequestBody, 
 			err = rs.ModuleService.CreateModule(ctx, courses, courserequest.Title, courserequest.Description, fromfile)
 			if err != nil {
 				fmt.Println("error insert module", err)
-				return err
+				return courses, err
 			}
 
 			fmt.Println("content : ", content)
 		} else {
 			if courserequest.IsFirtTime {
+				fmt.Println("is first time")
 				courses, err := rs.genCourse(courserequest, ctx.Context())
 				if err != nil {
 					fmt.Println(err)
-					return err
+					return courses, err
 				}
 
-				return ctx.Status(fiber.StatusOK).JSON(entities.ResponseModel{
-					Message: "Completed create Course from your promts",
-					Data:    courses,
-				})
+				return courses, nil
 
 			} else {
 				if courserequest.Regen {
+					fmt.Println("Regen courses")
 					courses, err := rs.RegenCourse(courserequest, ctx.Context())
 					if err != nil {
 						fmt.Println(err)
-						return err
+						return courses, err
 					}
+					fmt.Println("courses from regen : ", courses)
 
-					return ctx.Status(fiber.StatusOK).JSON(entities.ResponseModel{
-						Message: "Completed create Course from your promts",
-						Data:    courses,
-					})
+					return courses, nil
 				}
 			}
 
@@ -293,12 +330,12 @@ func (rs *courseService) CreateCourse(courserequest entities.CourseRequestBody, 
 		if err != nil {
 			fmt.Println("error insert course")
 			fmt.Println(err)
-			return err
+			return courses, err
 		}
 
 		modules, err := rs.CreateModulesFromFile(file, ctx)
 		if err != nil {
-			return err
+			return courses, err
 		}
 		fmt.Println("courses : ", modules)
 
@@ -309,7 +346,7 @@ func (rs *courseService) CreateCourse(courserequest entities.CourseRequestBody, 
 
 		err = rs.ModuleService.CreateModule(ctx, courses, courserequest.Title, courserequest.Description, fromfile)
 		if err != nil {
-			return err
+			return courses, err
 		}
 
 		//create module
@@ -325,7 +362,7 @@ func (rs *courseService) CreateCourse(courserequest entities.CourseRequestBody, 
 
 	}
 
-	return nil
+	return courses, nil
 }
 
 func (rs *courseService) GetCourseDetail(ctx *fiber.Ctx, courseId string) (*entities.CourseDetailResponse, error) {

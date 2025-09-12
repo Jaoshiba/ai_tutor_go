@@ -42,18 +42,18 @@ func (ms *ModuleService) CreateModule(ctx *fiber.Ctx, courese entities.CourseGem
 			// fmt.Println("Module : ", courese)
 			moduleId := uuid.NewString()
 			ctx.Locals("moduleID", moduleId)
-			if i > 5 {
+			if i > 1 {
 				break
 			}
 			//find title docs and insert into courese
-			serpReturn, err := ms.docSearchService.SearchDocuments(courseTitle, courseDescription, moduleData.Title, moduleData.Description, moduleId, ctx)
+			content, err := ms.docSearchService.SearchDocuments(courseTitle, courseDescription, moduleData.Title, moduleData.Description, moduleId, ctx)
 			if err != nil {
 				return fmt.Errorf("failed to search documents for module: %w", err)
 			}
 
-			fmt.Printf("Module %d content: %s\n", i+1, serpReturn.Content)
+			fmt.Printf("Module %d content: %s\n", i+1, content)
 
-			moduleData.Content = serpReturn.Content
+			moduleData.Content = content
 			userIdStr := ctx.Locals("userID").(string)
 
 			fmt.Println("ModuleService: User ID is:", userIdStr)

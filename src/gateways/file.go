@@ -24,7 +24,7 @@ func (h *HTTPGateway) UploadFile(ctx *fiber.Ctx) error {
 
 	CoursejsonBody.Title = Coursename
 
-	err = h.CourseService.CreateCourse(CoursejsonBody, false, file, ctx)
+	_, err = h.CourseService.CreateCourse(CoursejsonBody, false, file, ctx)
 	if err != nil {
 		return ctx.Status(fiber.StatusInternalServerError).JSON(entities.ResponseMessage{Message: "Failed to create course"})
 	}

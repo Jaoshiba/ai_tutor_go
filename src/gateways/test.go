@@ -4,19 +4,21 @@ import (
 	"encoding/json"
 	"fmt"
 	"go-fiber-template/domain/entities"
-	"mime/multipart"
 
 	"github.com/gofiber/fiber/v2"
+	"github.com/google/uuid"
 )
 
-func (h *HTTPGateway) CreateCourse(ctx *fiber.Ctx) error {
+func (h *HTTPGateway) TestCreateCourse(ctx *fiber.Ctx) error {
+
+	fmt.Println("TestCreateCourse called")
 
 	jsonbody := ctx.FormValue("jsonbody")
-	// file, err := ctx.FormFile("file")
-	// if err != nil {
-	// 	return ctx.Status(fiber.StatusUnprocessableEntity).JSON(entities.ResponseMessage{Message: "invalid file"})
-	// }
-	var file *multipart.FileHeader = nil
+	file, _ := ctx.FormFile("file")
+
+	userID := uuid.NewString()
+	ctx.Locals("userID", userID)
+
 	fmt.Println("jsonbody: ", jsonbody)
 
 	var coursejsonBody entities.CourseRequestBody
@@ -38,23 +40,15 @@ func (h *HTTPGateway) CreateCourse(ctx *fiber.Ctx) error {
 	if err != nil {
 		return ctx.Status(fiber.StatusBadRequest).JSON(entities.ResponseModel{
 			Message: "failed to create course on CreateCourse",
-			Data:    err.Error(),
 		})
-	}
-
-	datareturn := map[string]interface{}{
-		"confirmed":   coursejsonBody.Confirmed,
-		"isfirsttime": coursejsonBody.IsFirtTime,
-		"courses":     courses,
 	}
 
 	return ctx.Status(fiber.StatusOK).JSON(entities.ResponseModel{
 		Message: "Completed create Course from your promts",
-		Data:    datareturn,
-	})
+		Data:    courses})
 }
 
-func (h *HTTPGateway) GetCourseByUser(c *fiber.Ctx) error {
+func (h *HTTPGateway) TestGetCourseByUser(c *fiber.Ctx) error {
 	userID := c.Locals("userID")
 	if userID == nil {
 		return c.Status(fiber.StatusUnauthorized).JSON(entities.ResponseMessage{Message: "User ID not found in context"})
@@ -78,11 +72,13 @@ func (h *HTTPGateway) GetCourseByUser(c *fiber.Ctx) error {
 	})
 }
 
-func (h *HTTPGateway) GetCourseDetail(c *fiber.Ctx) error {
+func (h *HTTPGateway) TestGetCourseDetail(c *fiber.Ctx) error {
 	fmt.Println("Hello im in gateway at start")
 	// 1. ดึง CourseID จาก URL parameter
 	// สมมติว่า URL endpoint คือ /api/v1/courses/:courseId
 	courseID := c.Params("courseId")
+	userId := uuid.NewString()
+	c.Locals("userId", userId)
 	if courseID == "" {
 		return fiber.NewError(fiber.StatusBadRequest, "Course ID is required")
 	}
@@ -110,7 +106,7 @@ func (h *HTTPGateway) GetCourseDetail(c *fiber.Ctx) error {
 	return c.Status(fiber.StatusOK).JSON(courseDetail)
 }
 
-func (h *HTTPGateway) DeleteCourse(c *fiber.Ctx) error {
+func (h *HTTPGateway) TestDeleteCourse(c *fiber.Ctx) error {
 
 	courseID := c.Params("courseId")
 	if courseID == "" {

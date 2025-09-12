@@ -3,9 +3,12 @@ package repositories
 import (
 	"context"
 	"database/sql"
+
 	// "fmt"
 	"go-fiber-template/domain/entities"
 	"log"
+
+	"github.com/google/uuid"
 )
 
 // PostgreSQL implementation
@@ -22,6 +25,7 @@ type IUsersRepository interface {
 	UpdateUserProfile(data entities.UpdateUserProfileRequest) error
 	UpdateUserPassword(userID string, newHashedPassword string) error
 
+	GetUserById(userId string) (*entities.UserDataModel, error)
 	SetUserVerify(userID string, verified bool) error
 }
 
@@ -116,6 +120,21 @@ func (repo *usersRepositoryPostgres) GetUserInfo(email string) (*entities.UserIn
 	return &user, nil
 }
 
+func (repo *usersRepositoryPostgres) GetUserById(userId string) (*entities.UserDataModel, error) {
+    query := `SELECT userid, username, firstname, lastname, gender, role, dob, isemailverified, createdat FROM users WHERE userid = $1 LIMIT 1`
+    row := repo.db.QueryRowContext(context.Background(), query, userId)
+    var user entities.UserDataModel
+    err := row.Scan(&user.UserID, &user.Username, &user.FirstName, &user.LastName, &user.Gender, &user.Role, &user.DOB, &user.IsEmailVerified, &user.CreatedAt)
+    if err != nil {
+        if err == sql.ErrNoRows {
+            return nil, nil
+        }
+        return nil, err
+    }
+    return &user, nil
+}
+
+
 
 func (repo *usersRepositoryPostgres) FindByUsername(username string) (*entities.UserDataModel, error) {
 	query := `SELECT userid, username, email, password, role, isemailverified FROM users WHERE username = $1 LIMIT 1`
@@ -133,15 +152,20 @@ func (repo *usersRepositoryPostgres) FindByUsername(username string) (*entities.
 }
 
 func (repo *usersRepositoryPostgres) UpdateUserProfile(data entities.UpdateUserProfileRequest) error {
+	// data.UserID เป็น uuid.UUID ตาม entities
+	// data.DOB เป็น string: ให้แคสต์เป็น date ถ้าไม่ว่าง, ถ้าว่างจะเป็น NULL
 	query := `
 		UPDATE users
 		SET firstname = $1,
 		    lastname  = $2,
 		    gender    = $3,
-		    dob       = $4,
+		    dob       = NULLIF($4, '')::date,
 		    updatedat = NOW()
 		WHERE userid = $5
 	`
+
+	// ป้องกัน panic ถ้าฝั่ง call site เผลอส่ง zero UUID มา
+	var userID uuid.UUID = data.UserID
 
 	res, err := repo.db.ExecContext(
 		context.Background(),
@@ -149,15 +173,20 @@ func (repo *usersRepositoryPostgres) UpdateUserProfile(data entities.UpdateUserP
 		data.FirstName,
 		data.LastName,
 		data.Gender,
-		data.DOB,
-		data.UserID,
+		data.DOB,  
+		userID,    
 	)
 	if err != nil {
 		log.Printf("Users -> UpdateUserProfile: %v\n", err)
 		return err
 	}
 
-	rows, _ := res.RowsAffected()
+	rows, err := res.RowsAffected()
+	if err != nil {
+		log.Printf("Users -> UpdateUserProfile RowsAffected error: %v\n", err)
+		// เลือกรีเทิร์นต่อไป เพราะอัปเดตน่าจะสำเร็จแล้ว แค่นับแถวไม่ได้
+	}
+
 	if rows == 0 {
 		// ไม่พบผู้ใช้ตาม userid
 		return sql.ErrNoRows
@@ -208,4 +237,34 @@ func (repo *usersRepositoryPostgres) SetUserVerify(userID string, verified bool)
 		return sql.ErrNoRows
 	}
 	return nil
+}
+
+func (repo *usersRepositoryPostgres) UpdateUserProfileExceptEmail(data entities.UpdateUserProfileRequest) error {
+    query := `
+        UPDATE users
+        SET firstname = $1,
+            lastname  = $2,
+            gender    = $3,
+            dob       = $4,
+            updatedat = NOW()
+        WHERE userid = $5
+    `
+    res, err := repo.db.ExecContext(
+        context.Background(),
+        query,
+        data.FirstName,
+        data.LastName,
+        data.Gender,
+        data.DOB,
+        data.UserID,
+    )
+    if err != nil {
+        log.Printf("Users -> UpdateUserProfileExceptEmail: %v\n", err)
+        return err
+    }
+    rows, _ := res.RowsAffected()
+    if rows == 0 {
+        return sql.ErrNoRows
+    }
+    return nil
 }
