@@ -14,6 +14,7 @@ type IResetPassword interface {
 	GetResetPasswordByToken(ctx context.Context, token string) (*entities.ResetPassword, error)
 	UpdateResetPasswordStatus(ctx context.Context, id string, isReset bool) error
 	DeleteResetPassword(ctx context.Context, id string) error
+	DeactivateAllByUserID(ctx context.Context, userID string) error
 }
 
 type resetPasswordRepository struct {
@@ -41,6 +42,7 @@ func (repo *resetPasswordRepository) InsertNewResetPassword(ctx context.Context,
 		data.ExpiresAt,
 		data.Token,
 		data.IsReset,
+		data.IsAvailable,
 	)
 
 	if err != nil {
@@ -65,6 +67,7 @@ func (repo *resetPasswordRepository) GetResetPasswordByToken(ctx context.Context
 		&data.ExpiresAt,
 		&data.Token,
 		&data.IsReset,
+		&data.IsAvailable,
 	)
 
 	if err != nil {
@@ -98,6 +101,19 @@ func (repo *resetPasswordRepository) DeleteResetPassword(ctx context.Context, id
 	_, err := repo.db.ExecContext(ctx, query, id)
 	if err != nil {
 		return fmt.Errorf("failed to delete reset password record: %w", err)
+	}
+	return nil
+}
+
+func (repo *resetPasswordRepository) DeactivateAllByUserID(ctx context.Context, userID string) error {
+	query := `
+		UPDATE reset_passwords
+		SET is_available = false
+		WHERE user_id = $1 AND is_available = true
+	`
+	_, err := repo.db.ExecContext(ctx, query, userID)
+	if err != nil {
+		return fmt.Errorf("failed to deactivate all reset password records for user_id=%s: %w", userID, err)
 	}
 	return nil
 }

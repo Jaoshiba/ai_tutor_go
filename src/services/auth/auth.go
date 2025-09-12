@@ -153,6 +153,7 @@ func (s *authService) Login(email, password string, ctx *fiber.Ctx) (entities.Lo
 		}, nil
 	}
 
+	fmt.Println(user.IsEmailVerified)
 	if !user.IsEmailVerified {
 		fmt.Println("unverify email")
 		if err := s.EmailVerificationService.ResendVerificationEmail(ctx, user.Email); err != nil {

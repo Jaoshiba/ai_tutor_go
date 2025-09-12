@@ -81,7 +81,7 @@ func (h *HTTPGateway) ResendEmailVerification(ctx *fiber.Ctx) error {
 	})
 }
 
-func (h *HTTPGateway) ResetPassword(ctx *fiber.Ctx) error {
+func (h *HTTPGateway) ResetPasswordRequest(ctx *fiber.Ctx) error {
 
 	var req entities.ResetPasswordRequest
 
@@ -107,4 +107,42 @@ func (h *HTTPGateway) ResetPassword(ctx *fiber.Ctx) error {
 		"message": "Reset Email Send Successfully",
 	})
 
+}
+
+func (h *HTTPGateway) ResetPassword(ctx *fiber.Ctx) error {
+    var req struct {
+        Token       string `json:"token" form:"token"`
+        NewPassword string `json:"new_password" form:"new_password"`
+    }
+
+    // รองรับทั้ง query, form, และ body
+    if err := ctx.BodyParser(&req); err != nil {
+        return ctx.Status(fiber.StatusBadRequest).JSON(fiber.Map{
+            "error": "Invalid request body",
+        })
+    }
+    if req.Token == "" {
+        req.Token = ctx.Query("token")
+    }
+    if req.NewPassword == "" {
+        req.NewPassword = ctx.FormValue("new_password")
+    }
+
+    if req.Token == "" || req.NewPassword == "" {
+        return ctx.Status(fiber.StatusBadRequest).JSON(fiber.Map{
+            "error": "Token and new password are required",
+        })
+    }
+
+    // เรียก service เพื่อรีเซ็ตรหัสผ่าน
+    err := h.ResetPasswordService.ResetPassword(ctx, req.Token, req.NewPassword)
+    if err != nil {
+        return ctx.Status(fiber.StatusInternalServerError).JSON(fiber.Map{
+            "error": err.Error(),
+        })
+    }
+
+    return ctx.Status(fiber.StatusOK).JSON(fiber.Map{
+        "message": "Password reset successful",
+    })
 }

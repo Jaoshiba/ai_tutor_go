@@ -34,3 +34,16 @@ type UserInfoModel struct {
 	IsEmailVerified bool `json:"isemailverified" bson:"isemailverified,omitempty"`
 }
 
+type UpdateUserProfileRequest struct {
+	UserID    uuid.UUID `json:"userid"`           // ใช้เป็น key หลัก
+	FirstName string    `json:"firstname"`
+	LastName  string    `json:"lastname"`
+	Gender    string    `json:"gender"`
+	DOB       string    `json:"dob"`
+}
+
+// ใช้สำหรับอัปเดตรหัสผ่าน (ส่งเข้ามาเป็น "รหัสผ่านที่แฮชแล้ว")
+type UpdateUserPasswordRequest struct {
+	UserID           uuid.UUID `json:"userid"`
+	NewHashedPassword string   `json:"new_hashed_password"`
+}

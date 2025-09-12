@@ -143,6 +143,13 @@ func (s *EmailVerification) VerifyEmail(token string) error {
 		fmt.Println("Error to update")
 		return fmt.Errorf("error to update")
 	}
+	if data.UserId != "" {
+        err = s.UserRepo.SetUserVerify(data.UserId, true)
+        if err != nil {
+            fmt.Println("Error to update user verified status:", err)
+            return fmt.Errorf("error to update user verified status")
+        }
+    }
 
 	return nil
 }

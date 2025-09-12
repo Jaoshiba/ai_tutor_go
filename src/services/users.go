@@ -96,3 +96,7 @@ func (sv *usersService) CheckUserExistBy(field string, value string) error {
 
 	return nil
 }
+func (sv *usersService) UpdateUserProfile(req entities.UpdateUserProfileRequest) error {
+	return sv.UsersRepository.UpdateUserProfile(req)
+}
+

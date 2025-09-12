@@ -4,6 +4,7 @@ import (
 	"encoding/json"
 	"fmt"
 	"go-fiber-template/domain/entities"
+	"mime/multipart"
 
 	"github.com/gofiber/fiber/v2"
 )
@@ -11,16 +12,16 @@ import (
 func (h *HTTPGateway) CreateCourse(ctx *fiber.Ctx) error {
 
 	jsonbody := ctx.FormValue("jsonbody")
-	file, err := ctx.FormFile("file")
-	if err != nil {
-		return ctx.Status(fiber.StatusUnprocessableEntity).JSON(entities.ResponseMessage{Message: "invalid file"})
-	}
-
+	// file, err := ctx.FormFile("file")
+	// if err != nil {
+	// 	return ctx.Status(fiber.StatusUnprocessableEntity).JSON(entities.ResponseMessage{Message: "invalid file"})
+	// }
+	var file *multipart.FileHeader = nil
 	fmt.Println("jsonbody: ", jsonbody)
 
 	var coursejsonBody entities.CourseRequestBody
 
-	err = json.Unmarshal([]byte(jsonbody), &coursejsonBody)
+	err := json.Unmarshal([]byte(jsonbody), &coursejsonBody)
 	if err != nil {
 		return ctx.Status(fiber.StatusUnprocessableEntity).JSON(entities.ResponseMessage{Message: "invalid json body"})
 	}

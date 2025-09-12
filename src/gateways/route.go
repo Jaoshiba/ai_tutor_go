@@ -19,6 +19,7 @@ func GatewayAuth(gateway HTTPGateway, app *fiber.App) {
 	authAPI := app.Group("/api/auth")
 	authAPI.Post("/login", gateway.Login) // เส้นทางสาธารณะ: ล็อกอิน
 	authAPI.Get("/status/check", gateway.AuthService.CheckJWT)
+	authAPI.Post("/email/createresetpassword", gateway.ResetPasswordRequest)
 	authAPI.Post("/email/resetpassword", gateway.ResetPassword)
 	authAPI.Post("/email/verify", gateway.EmailVerify)
 	authAPI.Post("/email/resend/verify", gateway.ResendEmailVerification)
