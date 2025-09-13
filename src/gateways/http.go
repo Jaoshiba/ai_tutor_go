@@ -15,7 +15,6 @@ type HTTPGateway struct {
 	UserService       service.IUsersService
 	ModuleService     service.IModuleService
 	ExamsService      service.IExamService
-	GoogleAuthService auth.IGoogleOAuth
 	AuthService       auth.IAuthService
 	ChapterService    service.IChapterService
 	CourseService     service.ICourseService

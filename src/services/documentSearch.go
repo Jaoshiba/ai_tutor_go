@@ -92,7 +92,7 @@ func (ds *docSearchService) SearchDocuments(courseName, courseDescription, modul
 		if err != nil {
 			return allcontent, fmt.Errorf("error generating search keywords (attempt %d): %w", attempt, err)
 		}
-		generatedKeywords = strings.TrimSpace(kws)
+		generatedKeywords = strings.TrimSpace(kws)+ ` "Creative commons"`
 		fmt.Println("Generated Search Query:", generatedKeywords)
 
 		// generatedKeywords := fmt.Sprintf("สอน %s %s ใน %s -site:youtube.com -site:facebook.com", moduleName, moduleDescription, courseName)
@@ -120,7 +120,7 @@ func (ds *docSearchService) SearchDocuments(courseName, courseDescription, modul
 			return allcontent, fmt.Errorf("could not parse JSON (attempt %d): %w", attempt, err)
 		}
 
-		fmt.Println("SerpAPI Response:", serpAPIResponse.OrganicResults)
+		// fmt.Println("SerpAPI Response:", serpAPIResponse.OrganicResults)
 
 		for _, result := range serpAPIResponse.OrganicResults {
 			fmt.Println("Title:", result.Title)
@@ -217,55 +217,114 @@ func doSerpAPISearch(fullURL string) ([]byte, int, error) {
 	return body, resp.StatusCode, nil
 }
 
+
+
+// func buildKeywordPrompt(moduleName, moduleDescription, courseName, courseDescription string, attempt int) string {
+// 	var retryHint string
+
+// 	switch attempt {
+// 	case 1:
+// 		retryHint = `
+// - Focus on bilingual keywords (Thai/English) and HTML pages.
+// - Use trusted websites like Medium, W3Schools, StackOverflow, Wikipedia, .ac.th, .edu, .gov, .org.
+// - Do not limit by PDF/DOC files.
+// `
+// 	case 2:
+// 		retryHint = `
+// - Broaden keywords with synonyms or related topics.
+// - Use trusted general websites: Medium, W3Schools, StackOverflow, reputable blogs, ResearchGate.
+// - Focus on HTML and avoid downloadable files.
+// `
+// 	default:
+// 		retryHint = `
+// - Use umbrella/general keywords for broader results.
+// - Select trusted and HTML-based online sources.
+// - Remove site: or filetype filters if necessary.
+// `
+// 	}
+
+// 	// รวมตัวกรอง filetype เข้าไปในคำสั่ง Guidelines
+// 	return fmt.Sprintf(`
+// You are an academic research assistant.
+// Your task is to create effective and broad Google search keywords 
+// to find **HTML pages** relevant to the following topic, which you will later scrape for content.
+
+// Course Title: %s
+// Course Description: %s
+// Module Title: %s
+// Module Description: %s
+
+// Guidelines for keyword generation:
+// 1. Keywords must be broad enough to get a variety of relevant HTML results.
+// 2. Include both Thai and English terms for the topic.
+// 3. Prefer trusted websites, including:
+//    - Academic sites: .ac.th, .edu, .gov, .org
+//    - General trusted sites: Medium, W3Schools, StackOverflow, well-known blogs
+// 4. Combine keywords using OR to expand coverage; use AND only when necessary.
+// 5. Do NOT include filetype restrictions (no PDF/DOC limits).
+// 6. Return only the final search query without explanation.
+
+// Additional retry hint for this attempt:
+// %s
+// `, courseName, courseDescription, moduleName, moduleDescription, retryHint)
+// }
+
 func buildKeywordPrompt(moduleName, moduleDescription, courseName, courseDescription string, attempt int) string {
 	var retryHint string
 
 	switch attempt {
 	case 1:
+		// เริ่มแบบ "กว้างแต่แม่น" เน้น tutorial/docs/examples โดยอาศัยคำจากชื่อคอร์ส/โมดูล (TH+EN)
 		retryHint = `
-- Focus on bilingual keywords (Thai/English) and HTML pages.
-- Use trusted websites like Medium, W3Schools, StackOverflow, Wikipedia, .ac.th, .edu, .gov, .org.
-- Do not limit by PDF/DOC files.
+- สกัด "คีย์เวิร์ดหัวข้อ" 3–8 ตัว จากชื่อ/คำอธิบายของคอร์สและโมดูล (ไทย+อังกฤษ) เป็น TOPIC block
+- ใส่ CONTENT-TYPE block สำหรับทรัพยากรที่สอนได้จริง เช่น ("tutorial" OR "guide" OR "documentation" OR "docs" OR "how to" OR "examples" OR "reference" OR "sample code" OR "คู่มือ" OR "สอน" OR "ตัวอย่างโค้ด")
+- กันหน้าแปล/โซเชียลที่มักไม่ใช่เอกสารเทคนิค: -site:translate.google.com -site:facebook.com -site:x.com -site:twitter.com
+- ไม่ต้องใส่เงื่อนไขใบอนุญาตใดๆ
 `
 	case 2:
+		// ขยายคำหัวข้อ + เปิดแหล่งกว้างขึ้นเล็กน้อย และอนุญาตโดเมนทั่วไปมากขึ้น
 		retryHint = `
-- Broaden keywords with synonyms or related topics.
-- Use trusted general websites: Medium, W3Schools, StackOverflow, reputable blogs, ResearchGate.
-- Focus on HTML and avoid downloadable files.
+- ขยาย TOPIC ด้วยคำพ้อง/ชื่อย่อ (เช่น "SSR" OR "CSR" OR "Hydration" ถ้าเกี่ยว Next.js/DOM)
+- (แนะนำเชิงเลือก) เพิ่มโดเมนที่มักมีเอกสารดี: site:developer.mozilla.org OR site:docs.github.com OR site:readthedocs.io OR site:stackoverflow.com OR site:stackexchange.com
+- ถ้าผลน้อย ให้ลบ site: ออกเพื่อเปิดกว้าง แต่อย่าลืม CONTENT-TYPE block
 `
 	default:
+		// โหมดยืดหยุ่นสูงสุด: ลดข้อจำกัดให้เหลือเพียง “ต้องมี TOPIC + CONTENT-TYPE” และกันเพจรบกวนขั้นต่ำ
 		retryHint = `
-- Use umbrella/general keywords for broader results.
-- Select trusted and HTML-based online sources.
-- Remove site: or filetype filters if necessary.
+- ใช้เฉพาะ TOPIC block + CONTENT-TYPE block ก็พอ
+- เอา site: ออกทั้งหมด (ถ้ามี) เพื่อเปิดกว้าง
+- กันเฉพาะเพจแปล/โซเชียลเท่านั้น: -site:translate.google.com -site:facebook.com -site:x.com -site:twitter.com
 `
 	}
 
-	// รวมตัวกรอง filetype เข้าไปในคำสั่ง Guidelines
 	return fmt.Sprintf(`
 You are an academic research assistant.
-Your task is to create effective and broad Google search keywords 
-to find **HTML pages** relevant to the following topic, which you will later scrape for content.
+Generate ONE Google search query string that retrieves **tutorials, official/technical documentation, guides, references, and code examples** about the course/module TOPIC.
 
 Course Title: %s
 Course Description: %s
 Module Title: %s
 Module Description: %s
 
-Guidelines for keyword generation:
-1. Keywords must be broad enough to get a variety of relevant HTML results.
-2. Include both Thai and English terms for the topic.
-3. Prefer trusted websites, including:
-   - Academic sites: .ac.th, .edu, .gov, .org
-   - General trusted sites: Medium, W3Schools, StackOverflow, well-known blogs
-4. Combine keywords using OR to expand coverage; use AND only when necessary.
-5. Do NOT include filetype restrictions (no PDF/DOC limits).
-6. Return only the final search query without explanation.
+Build the query with:
+1) A **TOPIC block** (Thai + English) from the course/module names & descriptions, 3–8 concise terms:
+   (topic1 OR topic2 OR "topic phrase" OR "คำไทย")
+   → This block is **mandatory**.
+2) A **CONTENT-TYPE block** to target learnable resources:
+   ("tutorial" OR "guide" OR "how to" OR "documentation" OR "docs" OR "reference" OR "examples" OR "sample code" OR
+    "คู่มือ" OR "สอน" OR "ตัวอย่าง" OR "ตัวอย่างโค้ด")
+3) (Optional) You MAY include preferred sources if helpful (e.g., site:developer.mozilla.org OR site:docs.github.com OR site:readthedocs.io OR site:stackoverflow.com OR site:stackexchange.com), but do **not** overconstrain.
+4) Exclude obvious noise pages (translations/social):
+   -site:translate.google.com -site:facebook.com -site:x.com -site:twitter.com
+5) **Final query must combine**: (TOPIC block) AND (CONTENT-TYPE block).
+6) **Return exactly one** final Google query string. No explanations.
 
-Additional retry hint for this attempt:
+Additional hint for this attempt:
 %s
 `, courseName, courseDescription, moduleName, moduleDescription, retryHint)
 }
+
+
 
 func isAllowedContentType(ct string) (ok bool, ext string) {
 	ct = strings.ToLower(strings.TrimSpace(strings.Split(ct, ";")[0]))

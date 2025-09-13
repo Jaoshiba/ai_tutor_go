@@ -126,7 +126,26 @@ func (h *HTTPGateway) TestDeleteCourse(c *fiber.Ctx) error {
 
 func (h *HTTPGateway) TestSearch(c *fiber.Ctx) error {
 	
+	var req entities.TestRequest
+	var result entities.OrganicResult
+
+	err := c.BodyParser(&req)
+	if err!=nil{
+		return c.Status(fiber.StatusBadRequest).JSON(fiber.Map{
+			"error":"invalid jsonbody",
+		})
+	}
+
+	result, err = h.CourseService.SearchTest(c, req.Coursename, req.CourseDescription, req.Modulename, req.ModuleDescription)
+	if err!=nil {
+		fmt.Println(err)
+		return c.Status(fiber.StatusInternalServerError).JSON(fiber.Map{
+			"error":"internal server error",
+		})
+	}
 	
-	
-	return nil
+	return c.Status(fiber.StatusOK).JSON(fiber.Map{
+		"message":"completed",
+		"data":result,
+	})
 }

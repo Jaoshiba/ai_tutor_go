@@ -7,7 +7,15 @@ import (
 	"fmt"
 	"go-fiber-template/domain/entities"
 	repo "go-fiber-template/domain/repositories"
+	
 	"mime/multipart"
+	"net/http"
+	"net/url"
+	"os"
+	"strings"
+	"strconv"
+
+	// "strings"
 
 	"time"
 
@@ -21,6 +29,7 @@ type courseService struct {
 	GeminiService        IGeminiService
 	ChapterServices      IChapterService
 	LearningProgressRepo repo.ILearningProgressRepository
+	
 }
 
 type ICourseService interface {
@@ -28,6 +37,7 @@ type ICourseService interface {
 	GetCourses(ctx *fiber.Ctx) ([]entities.CourseDataModel, error)
 	GetCourseDetail(ctx *fiber.Ctx, courseId string) (*entities.CourseDetailResponse, error)
 	DeleteCourse(ctx *fiber.Ctx, courseId string) error
+	SearchTest(ctx *fiber.Ctx, coursename, coursedescription, modulename, moduledescription string) (entities.OrganicResult, error)
 }
 
 func NewCourseService(
@@ -45,6 +55,189 @@ func NewCourseService(
 		LearningProgressRepo: learningprogressRepo,
 	}
 }
+
+func (rs *courseService) SearchTest(ctx *fiber.Ctx, coursename, coursedescription, modulename, moduledescription string) (entities.OrganicResult, error) {
+	var result entities.OrganicResult
+	geminiService := NewGeminiService()
+
+	baseURL := "https://serpapi.com/search"
+	serpAPIKey := os.Getenv("SERPAPI_KEY")
+	if serpAPIKey == "" {
+		return nil, fmt.Errorf("missing SERPAPI_KEY")
+	}
+
+	// ---- ค่าควบคุมลูป ----
+	const targetLinks = 10
+	const maxQueryAttempts = 6
+	const pagesPerQuery = 3
+	const resultsPerPage = 10
+	const politeGap = 350 * time.Millisecond
+
+	seen := make(map[string]struct{}) // กันซ้ำระดับลิงก์
+	collected := make(entities.OrganicResult, 0, targetLinks)
+
+	// blacklist: โดเมนที่ใช้ไม่ได้ (robots disallow / เช็คพัง)
+	blacklist := make(map[string]struct{})
+	// used: โดเมนที่เรา "เก็บแล้ว" เพื่อกันผลซ้ำใน attempt ถัดไป
+	used := make(map[string]struct{})
+
+	// helper: extract โดเมนแบบง่าย (ตัด www.)
+	domainFromURL := func(raw string) (string, error) {
+		u, err := url.Parse(raw)
+		if err != nil {
+			return "", err
+		}
+		h := strings.ToLower(u.Hostname())
+		h = strings.TrimPrefix(h, "www.")
+		return h, nil
+	}
+
+	// helper: สร้างสตริง "-site:domain" จาก blacklist ∪ used
+	buildExclusionQuery := func() string {
+		if len(blacklist) == 0 && len(used) == 0 {
+			return ""
+		}
+		parts := make([]string, 0, len(blacklist)+len(used))
+		for d := range blacklist {
+			if d != "" {
+				parts = append(parts, "-site:"+d)
+			}
+		}
+		for d := range used {
+			if d != "" {
+				parts = append(parts, "-site:"+d)
+			}
+		}
+		return " " + strings.Join(parts, " ")
+	}
+
+	// วนพยายามสร้างคิวรี่ใหม่
+	for attempt := 1; attempt <= maxQueryAttempts && len(collected) < targetLinks; attempt++ {
+		searchPrompt := buildKeywordPrompt(modulename, moduledescription, coursename, coursedescription, attempt)
+		fmt.Println("SearchPrompt is :", searchPrompt)
+
+		kws, err := geminiService.GenerateContentFromPrompt(context.Background(), searchPrompt)
+		if err != nil {
+			fmt.Printf("[keyword] attempt %d failed: %v\n", attempt, err)
+			continue
+		}
+
+		// base query (คุณตั้งใจจะ pin ด้วยชื่อคอร์ส/โมดูล)
+		baseQuery := strings.TrimSpace(coursename + " " + modulename)
+		if baseQuery == "" {
+			// fallback เป็น kws ถ้า title ว่าง
+			baseQuery = strings.TrimSpace(kws)
+		}
+
+		// ใส่ CC + filetype:pdf + exclusions จาก blacklist/used
+		generatedKeyword := baseQuery + ` "Creative commons"` + " filetype:pdf" + buildExclusionQuery()
+		fmt.Println("Search Query is :", generatedKeyword)
+
+		// ไล่หน้า
+		for page := 0; page < pagesPerQuery && len(collected) < targetLinks; page++ {
+			start := page * resultsPerPage
+
+			params := url.Values{}
+			params.Add("q", generatedKeyword)
+			params.Add("engine", "google")
+			params.Add("api_key", serpAPIKey)
+			params.Add("hl", "th")
+			params.Add("gl", "th")
+			params.Add("num", strconv.Itoa(resultsPerPage))
+			// เปิด filter=1 เพื่อลดหน้า duplicated จาก Google (optional แต่ช่วยได้)
+			params.Add("filter", "1")
+			if start > 0 {
+				params.Add("start", strconv.Itoa(start))
+			}
+
+			fullURL := fmt.Sprintf("%s?%s", baseURL, params.Encode())
+			fmt.Printf("[SearchDocuments] SerpAPI request (attempt=%d page=%d start=%d)...\n", attempt, page, start)
+
+			body, status, err := doSerpAPISearch(fullURL)
+			if err != nil {
+				fmt.Printf("[SerpAPI] error: %v\n", err)
+				break
+			}
+			if status != http.StatusOK {
+				fmt.Printf("[SerpAPI] non-200 (%d): %s\n", status, string(body))
+				break
+			}
+
+			var serp entities.SerpAPIResponse
+			if err := json.Unmarshal(body, &serp); err != nil {
+				fmt.Printf("[SerpAPI] JSON parse error: %v\n", err)
+				break
+			}
+			if len(serp.OrganicResults) == 0 {
+				fmt.Println("[SerpAPI] no organic results on this page")
+				break
+			}
+
+			// ประมวลผลผลลัพธ์
+			for _, item := range serp.OrganicResults {
+				if _, ok := seen[item.Link]; ok {
+					continue
+				}
+				seen[item.Link] = struct{}{} // กันซ้ำระดับลิงก์ทันที
+
+				domain, derr := domainFromURL(item.Link)
+				if derr != nil || domain == "" {
+					fmt.Printf("[domain] bad url: %s (%v)\n", item.Link, derr)
+					// URL แปลก ๆ ถือว่าใช้ไม่ได้ → แบล็กลิสโดเมนว่างไม่ได้ ก็ข้ามเฉย ๆ
+					continue
+				}
+				// ถ้าโดเมนอยู่ใน blacklist/used อยู่แล้ว ข้ามทันที (ป้องกันกรณี Google ยังคืนมา)
+				if _, bad := blacklist[domain]; bad {
+					continue
+				}
+				if _, done := used[domain]; done {
+					continue
+				}
+
+				// เช็ค robots
+				rc, rerr := CheckRobot(item.Link, "ai-tutor-bot")
+				if rerr != nil {
+					fmt.Printf("[robots] skip %s (error: %v)\n", item.Link, rerr)
+					blacklist[domain] = struct{}{} // error ในการเช็ค → แบล็กลิสโดเมน
+					continue
+				}
+				if !rc.Allowed {
+					fmt.Printf("[robots] disallow %s (%s)\n", item.Link, rc.Reason)
+					blacklist[domain] = struct{}{} // ไม่อนุญาต → แบล็กลิสโดเมน
+					continue
+				}
+
+				// ผ่าน robots → เก็บ และกัน attempt ถัดไปไม่ให้หาโดเมนนี้ซ้ำ
+				collected = append(collected, item)
+				used[domain] = struct{}{}
+				fmt.Printf("[collect] %d/%d %s (domain=%s)\n", len(collected), targetLinks, item.Link, domain)
+
+				if rc.CrawlDelay > 0 {
+					time.Sleep(rc.CrawlDelay)
+				}
+
+				if len(collected) >= targetLinks {
+					break
+				}
+			}
+
+			time.Sleep(politeGap)
+		}
+
+		// ก่อนขึ้น attempt ใหม่ คิวรี่ถัดไปจะถูกต่อท้าย -site: จาก blacklist/used โดยอัตโนมัติ
+	}
+
+	if len(collected) == 0 {
+		return nil, fmt.Errorf("no allowed links found after %d attempts", maxQueryAttempts)
+	}
+	if len(collected) > targetLinks {
+		collected = collected[:targetLinks]
+	}
+	result = collected
+	return result, nil
+}
+
+
 
 func (rs *courseService) GetCourses(ctx *fiber.Ctx) ([]entities.CourseDataModel, error) {
 	userID := ctx.Locals("userID").(string)
@@ -67,7 +260,7 @@ func (rs *courseService) GetCourses(ctx *fiber.Ctx) ([]entities.CourseDataModel,
 	// }
 
 	return course, nil
-}
+} 
 
 func (rs *courseService) genCourse(courseJsonBody entities.CourseRequestBody, ctx context.Context) (entities.CourseGeminiResponse, error) {
 	prompt := fmt.Sprintf(`ฉันมีข้อมูลเบื้องต้น 3 อย่างที่ได้จากผู้ใช้:
@@ -75,7 +268,6 @@ func (rs *courseService) genCourse(courseJsonBody entities.CourseRequestBody, ct
 			ชื่อ Course: %s
 
 			คำอธิบาย Course: %s
-
 
 			ChatGPT - Course Creation Prompt
 
