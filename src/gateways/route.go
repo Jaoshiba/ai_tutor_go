@@ -63,6 +63,7 @@ func GatewayTest(gateway HTTPGateway, app *fiber.App) {
 	api := app.Group("/api/v1/test")
 	api.Get("/:courseId", gateway.TestGetCourseDetail)
 	api.Post("/course/create", gateway.TestCreateCourse)
+	api.Post("/search", gateway.TestSearch)
 }
 
 // GatewayProtected สำหรับเส้นทางทั้งหมดที่ต้องการการตรวจสอบสิทธิ์ (Protected Routes)

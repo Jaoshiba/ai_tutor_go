@@ -123,3 +123,10 @@ func (h *HTTPGateway) TestDeleteCourse(c *fiber.Ctx) error {
 		"message": "Course deleted successfully",
 	})
 }
+
+func (h *HTTPGateway) TestSearch(c *fiber.Ctx) error {
+	
+	
+	
+	return nil
+}
